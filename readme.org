@@ -1,0 +1,23 @@
+#+title: xlib
+#+description: X11 Library
+#+author: Richard Westhaver
+#+email:richard.westhaver@gmail.com
+This is a fork of CLX built for the Cursed Linux environment.
+
+#+BEGIN: project-info :files nil :tasks nil :status nil :churn nil :html nil
+#+CALL: project-details(vc='nil) :dir ~/comp/shed/xlib/
+
+#+RESULTS:
+|-------------+------------------------------------------|
+| name        | xlib                                     |
+| version     | 1.0.0                                    |
+| description | A fork of CLX maintained by Sharplispers |
+| skel-id     | 3818250095842153598                      |
+| root        | ~/comp/shed/xlib/                        |
+| tags        | (x)                                      |
+| updated     | Tue Nov 11 16:47:00 2025 -0500           |
+| langs       | lisp org                                 |
+| lines       | 34082 :λ 27419 :# 3826 :_ 2837           |
+|-------------+------------------------------------------|
+
+#+END:

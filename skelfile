@@ -1,7 +1,10 @@
-;;; clx @ 2025-06-27.22:43:51 -*- mode:skel; -*-
-:name "clx"
-:author ""
+;;; xlib @ 2025-06-27.22:43:51 -*- mode:skel; -*-
+:name "xlib"
+:author ("Richard Westhaver" . "ellis@rwest.io")
+:description "A fork of CLX maintained by Sharplispers"
+:license #p"LICENSE"
+:tags ("x")
 :version "1.0.0"
-:vc (:hg "https://vc.compiler.company/ext/clx"
+:vc (:hg "https://vc.compiler.company/shed/xlib"
      (upstream (:git "https://github.com/sharplispers/clx"))
-     (gh (:git "ssh://github.com/richardwesthaver/clx")))
+     (gh (:git "ssh://github.com/richardwesthaver/xlib")))
