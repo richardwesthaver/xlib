@@ -40,7 +40,6 @@
    :shiftlevel/leftover-modifiers :corestate->mask))
 
 (in-package :xlib/xkb)
-(pushnew :clx-ext-xkeyboard *features*)
 
 (define-extension "XKEYBOARD"
   :events () 

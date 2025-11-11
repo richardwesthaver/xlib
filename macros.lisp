@@ -191,7 +191,7 @@
    `(atom-name ,buffer (read-card29 ,index)))
   ((index thing &key (buffer '%buffer))
    `(write-card29 ,index (or (atom-id ,thing ,buffer)
-                             (error "CLX implementation error in KEYWORD-PUT")))))
+                             (error "X implementation error in KEYWORD-PUT")))))
 
 (define-accessor resource-id (32)
   ((index) `(read-card29 ,index))

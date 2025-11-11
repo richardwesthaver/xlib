@@ -452,7 +452,7 @@
 (defun make-process-lock (name)
   (sb-thread:make-mutex :name name))
 
-(defmacro holding-lock ((lock display &optional (whostate "CLX wait")
+(defmacro holding-lock ((lock display &optional (whostate "X wait")
                                       &key timeout)
                         &body body)
   ;; This macro is used by WITH-DISPLAY, which claims to be callable

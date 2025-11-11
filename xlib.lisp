@@ -75,13 +75,7 @@
 
 ;; Note: all of the following is in the package XLIB.
 (in-package :xlib)
-
-(pushnew :clx *features*)
 (pushnew :xlib *features*)
-
-(defparameter *version* "MIT R5.02")
-(pushnew :clx-mit-r4 *features*)
-(pushnew :clx-mit-r5 *features*)
 
 (defparameter *protocol-major-version* 11.)
 (defparameter *protocol-minor-version* 0)
@@ -244,9 +238,9 @@
   (display 0 :type integer)			; Display number on host
   (after-function nil)				; Function to call after every request
   (event-lock
-    (make-process-lock "CLX Event Lock"))	; with-event-queue lock
+    (make-process-lock "X Event Lock"))	; with-event-queue lock
   (event-queue-lock
-    (make-process-lock "CLX Event Queue Lock"))	; new-events/event-queue lock
+    (make-process-lock "X Event Queue Lock"))	; new-events/event-queue lock
   (event-queue-tail				; last event in the event queue
     nil :type (or null reply-buffer))
   (event-queue-head				; Threaded queue of events
@@ -268,8 +262,8 @@
 		   :type hash-table)		; hash table maps resource-id's to
 						; objects (used in lookup functions)
   (xid 'resourcealloc)				; allocator function
-  (byte-order #+clx-little-endian :lsbfirst     ; connection byte order
-	      #-clx-little-endian :msbfirst)
+  (byte-order #+little-endian :lsbfirst     ; connection byte order
+	      #-little-endian :msbfirst)
   (release-number 0 :type card32)		; release of the server
   (max-request-length 0 :type card16)		; maximum number 32 bit words in request
   (default-screen)				; default screen for operations
@@ -515,7 +509,7 @@
 (deftype gcontext-state () 'simple-vector)
 
 (def-clx-class (gcontext (:copier nil) (:print-function print-gcontext))
-  ;; The accessors convert to CLX data types.
+  ;; The accessors convert to X data types.
   (id 0 :type resource-id)
   (display nil :type (or null display))
   (drawable nil :type (or null drawable))

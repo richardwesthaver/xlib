@@ -173,9 +173,9 @@
 (declaim (inline __card32->card16__))
 (defun __card32->card16__ (i)
   (declare (type card32 i))
-  #+clx-little-endian
+  #+little-endian
   (progn (values (ldb (byte 16 0) i) (ldb (byte 32 16) i)))
-  #-clx-little-endian
+  #-little-endian
   (progn (values (ldb (byte 32 16) i) (ldb (byte 16 0) i))))
 
 ;;; public XFree86-VidMode Extension routines

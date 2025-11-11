@@ -19,12 +19,12 @@
 ;;;
 ;;; Franz Incorporated provides this software "as is" without express
 ;;; or implied warranty.
-(defpackage :clx-system (:use :cl :asdf))
-(in-package :clx-system)  
+(defpackage :xlib-system (:use :cl :asdf))
+(in-package :xlib-system)  
 
-(defclass clx-source-file (cl-source-file) ())
+(defclass xlib-source-file (cl-source-file) ())
 
-(defsystem #:clx
+(defsystem #:xlib
   :description "An implementation of the X Window System protocol in Lisp."
   :author "Texas Instruments Incorporated.
 Franz Inc, Berkeley, Ca.
@@ -34,12 +34,12 @@ Independent FOSS developers"
   :depends-on (:sb-bsd-sockets :std)
   :version "0.7.7"
   :serial t
-  :default-component-class clx-source-file
-  :in-order-to ((test-op (test-op "clx/tests")))
+  :default-component-class xlib-source-file
+  :in-order-to ((test-op (test-op "xlib/tests")))
   :components
-  ((:file "package")
+  ((:file "pkg")
    (:file "depdefs")
-   (:file "clx")
+   (:file "xlib")
    (:file "dependent")
    (:file "common")
    (:file "macros")
@@ -78,8 +78,8 @@ Independent FOSS developers"
              (:file "xkeyboard")
              (:file "xembed")))))
 
-(defsystem #:clx/demo
-  :depends-on ("clx")
+(defsystem #:xlib/demo
+  :depends-on ("xlib")
   :components
   ((:module "demo"
 	    :components
@@ -88,7 +88,7 @@ Independent FOSS developers"
 	     (:file "beziertest" :depends-on ("bezier"))
 	     (:file "clclock")
 	     (:file "clipboard")
-	     (:file "clx-demos")
+	     (:file "xlib-demos")
 	     (:file "gl-test")
 	     ;; FIXME: compiling this generates 30-odd spurious code
 	     ;; deletion notes.  Find out why, and either fix or
@@ -98,15 +98,15 @@ Independent FOSS developers"
 	     (:file "image")
 	     (:file "trapezoid" :depends-on ("zoid"))))))
 
-(asdf:defsystem #:clx/truetype
+(defsystem #:xlib/truetype
   :serial t
-  :description "clx-truetype is pure common lisp solution for antialiased TrueType font
-rendering using CLX and XRender extension."
+  :description "xlib/truetype is pure common lisp solution for antialiased TrueType font
+rendering using XLIB and XRender extension."
   :author "Michael Filonenko <filonenko.mikhail@gmail.com>"
   :license "MIT"
   :version "0.1"
   :depends-on 
-  (#:clx 
+  (#:xlib 
    #:obj
    #:dat
    #:cl-vectors
@@ -114,8 +114,8 @@ rendering using CLX and XRender extension."
    #:cl-aa)
   :components ((:file "truetype")))
 
-(defsystem #:clx/tests
-  :depends-on ("clx" "clx/truetype" "rt")
+(defsystem #:xlib/tests
+  :depends-on ("xlib" "xlib/truetype" "rt")
   :perform (test-op (o s) (uiop:symbol-call :rt :do-tests :xlib))
   :components
   ((:module "tests"
@@ -125,7 +125,7 @@ rendering using CLX and XRender extension."
      (:file "core-protocol" :depends-on ("pkg" "util"))
      (:file "truetype" :depends-on ("pkg" "util"))))))
 
-(defmethod perform :around ((o compile-op) (f clx-source-file))
+(defmethod perform :around ((o compile-op) (f xlib-source-file))
   ;; a variety of accessors, such as AREF-CARD32, are not
   ;; declared INLINE.  Without this (non-ANSI)
   ;; static-type-inference behaviour, SBCL emits an extra 100
@@ -133,7 +133,7 @@ rendering using CLX and XRender extension."
   ;; notes emitted).  Since the internals are unlikely to
   ;; change much, and certainly the internals should stay in
   ;; sync, enabling this extension is a win.  (Note that the
-  ;; use of this does not imply that applications using CLX
+  ;; use of this does not imply that applications using XLIB
   ;; calls that expand into calls to these accessors will be
   ;; optimized in the same way).
   (let ((sb-ext:*derive-function-types* t))

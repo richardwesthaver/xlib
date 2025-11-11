@@ -11,6 +11,7 @@
 ;;; * Add the missing (declare (type ...
 (defpackage #:xlib/xtest
   (:use :common-lisp :xlib)
+  (:nicknames :xtest)
   (:import-from :xlib
                 #:data
                 #:card8

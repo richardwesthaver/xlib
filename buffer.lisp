@@ -71,7 +71,7 @@
 	     ,(declare-bufmac)
 	     (when (buffer-dead ,buf)
 	       (x-error 'closed-display :display ,buf))
-	     (holding-lock ((buffer-lock ,buf) ,buf "CLX Display Lock"
+	     (holding-lock ((buffer-lock ,buf) ,buf "X Display Lock"
 			    ,@(and timeout `(:timeout ,timeout)))
 	       ,@body))))))
 

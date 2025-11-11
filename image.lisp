@@ -95,11 +95,11 @@
 		     red-mask blue-mask green-mask
 		     bits-per-pixel format bytes-per-line
 		     (byte-lsb-first-p 
-		       #+clx-little-endian t
-		       #-clx-little-endian nil)
+		       #+little-endian t
+		       #-little-endian nil)
 		     (bit-lsb-first-p
-		       #+clx-little-endian t
-		       #-clx-little-endian nil)
+		       #+little-endian t
+		       #-little-endian nil)
 		     unit pad left-pad)
   ;; Returns an image-x image-xy or image-z structure, depending on the
   ;; type of the :DATA parameter.

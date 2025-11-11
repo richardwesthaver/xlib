@@ -116,18 +116,6 @@
 (defmacro keysym->character-map-test ()
   '#'eql)
 
-;;; You must define this to match the real byte order.  It is used by
-;;; overlapping array and image code.
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  ;; FIXME: Ideally, we shouldn't end up with the internal
-  ;; :CLX-LITTLE-ENDIAN decorating user-visible *FEATURES* lists.
-  ;; This probably wants to be split up into :compile-toplevel
-  ;; :execute and :load-toplevel clauses, so that loading the compiled
-  ;; code doesn't push the feature.
-  (ecase sb-c:*backend-byte-order*
-    (:big-endian)
-    (:little-endian (pushnew :clx-little-endian *features*))))
-
 (deftype buffer-bytes () `(simple-array (unsigned-byte 8) (*)))
 
 ;;; This defines a type which is a subtype of the integers.
@@ -356,7 +344,7 @@ used, since NIL is the empty list."))
 ;; half-word and word access on both input and output.
 (def-clx-class (buffer (:constructor nil) (:copier nil) (:predicate nil))
   ;; Lock for multi-processing systems
-  (lock (make-process-lock "CLX Buffer Lock"))
+  (lock (make-process-lock "X Buffer Lock"))
   (output-stream nil :type (or null stream))
   ;; Buffer size
   (size 0 :type array-index)
@@ -401,12 +389,12 @@ used, since NIL is the empty list."))
 ;; Image stuff
 ;;-----------------------------------------------------------------------------
 (defconstant +image-bit-lsb-first-p+
-	     #+clx-little-endian t
-	     #-clx-little-endian nil)
+	     #+little-endian t
+	     #-little-endian nil)
 
 (defconstant +image-byte-lsb-first-p+
-	     #+clx-little-endian t
-	     #-clx-little-endian nil)
+	     #+little-endian t
+	     #-little-endian nil)
 
 (defconstant +image-unit+ 32)
 

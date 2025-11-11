@@ -329,7 +329,7 @@
 			display
 		      '.display.)))
 	  `(let (,@(unless (eq disp display) `((,disp ,display))))
-	     (holding-lock ((display-event-lock ,disp) ,disp "CLX Event Lock"
+	     (holding-lock ((display-event-lock ,disp) ,disp "X Event Lock"
 			    ,@(and timeout `(:timeout ,timeout)))
 	       ,@body))))))
 
@@ -347,7 +347,7 @@
   ;; exclusive access to the internal event queues
   (let ((disp (if (or (symbolp display) (constantp display)) display '.display.)))
     `(let (,@(unless (eq disp display) `((,disp ,display))))
-       (holding-lock ((display-event-queue-lock ,disp) ,disp "CLX Event Queue Lock"
+       (holding-lock ((display-event-queue-lock ,disp) ,disp "X Event Queue Lock"
 		      ,@(and timeout `(:timeout ,timeout)))
 	 ,@body))))
 

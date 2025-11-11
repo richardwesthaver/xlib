@@ -20,8 +20,8 @@
   (make-package "XLIB" :use '("COMMON-LISP")))
 
 (progn 
-  (compile-file "clx:defsystem.lisp")
-  (load "clx:defsystem"))
+  (compile-file "xlib:defsystem.lisp")
+  (load "xlib:defsystem"))
 
 (with-compilation-unit ()
-  (compile-clx (pathname "CLX:")))
+  (compile-clx (pathname "XLIB:")))

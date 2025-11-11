@@ -1,4 +1,4 @@
-;;; package.lisp --- CLX Packages
+;;; package.lisp --- XLIB Packages
 
 ;; Copyright 1990 Massachusetts Institute of Technology, Cambridge,
 ;; Massachusetts.  All Rights Reserved.

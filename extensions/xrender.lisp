@@ -135,8 +135,6 @@
           render-add-glyph-from-picture
           render-free-glyphs))
 
-(pushnew :clx-ext-render *features*)
-
 (define-extension "RENDER")
 ;;; X-RenderQueryVersion will always return the highest version it supports
 ;;; which is no higher than requested client version. For example:

@@ -401,7 +401,7 @@
 		        (conditional-store (display-input-in-progress display) nil token))
 	      (if (eql timeout 0)
 		  (return-from read-input :timeout)
-		  (apply #'process-block "CLX Input Lock"
+		  (apply #'process-block "X Input Lock"
 			 #'(lambda (display predicate &rest predicate-args)
 			     (declare (type display display)
 				      (dynamic-extent predicate-args)
