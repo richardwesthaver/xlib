@@ -1,5 +1,5 @@
 ;;; truetype.lisp
-(defpackage #:clx/truetype
+(defpackage #:xlib/truetype
   (:nicknames #:xft)
   (:use #:cl #:std #:dat/ttf #:obj/cache)
   (:import-from :obj/val :get-val)
@@ -26,7 +26,7 @@
 Glyphs information is obtained by DAT/TTF. Font rasterization is made by
 CL-VECTORS."))
 
-(in-package #:clx/truetype)
+(in-package #:xlib/truetype)
 
 ;;; Utils
 (defun drawable-screen (drawable)
