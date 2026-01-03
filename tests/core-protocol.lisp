@@ -1,6 +1,5 @@
 ;;; core-protocol.lisp
 (in-package :xlib/tests)
-(use-package :rt)
 (in-suite :xlib)
 ;;; This test will fail the day "FOO" extension is written.
 (deftest display-protocol ()
@@ -49,9 +48,9 @@
     ;; dummy test
     (let ((count 0))
       (is (setf (xlib:display-after-function display)
-                      (lambda (display)
-                        (declare (ignore display))
-                        (incf count))))
+                (lambda (display)
+                  (declare (ignore display))
+                  (incf count))))
       (xlib:with-display (display)
         (xlib:query-extension display "FOO")
         (xlib:display-finish-output display)
@@ -71,11 +70,11 @@
       (is (typep (xlib:screen-default-colormap screen) 'xlib:colormap))
       (let ((depths (xlib:screen-depths screen)))
         (loop for depth in depths do
-             (is (consp depth))
-             (is (< 0 (car depth)))
-             (is (listp (cdr depth)))
-             (loop for visual in (cdr depth) do
-                  (is (typep visual 'xlib:visual-info)))))
+                 (is (consp depth))
+                 (is (< 0 (car depth)))
+                 (is (listp (cdr depth)))
+                 (loop for visual in (cdr depth) do
+                          (is (typep visual 'xlib:visual-info)))))
       (is (typep (xlib:screen-event-mask-at-open screen) 'xlib:mask32))
       (is (typep (xlib:screen-height screen) 'xlib:card16))
       (is (typep (xlib:screen-height-in-millimeters screen) 'xlib:card16))
@@ -106,18 +105,18 @@
            (pixmap2 nil))
       (test-required-params xlib:create-window :parent root-window :x 0 :y 0 :width 100 :height 100)
       (is
-        (progn
-          (setf child-window (xlib:create-window :parent root-window
-                                                 :x 50
-                                                 :y 50
-                                                 :width 100
-                                                 :height 100
-                                                 :class :input-output))
-          (setf child-window2 (xlib:create-window :parent root-window
-                                                  :x 100
-                                                  :y 0
-                                                  :width 200
-                                                  :height 300))))
+       (progn
+         (setf child-window (xlib:create-window :parent root-window
+                                                :x 50
+                                                :y 50
+                                                :width 100
+                                                :height 100
+                                                :class :input-output))
+         (setf child-window2 (xlib:create-window :parent root-window
+                                                 :x 100
+                                                 :y 0
+                                                 :width 200
+                                                 :height 300))))
       (test-required-params xlib:create-pixmap :width 100 :height 100 :depth 24 :drawable root-window)
       (is (setf pixmap (xlib:create-pixmap :width 100 :height 100 :depth 24 :drawable child-window)))
       (is (setf pixmap2 (xlib:create-pixmap :width 100 :height 100 :depth 24 :drawable child-window)))
@@ -194,9 +193,9 @@
       (isnt (xlib:drawable-equal (xlib:drawable-root child-window) child-window))
       (isnt (xlib:drawable-equal (xlib:drawable-root root-window) child-window))
       (is
-        (let ((query-tree (xlib:query-tree root-window)))
-          (dolist (window (list child-window child-window2))
-            (is (member window query-tree :test #'xlib:drawable-equal)))))
+       (let ((query-tree (xlib:query-tree root-window)))
+         (dolist (window (list child-window child-window2))
+           (is (member window query-tree :test #'xlib:drawable-equal)))))
       (is (xlib:reparent-window child-window2 child-window 50 50))
       (multiple-value-bind (x y)
           (xlib:translate-coordinates child-window2 0 0 root-window)
@@ -212,7 +211,7 @@
       (is (typep (xlib:pixmap-id pixmap) 'xlib:resource-id))
       (is (xlib:pixmap-p pixmap))
       (loop for not-pixmap in (list display screen root-window child-window) do
-           (is (not (xlib:pixmap-p not-pixmap))))
+               (is (not (xlib:pixmap-p not-pixmap))))
       ;; setf tests
       (is (typep (xlib:pixmap-plist pixmap) 'list))
       (is (setf (getf (xlib:pixmap-plist pixmap) 'foo) "hell is empty"))
@@ -239,7 +238,7 @@
       (is (setf (xlib:window-gravity child-window) :south-west))
       (is (setf (xlib:window-override-redirect child-window) :on))
       (loop for priority in '(:above :below :bottom-if :opposite :top-if) do
-           (is (setf (xlib:window-priority child-window) priority)))
+               (is (setf (xlib:window-priority child-window) priority)))
       (is (setf (xlib:window-save-under child-window) :on))
 
       (is (= (xlib:drawable-width child-window) 120))
@@ -271,7 +270,7 @@
         (is (setf (xlib:window-gravity child-window2) :south-west))
         (is (setf (xlib:window-override-redirect child-window2) :on))
         (loop for priority in '(:above :below :bottom-if :opposite :top-if) do
-             (is (setf (xlib:window-priority child-window2) priority)))
+                 (is (setf (xlib:window-priority child-window2) priority)))
         (is (setf (xlib:window-save-under child-window2) :on))
         (is (= (xlib:drawable-width child-window2) 120))
         (is (= (xlib:drawable-height child-window2) 120))

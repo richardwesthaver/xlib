@@ -457,7 +457,8 @@
                         &body body)
   ;; This macro is used by WITH-DISPLAY, which claims to be callable
   ;; recursively.  So, had better use a recursive lock.
-  (declare (ignore display whostate))
+  (declare (ignore display whostate)
+           (sb-ext:muffle-conditions style-warning))
   `(sb-thread:with-recursive-lock (,lock ,@(when timeout
                                              `(:timeout ,timeout)))
      ,@body))

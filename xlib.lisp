@@ -199,6 +199,8 @@
   (declare (clx-values red green blue))
   (values (color-red color) (color-green color) (color-blue color)))
 
+;; TODO 2026-01-01: OBJ/COLOR (as-rgb, etc)
+
 (def-clx-class (bitmap-format (:copier nil) (:print-function print-bitmap-format))
   (unit 8 :type (member 8 16 32))
   (pad 8 :type (member 8 16 32))
@@ -364,8 +366,7 @@
 (def-clx-class (visual-info (:copier nil) (:print-function print-visual-info))
   (id 0 :type resource-id)
   (display nil :type (or null display))
-  (class :static-gray :type (member :static-gray :static-color :true-color
-				    :gray-scale :pseudo-color :direct-color))
+  (class :static-gray :type x11-colormap-class)
   (red-mask 0 :type pixel)
   (green-mask 0 :type pixel)
   (blue-mask 0 :type pixel)

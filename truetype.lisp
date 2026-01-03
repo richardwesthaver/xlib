@@ -320,7 +320,7 @@ in fixed-pitch fonts.")
                                     :initial-element 0
                                     :element-type '(unsigned-byte 8)))
                  (state (make-state font))
-                 (paths (paths-ttf:paths-from-string font-loader string
+                 (paths (paths/ttf:paths-from-string font-loader string
                                                      :offset (paths:make-point (- min-x)
                                                                                max-y)
                                                      :scale-x units->pixels-x
@@ -391,7 +391,7 @@ position before rendering), horizontal and vertical advances.
                                     :initial-element 0
                                     :element-type '(unsigned-byte 8)))
                  (state (make-state font))
-                 (paths (paths-ttf:paths-from-string font-loader string
+                 (paths (paths/ttf:paths-from-string font-loader string
                                                      :offset (paths:make-point (- min-x)
                                                                                max-y)
                                                      :scale-x units->pixels-x

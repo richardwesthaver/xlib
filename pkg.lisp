@@ -11,8 +11,9 @@
 ;; publicity pertaining to distribution of the software without specific,
 ;; written prior permission.
 (defpackage #:xlib
-  (:use :cl)
-  (:shadow :defconstant)
+  (:use :cl :std)
+  (:import-from :obj/color :x11-colormap-class)
+  (:shadow :defconstant :buffer)
   (:use :sb-bsd-sockets)
   (:export
     *version* access-control access-error access-hosts

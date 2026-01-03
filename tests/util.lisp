@@ -55,5 +55,3 @@
        (xlib:free-gcontext *gcontext*)
        (xlib:destroy-window *window*)
        (xlib:close-display *display*))))
-
-                       

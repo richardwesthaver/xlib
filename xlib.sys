@@ -1,0 +1,89 @@
+;;; ~/comp/shed/xlib/xlib.sys --- XLIB Sytem Definitions
+(defsys :xlib
+ :description "An implementation of the X Window System protocol in Lisp."
+ :version "0.7.7"
+ :require (:std :log)
+ :components 
+ ((:file "pkg")
+  (:file "depdefs")
+  (:file "xlib")
+  (:file "dependent")
+  (:file "common")
+  (:file "macros")
+  (:file "bufmac")
+  (:file "buffer")
+  (:file "display")
+  (:file "gcontext")
+  (:file "input")
+  (:file "requests")
+  (:file "fonts")
+  (:file "graphics")
+  (:file "text")
+  (:file "attributes")
+  (:file "translate")
+  (:file "keysyms")
+  (:file "manager")
+  (:file "image")
+  (:file "resource")
+  (:mod "extensions"
+   :components
+   ((:file "shape")
+    (:file "big-requests")
+    (:file "xvidmode")
+    (:file "xrender")
+    (:file "glx")
+    (:file "gl" :require ("glx"))
+    (:file "dpms")
+    (:file "xtest")
+    (:file "screensaver")
+    (:file "randr")
+    (:file "xinerama")
+    (:file "dbe")
+    (:file "xc-misc")
+    (:file "dri2")
+    (:file "composite")
+    (:file "xkeyboard")
+    (:file "xembed"))))
+ :provide
+ ((:sys :xlib/demo
+   :require (:xlib)
+   :components
+   ((:mod "demo"
+     :components
+     ((:file "menu")
+      (:file "bezier")
+      (:file "beziertest" :require ("bezier"))
+      (:file "clclock")
+      (:file "clipboard")
+      (:file "xlib-demos")
+      (:file "gl-test")
+      ;; FIXME: compiling this generates 30-odd spurious code
+      ;; deletion notes.  Find out why, and either fix or
+      ;; workaround the problem.
+      (:file "mandel")
+      (:file "zoid")
+      (:file "image")
+      (:file "trapezoid" :require ("zoid"))))))
+  (:sys :xlib/truetype
+   :description "xlib/truetype is pure common lisp solution for antialiased TrueType font
+rendering using XLIB and XRender extension."
+   :require
+   (#:xlib 
+    #:obj
+    #:dat
+    #:vec
+    #:vec/paths/ttf
+    #:vec/aa)
+   :components ((:file "truetype")))
+  (:tests
+   :require (:rt :xlib :xlib/truetype)
+   :components
+   ((:mod "tests"
+     :components
+     ((:file "pkg")
+      (:file "util")
+      (:file "core-protocol" :require ("pkg" "util"))
+      (:file "truetype" :require ("pkg" "util"))))))))
+
+
+   

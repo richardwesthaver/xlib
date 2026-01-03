@@ -31,7 +31,7 @@ Franz Inc, Berkeley, Ca.
 Independent FOSS developers"
   :maintainer "sharplispers"
   :license "MIT"
-  :depends-on (:sb-bsd-sockets :std)
+  :depends-on (:sb-bsd-sockets :obj)
   :version "0.7.7"
   :serial t
   :default-component-class xlib-source-file
@@ -109,9 +109,9 @@ rendering using XLIB and XRender extension."
   (#:xlib 
    #:obj
    #:dat
-   #:cl-vectors
-   #:cl-paths-ttf ; from cl-vectors
-   #:cl-aa)
+   #:vec
+   #:vec/paths/ttf
+   #:vec/aa)
   :components ((:file "truetype")))
 
 (defsystem #:xlib/tests
@@ -125,6 +125,7 @@ rendering using XLIB and XRender extension."
      (:file "core-protocol" :depends-on ("pkg" "util"))
      (:file "truetype" :depends-on ("pkg" "util"))))))
 
+#+nil
 (defmethod perform :around ((o compile-op) (f xlib-source-file))
   ;; a variety of accessors, such as AREF-CARD32, are not
   ;; declared INLINE.  Without this (non-ANSI)
