@@ -2,6 +2,46 @@
 
 ;; 
 
+;;; Commentary:
+
+#|
+XEmbed is a protocol that uses basic X mechanisms such as client messages and
+reparenting windows to provide embedding of a control from one application
+into another application. Some of the goals of the XEmbed design are:
+
+1. Support for out-of process controls, written in any toolkit or even plain Xlib.
+
+2. Support for in-process-controls when mixing different toolkits in one process.
+
+3. Smooth integration of the embedding application and embedded client in areas
+   such as input device handling and visual feedback.
+
+4. Easy implementation. A full implementation supporting all details correctly
+   may require minor toolkit modifications, but it should be possible to get
+   basic functionality going in less than 1000 lines of code.
+
+Goal 1 is the most urgent one. A embedding specification allows developers to
+write applets for whatever desktop the user is using in whatever toolkit they
+prefer. Goal 2 is more of something to keep in mind than a immediate
+requirement. While there are other ways to mix two or more toolkits, using
+XEmbed might be the easiest and thus most comfortable way. Goal 3 describes
+the targeted level of integration. The users should not necessarily notice
+that they work with embedded controls; devices like the keyboard and the mouse
+should work as expected, inactive windows should look like they are inactive,
+and so forth. The level of integration may, however, be limited by goal 4. In
+order for the protocol to be successful, it's crucial to get implementations
+for the most important toolkits. Thus, the implementation should not require
+too much coding and no or only few modifications to the toolkit's kernel.
+
+At the time of writing, an implementation of XEmbed is included in GTK+-2.0
+that mostly conforms to this version of the specification. The main area of
+divergence is in the area of accelerators, where a simpler scheme is
+implemented than the XEMBED_REGISTER_ACCELERATOR,
+XEMBED_UNREGISTER_ACCELERATOR accelerator scheme described here. The KDE
+libraries (libkdeui) include QXEmbed, a mostly-complete implementation for Qt
+of an earlier version of the protocol.
+|#
+
 ;;; Code:
 (defpackage :xlib/xembed
   (:nicknames :xembed)
@@ -34,9 +74,11 @@
 
 (defun dformat-call (level fn in-or-out &rest arguments)
   (dformat level "~a~%" (apply #'format-call fn in-or-out arguments)))
+
 (defun dformat (level control-string &rest format-arguments)
   (when (<= level *debug-level*)
     (apply #'format *debug-stream* control-string format-arguments)))
+
 (defun pformat (control-string &rest format-arguments)
   (when *show-progress*
     (apply #'format *progress-stream* control-string format-arguments)))
@@ -233,9 +275,9 @@ whith the value associated to KEY changed to VALUE"
 (defparameter +XEMBED-VERSION+ 0)
 
 ;; Internal return codes
-(defparameter +XEMBED_RESULT_OK+ 0)
-(defparameter +XEMBED_RESULT_UNSUPPORTED+ 1)
-(defparameter +XEMBED_RESULT_X11ERROR+ 2)
+(defparameter +XEMBED-RESULT-OK+ 0)
+(defparameter +XEMBED-RESULT-UNSUPPORTED+ 1)
+(defparameter +XEMBED-RESULT-X11ERROR+ 2)
 
 ;; XEMBED messages
 (defparameter +XEMBED-MESSAGE-ALIST+
@@ -278,14 +320,13 @@ whith the value associated to KEY changed to VALUE"
 (defun decode-xembed-detail (detail)
   (car (rassoc detail +XEMBED-DETAIL-ALIST+)))
 
-
 ;; Modifiers field for XEMBED_REGISTER_ACCELERATOR */
 (defparameter +XEMBED-MODIFIER-ALIST+
-  `((:XEMBED_MODIFIER_SHIFT . ,(ash 1 0))
-    (:XEMBED_MODIFIER_CONTROL . ,(ash 1 1))
-    (:XEMBED_MODIFIER_ALT . ,(ash 1 2))
-    (:XEMBED_MODIFIER_SUPER . ,(ash 1 3))
-    (:XEMBED_MODIFIER_HYPER . ,(ash 1 4))))
+  `((:XEMBED-MODIFIER-SHIFT . ,(ash 1 0))
+    (:XEMBED-MODIFIER-CONTROL . ,(ash 1 1))
+    (:XEMBED-MODIFIER-ALT . ,(ash 1 2))
+    (:XEMBED-MODIFIER-SUPER . ,(ash 1 3))
+    (:XEMBED-MODIFIER-HYPER . ,(ash 1 4))))
 
 (defun encode-xembed-modifier-flags (flags)
   (encode-flags flags +XEMBED-MODIFIER-ALIST+))
@@ -294,12 +335,12 @@ whith the value associated to KEY changed to VALUE"
   (decode-flags flags +XEMBED-MODIFIER-ALIST+))
 
 ;; Flags for XEMBED_ACTIVATE_ACCELERATOR 
-(defparameter +XEMBED_ACCELERATOR_OVERLOADED+ (ash 1 0))
+(defparameter +XEMBED-ACCELERATOR-OVERLOADED+ (ash 1 0))
 
 ;; Directions for focusing
-(defparameter +XEMBED_DIRECTION_DEFAULT+ 0)
-(defparameter +XEMBED_DIRECTION_UP_DOWN+ 1)
-(defparameter +XEMBED_DIRECTION_LEFT_RIGHT+ 2)
+(defparameter +XEMBED-DIRECTION-DEFAULT+ 0)
+(defparameter +XEMBED-DIRECTION-UP-DOWN+ 1)
+(defparameter +XEMBED-DIRECTION-LEFT-RIGHT+ 2)
 
 ;; Flags for _XEMBED_INFO
 (defparameter +XEMBED-INFO-FLAGS-ALIST+

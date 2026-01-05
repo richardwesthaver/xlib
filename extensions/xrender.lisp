@@ -22,27 +22,6 @@
 ;;; around them. Sometimes e.g. in AddGlyphs this is not possible,
 ;;; which is a design failure.
 
-;;; TODO
-
-;; - some request are still to be implemented at all.
-
-;; - we need to invent something for the color values of e.g.  fill-rectangles;
-;;   I would prefer some generic functions, so that we later can map CLIM design
-;;   directly to colors.
-
-;; - we want some conviencene function to turn graphics contexts into render
-;;   pictures. --GB 2002-08-21
-
-;; - also: uniform-alpha-picture display alpha-value
-;;         uniform-color-picture display red green blue
-;;   --GB 2002-08-21
-
-;; - maybe we should aim for a higher level interface to color-trapzoids and
-;;   color-triangles and offer a low level [raw] interface also for high
-;;   performance apps?
-
-;; - Write tests.
-
 ;;;; API issues
 
 ;; - On one hand we want convenience functions like RENDER-TRIANGLE or
