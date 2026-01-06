@@ -14,6 +14,8 @@
 ;; Texas Instruments Incorporated provides this software "as is" without
 ;; express or implied warranty.
 
+;;; Commentary: 
+
 ;; CLX basically implements a very low overhead remote procedure call to the
 ;; server.  This file contains macros which generate the code for both the
 ;; client AND the server, given a specification of the interface. This was
@@ -22,6 +24,8 @@
 ;; protocol.
 
 ;; This is built on top of BUFFER
+
+;;; Code:
 (in-package :xlib)
 
 (defmacro type-check (value type)

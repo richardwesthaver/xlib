@@ -20,10 +20,28 @@
 
 (proclaim '(declaration array-register))
 
-;;; The size of the output buffer.  Must be a multiple of 4.
+;; Finding the server socket
+
+;; These are here because dependent.lisp needs them
+(defconstant +X-unix-socket-path+
+  "/tmp/.X11-unix/X"
+  "The location of the X socket")
+
+(defun unix-socket-path-from-host (host display)
+  "Return the name of the unix domain socket for host and display, or
+nil if a network socket should be opened."
+  (cond ((or (string= host "") (string= host "unix"))
+         (format nil "~A~D" +X-unix-socket-path+ display))
+        #+darwin
+        ((or (and (> (length host) 10) (string= host "tmp/launch" :end1 10))
+             (and (> (length host) 29) (string= host "private/tmp/com.apple.launchd" :end1 29)))
+         (format nil "/~A:~D" host display))
+        (t nil)))
+
+;; The size of the output buffer.  Must be a multiple of 4.
 (defparameter *output-buffer-size* #x10000)
 
-;;; Number of seconds to wait for a reply to a server request
+;; Number of seconds to wait for a reply to a server request
 (defparameter *reply-timeout* nil)
 
 (progn
@@ -35,7 +53,7 @@
   (defconstant +long-2+ 2)
   (defconstant +long-3+ 3))
 
-;;; Set some compiler-options for often used code
+;; Set some compiler-options for often used code
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant +buffer-speed+ #+clx-debugging 1 #-clx-debugging 3
                "Speed compiler option for buffer code.")
@@ -324,14 +342,10 @@
              (the int16 (round x #.(float (/ pi 180.0s0 64.0s0) 0.0s0)))
              (* 360 64)))))
 
-;;-----------------------------------------------------------------------------
 ;; Character transformation
-;;-----------------------------------------------------------------------------
-
 
 ;;; This stuff transforms chars to ascii codes in card8's and back.
 ;;; You might have to hack it a little to get it to work for your machine.
-
 (declaim (inline char->card8 card8->char))
 
 (macrolet ((char-translators ()
@@ -438,17 +452,14 @@
                            (the base-char (code-char card8)))))))))
   (char-translators))
 
-;;-----------------------------------------------------------------------------
 ;; Process Locking
-;;
+
 ;;	Common-Lisp doesn't provide process locking primitives, so we define
 ;;	our own here, based on Zetalisp primitives.  Holding-Lock is very
 ;;	similar to with-lock on The TI Explorer, and a little more efficient
 ;;	than with-process-lock on a Symbolics.
-;;-----------------------------------------------------------------------------
 
 ;;; MAKE-PROCESS-LOCK: Creating a process lock.
-
 (defun make-process-lock (name)
   (sb-thread:make-mutex :name name))
 
@@ -464,19 +475,16 @@
      ,@body))
 
 ;;; WITHOUT-ABORTS
-
-;;; If you can inhibit asynchronous keyboard aborts inside the body of this
-;;; macro, then it is a good idea to do this.  This macro is wrapped around
-;;; request writing and reply reading to ensure that requests are atomically
-;;; written and replies are atomically read from the stream.
-
+;; If you can inhibit asynchronous keyboard aborts inside the body of this
+;; macro, then it is a good idea to do this.  This macro is wrapped around
+;; request writing and reply reading to ensure that requests are atomically
+;; written and replies are atomically read from the stream.
 (defmacro without-aborts (&body body)
   `(progn ,@body))
 
-;;; PROCESS-BLOCK: Wait until a given predicate returns a non-NIL value.
-;;; Caller guarantees that PROCESS-WAKEUP will be called after the predicate's
-;;; value changes.
-
+;; PROCESS-BLOCK: Wait until a given predicate returns a non-NIL value.
+;; Caller guarantees that PROCESS-WAKEUP will be called after the predicate's
+;; value changes.
 (progn
   (declaim (inline yield))
   (defun yield ()
@@ -493,10 +501,10 @@
       (return))
     (yield)))
 
-;;; FIXME: the below implementation for threaded PROCESS-BLOCK using
-;;; queues and condition variables might seem better, but in fact it
-;;; turns out to make performance extremely suboptimal, at least as
-;;; measured by McCLIM on linux 2.4 kernels.  -- CSR, 2003-11-10
+;; FIXME: the below implementation for threaded PROCESS-BLOCK using
+;; queues and condition variables might seem better, but in fact it
+;; turns out to make performance extremely suboptimal, at least as
+;; measured by McCLIM on linux 2.4 kernels.  -- CSR, 2003-11-10
 #+(or)
 (defvar *process-conditions* (make-hash-table))
 
@@ -524,22 +532,25 @@
             (format *trace-output* "thread ~A, process-block timed out~%"
                     (sb-thread:current-thread-id) )))))))
 
-;;; PROCESS-WAKEUP: Check some other process' wait function.
+;;; PROCESS-WAKEUP
+;; Check some other process' wait function.
 (declaim (inline process-wakeup))
 
 (defun process-wakeup (process)
   (declare (ignore process))
   (yield))
 
-;;; CURRENT-PROCESS: Return the current process object for input locking and
-;;; for calling PROCESS-WAKEUP.
+;;; CURRENT-PROCESS 
+;; Return the current process object for input locking and for calling
+;; PROCESS-WAKEUP.
 (declaim (inline current-process))
 
-;;; Default return NIL, which is acceptable even if there is a scheduler.
+;; Default return NIL, which is acceptable even if there is a scheduler.
 (defun current-process ()
   sb-thread:*current-thread*)
 
-;;; WITHOUT-INTERRUPTS -- provide for atomic operations.
+;;; WITHOUT-INTERRUPTS 
+;; provide for atomic operations.
 (defvar *without-interrupts-sic-lock*
   (sb-thread:make-mutex :name "lock simulating *without-interrupts*"))
 
@@ -547,20 +558,18 @@
   `(sb-thread:with-recursive-lock (*without-interrupts-sic-lock*)
      ,@body))
 
-;;; CONDITIONAL-STORE:
-;; This should use GET-SETF-METHOD to avoid evaluating subforms multiple times.
-;; It doesn't because CLtL doesn't pass the environment to GET-SETF-METHOD.
+;;; CONDITIONAL-STORE
+;; This should use GET-SETF-METHOD to avoid evaluating subforms multiple
+;; times. It doesn't because CLtL doesn't pass the environment to
+;; GET-SETF-METHOD.
 (defmacro conditional-store (place old-value new-value)
   (let ((ov (gensym)))
     `(let ((,ov ,old-value))
        (eq ,ov (sb-ext:compare-and-swap ,place ,ov ,new-value)))))
 
-;;;----------------------------------------------------------------------------
 ;;; IO Error Recovery
-;;;	All I/O operations are done within a WRAP-BUF-OUTPUT macro.
-;;;	It prevents multiple mindless errors when the network craters.
-;;;
-;;;----------------------------------------------------------------------------
+;; All I/O operations are done within a WRAP-BUF-OUTPUT macro. It prevents
+;; multiple mindless errors when the network craters.
 (defmacro wrap-buf-output ((buffer) &body body)
   ;; Error recovery wrapper
   `(unless (buffer-dead ,buffer)
@@ -571,11 +580,9 @@
   ;; Error recovery wrapper
   `(progn ,@body))
 
-;;;----------------------------------------------------------------------------
 ;;; System dependent IO primitives
-;;;	Functions for opening, reading writing forcing-output and closing
-;;;	the stream to the server.
-;;;----------------------------------------------------------------------------
+;; Functions for opening, reading writing forcing-output and closing the
+;; stream to the server.
 
 ;;; OPEN-X-STREAM - create a stream for communicating to the appropriate X
 ;;; server
@@ -596,10 +603,11 @@
    :element-type '(unsigned-byte 8)
    :input t :output t :buffering :none))
 
-;;; BUFFER-INPUT-WAIT-DEFAULT - wait for for input to be available for the
-;;; buffer.  This is called in read-input between requests, so that a process
-;;; waiting for input is abortable when between requests.  Should return
-;;; :TIMEOUT if it times out, NIL otherwise.
+;;; BUFFER-INPUT-WAIT-DEFAULT 
+;; wait for for input to be available for the buffer. This is called in
+;; read-input between requests, so that a process waiting for input is
+;; abortable when between requests. Should return :TIMEOUT if it times out,
+;; NIL otherwise.
 (defun buffer-input-wait-default (display timeout)
   (declare (type display display)
            (type (or null number) timeout))
@@ -613,35 +621,7 @@
            nil)
           (t :timeout))))
 
-;;;----------------------------------------------------------------------------
 ;;; System dependent speed hacks
-;;;----------------------------------------------------------------------------
-;;
-;; WITH-STACK-LIST is used by WITH-STATE as a memory saving feature.
-;; If your lisp doesn't have stack-lists, and you're worried about
-;; consing garbage, you may want to re-write this to allocate and
-;; initialize lists from a resource.
-;;
-(defmacro with-stack-list ((var &rest elements) &body body)
-  ;; SYNTAX: (WITH-STACK-LIST (var exp1 ... expN) body)
-  ;; Equivalent to (LET ((var (MAPCAR #'EVAL '(exp1 ... expN)))) body)
-  ;; except that the list produced by MAPCAR resides on the stack and
-  ;; therefore DISAPPEARS when WITH-STACK-LIST is exited.
-  `(let ((,var (list ,@elements)))
-     (declare (type cons ,var)
-              (dynamic-extent ,var))
-     ,@body))
-
-(defmacro with-stack-list* ((var &rest elements) &body body)
-  ;; SYNTAX: (WITH-STACK-LIST* (var exp1 ... expN) body)
-  ;; Equivalent to (LET ((var (APPLY #'LIST* (MAPCAR #'EVAL '(exp1 ... expN))))) body)
-  ;; except that the list produced by MAPCAR resides on the stack and
-  ;; therefore DISAPPEARS when WITH-STACK-LIST is exited.
-  `(let ((,var (list* ,@elements)))
-     (declare (type cons ,var)
-              (dynamic-extent ,var))
-     ,@body))
-
 (declaim (inline buffer-replace))
 (defun buffer-replace (buf1 buf2 start1 end1 &optional (start2 0))
   (declare (type buffer-bytes buf1 buf2)
@@ -666,29 +646,28 @@
          (restore-gcontext-temp-state ,gc ,temp-mask ,temp-gc))
        (deallocate-gcontext-state ,saved-state))))
 
-;;;----------------------------------------------------------------------------
-;;; How much error detection should CLX do?
-;;; Several levels are possible:
-;;;
-;;; 1. Do the equivalent of check-type on every argument.
-;;;
-;;; 2. Simply report TYPE-ERROR.  This eliminates overhead of all the format
-;;;    strings generated by check-type.
-;;;
-;;; 3. Do error checking only on arguments that are likely to have errors
-;;;    (like keyword names)
-;;;
-;;; 4. Do error checking only where not doing so may dammage the envirnment
-;;;    on a non-tagged machine (i.e. when storing into a structure that has
-;;;    been passed in)
-;;;
-;;; 5. No extra error detection code.  On lispm's, ASET may barf trying to
-;;;    store a non-integer into a number array.
-;;;
-;;; How extensive should the error checking be?  For example, if the server
-;;; expects a CARD16, is is sufficient for CLX to check for integer, or
-;;; should it also check for non-negative and less than 65536?
-;;;----------------------------------------------------------------------------
+;;; Error Detection
+;; How much error detection should CLX do?
+;; Several levels are possible:
+
+;; 1. Do the equivalent of check-type on every argument.
+
+;; 2. Simply report TYPE-ERROR.  This eliminates overhead of all the format
+;;    strings generated by check-type.
+
+;; 3. Do error checking only on arguments that are likely to have errors
+;;    (like keyword names)
+
+;; 4. Do error checking only where not doing so may dammage the envirnment
+;;    on a non-tagged machine (i.e. when storing into a structure that has
+;;    been passed in)
+
+;; 5. No extra error detection code.  On lispm's, ASET may barf trying to
+;;    store a non-integer into a number array.
+
+;; How extensive should the error checking be?  For example, if the server
+;; expects a CARD16, is is sufficient for CLX to check for integer, or
+;; should it also check for non-negative and less than 65536?
 
 ;; The +TYPE-CHECK?+ constant controls how much error checking is done.
 ;; Possible values are:
@@ -696,19 +675,16 @@
 ;;    t        - Do the equivalent of checktype on every argument
 ;;    :minimal - Do error checking only where errors are likely
 
-;;; This controls macro expansion, and isn't changable at run-time You will
-;;; probably want to set this to nil if you want good performance at
-;;; production time.
+;; This controls macro expansion, and isn't changable at run-time You will
+;; probably want to set this to nil if you want good performance at
+;; production time.
+(defconstant +type-check?+ nil)
 
-(defconstant +type-check?+
-  #+clx-debugging t
-  #-clx-debugging nil)
-
-;; TYPE? is used to allow the code to do error checking at a different level from
-;; the declarations.  It also does some optimizations for systems that don't have
-;; good compiler support for TYPEP.  The definitions for CARD32, CARD16, INT16, etc.
-;; include range checks.  You can modify TYPE? to do less extensive checking
-;; for these types if you desire.
+;; TYPE? is used to allow the code to do error checking at a different level
+;; from the declarations. It also does some optimizations for systems that
+;; don't have good compiler support for TYPEP. The definitions for CARD32,
+;; CARD16, INT16, etc.  include range checks. You can modify TYPE? to do less
+;; extensive checking for these types if you desire.
 
 ;;
 ;; ### This comment is a lie!  TYPE? is really also used for run-time type
@@ -717,21 +693,17 @@
 (defmacro type? (object type)
   `(typep ,object ,type))
 
-;; X-TYPE-ERROR is the function called for type errors.
-;; If you want lots of checking, but are concerned about code size,
-;; this can be made into a macro that ignores some parameters.
-
+;; X-TYPE-ERROR is the function called for type errors. If you want lots of
+;; checking, but are concerned about code size, this can be made into a macro
+;; that ignores some parameters.
 (defun x-type-error (object type &optional error-string)
   (x-error 'x-type-error
            :datum object
            :expected-type type
            :type-string error-string))
 
-;;-----------------------------------------------------------------------------
-;; Error handlers
-;;    Hack up KMP error signaling using zetalisp until the real thing comes
-;;    along
-;;-----------------------------------------------------------------------------
+;;; Error handlers
+;; Hack up KMP error signaling using zetalisp until the real thing comes along
 (defun default-error-handler (display error-key &rest key-vals
                                                 &key asynchronous &allow-other-keys)
   (declare (type generalized-boolean asynchronous)
@@ -751,20 +723,16 @@
   (apply #'cerror proceed-format-string condition keyargs))
 
 ;;; X-ERROR for CMU Common Lisp
-;;;
-;;; We detect a couple condition types for which we disable event handling in
-;;; our system.  This prevents going into the debugger or returning to a
-;;; command prompt with CLX repeatedly seeing the same condition.  This occurs
-;;; because CMU Common Lisp provides for all events (that is, X, input on file
-;;; descriptors, Mach messages, etc.) to come through one routine anyone can
-;;; use to wait for input.
-;;;
 
+;; We detect a couple condition types for which we disable event handling in
+;; our system.  This prevents going into the debugger or returning to a
+;; command prompt with CLX repeatedly seeing the same condition.  This occurs
+;; because CMU Common Lisp provides for all events (that is, X, input on file
+;; descriptors, Mach messages, etc.) to come through one routine anyone can
+;; use to wait for input.
 (define-condition x-error (error) ())
 
-;;-----------------------------------------------------------------------------
 ;;  HOST hacking
-;;-----------------------------------------------------------------------------
 (defun host-address (host &optional (family :internet))
   ;; Return a list whose car is the family keyword (:internet :DECnet :Chaos)
   ;; and cdr is a list of network address bytes.
@@ -776,26 +744,19 @@
       ((:internet nil 0)
        (cons :internet (coerce (host-ent-address hostent) 'list))))))
 
-;;-----------------------------------------------------------------------------
 ;; Whether to use closures for requests or not.
-;;-----------------------------------------------------------------------------
 
-;;; If this macro expands to non-NIL, then request and locking code is
-;;; compiled in a much more compact format, as the common code is shared, and
-;;; the specific code is built into a closure that is funcalled by the shared
-;;; code.  If your compiler makes efficient use of closures then you probably
-;;; want to make this expand to T, as it makes the code more compact.
-(defmacro use-closures () nil)
+;; If this macro expands to non-NIL, then request and locking code is compiled
+;; in a much more compact format, as the common code is shared, and the
+;; specific code is built into a closure that is funcalled by the shared
+;; code. If your compiler makes efficient use of closures then you probably
+;; want to make this expand to T, as it makes the code more compact.
+;; REVIEW 2026-01-05: changed to T
+(defmacro use-closures () t)
 
-;;; fixme: remove no-op
-(defun clx-macroexpand (form env)
-  (macroexpand form env))
+;;; Resource stuff
 
-;;-----------------------------------------------------------------------------
-;; Resource stuff
-;;-----------------------------------------------------------------------------
-
-;;; Utilities
+;;;; Utilities
 (defun getenv (name)
   (sb-ext:posix-getenv name))
 
@@ -806,15 +767,15 @@
   (machine-instance))
 
 (defun homedir-file-pathname (name)
-  (and (merge-pathnames (user-homedir-pathname) (pathname name))))
+  (merge-pathnames (user-homedir-pathname) (pathname name)))
 
-;;; DEFAULT-RESOURCES-PATHNAME - The pathname of the resources file to load if
-;;; a resource manager isn't running.
+;; DEFAULT-RESOURCES-PATHNAME - The pathname of the resources file to load if
+;; a resource manager isn't running.
 (defun default-resources-pathname ()
   (homedir-file-pathname ".Xdefaults"))
 
-;;; RESOURCES-PATHNAME - The pathname of the resources file to load after the
-;;; defaults have been loaded.
+;; RESOURCES-PATHNAME - The pathname of the resources file to load after the
+;; defaults have been loaded.
 (defun resources-pathname ()
   (or (let ((string (getenv "XENVIRONMENT")))
         (and string
@@ -822,14 +783,14 @@
       (homedir-file-pathname
        (concatenate 'string ".Xdefaults-" (get-host-name)))))
 
-;;; AUTHORITY-PATHNAME - The pathname of the authority file.
+;; AUTHORITY-PATHNAME - The pathname of the authority file.
 (defun authority-pathname ()
   (or (let ((xauthority (getenv "XAUTHORITY")))
         (and xauthority
              (pathname xauthority)))
       (homedir-file-pathname ".Xauthority")))
 
-;;; this particular defaulting behaviour is typical to most Unices, I think
+;; this particular defaulting behaviour is typical to most Unices, I think
 #+unix
 (defun get-default-display (&optional display-name)
   "Parse the argument DISPLAY-NAME, or the environment variable $DISPLAY
@@ -875,9 +836,7 @@ Returns a list of (host display-number screen protocol)."
                  (t :internet))))
     (list host (or display 0) (or screen 0) protocol)))
 
-;;-----------------------------------------------------------------------------
 ;; GC stuff
-;;-----------------------------------------------------------------------------
 (defun gc-cleanup ()
   (declare (special *event-free-list*
                     *pending-command-free-list*
@@ -892,9 +851,7 @@ Returns a list of (host display-number screen protocol)."
   (setq *temp-gcontext-cache* nil)
   nil)
 
-;;-----------------------------------------------------------------------------
-;; DEFAULT-KEYSYM-TRANSLATE
-;;-----------------------------------------------------------------------------
+;;;; DEFAULT-KEYSYM-TRANSLATE
 ;; If object is a character, char-bits are set from state.
 
 ;; [the following isn't implemented (should it be?)]
@@ -913,11 +870,9 @@ Returns a list of (host display-number screen protocol)."
            (clx-values t))
   object)
 
-;;-----------------------------------------------------------------------------
-;; Image stuff
-;;-----------------------------------------------------------------------------
+;;; Image stuff
 
-;;; Types
+;;;; Types
 (deftype pixarray-1-element-type ()
   'bit)
 
@@ -965,7 +920,6 @@ Returns a list of (host display-number screen protocol)."
 (deftype bitmap ()
   'pixarray-1)
 
-;;; WITH-UNDERLYING-SIMPLE-VECTOR
 ;; We do *NOT* support viewing an array as having a different element type.
 ;; Element-type is ignored.
 (defmacro with-underlying-simple-vector
@@ -976,17 +930,17 @@ Returns a list of (host display-number screen protocol)."
      (declare (ignore start end))
      ,@body))
 
-;;; These are used to read and write pixels from and to CARD8s.
+;; These are used to read and write pixels from and to CARD8s.
 
-;;; READ-IMAGE-LOAD-BYTE is used to extract 1 and 4 bit pixels from CARD8s.
+;; READ-IMAGE-LOAD-BYTE is used to extract 1 and 4 bit pixels from CARD8s.
 (defmacro read-image-load-byte (size position integer)
   (unless +image-bit-lsb-first-p+ (setq position (- 7 position)))
   `(the (unsigned-byte ,size)
         (ldb (byte ,size ,position)
              (the card8 ,integer))))
 
-;;; READ-IMAGE-ASSEMBLE-BYTES is used to build 16, 24 and 32 bit pixels from
-;;; the appropriate number of CARD8s.
+;; READ-IMAGE-ASSEMBLE-BYTES is used to build 16, 24 and 32 bit pixels from
+;; the appropriate number of CARD8s.
 (defmacro read-image-assemble-bytes (&rest bytes)
   (unless +image-byte-lsb-first-p+ (setq bytes (reverse bytes)))
   (let ((it (first bytes))
@@ -998,8 +952,8 @@ Returns a list of (host display-number screen protocol)."
                   (the (unsigned-byte ,count) ,it))))
     `(the (unsigned-byte ,(* (length bytes) 8)) ,it)))
 
-;;; WRITE-IMAGE-LOAD-BYTE is used to extract a CARD8 from a 16, 24 or 32 bit
-;;; pixel.
+;; WRITE-IMAGE-LOAD-BYTE is used to extract a CARD8 from a 16, 24 or 32 bit
+;; pixel.
 (defmacro write-image-load-byte (position integer integer-size)
   integer-size
   (unless +image-byte-lsb-first-p+ (setq position (- integer-size 8 position)))
@@ -1007,8 +961,8 @@ Returns a list of (host display-number screen protocol)."
         (ldb (byte 8 ,position)
              (the (unsigned-byte ,integer-size) ,integer))))
 
-;;; WRITE-IMAGE-ASSEMBLE-BYTES is used to build a CARD8 from 1 or 4 bit
-;;; pixels.
+;; WRITE-IMAGE-ASSEMBLE-BYTES is used to build a CARD8 from 1 or 4 bit
+;; pixels.
 (defmacro write-image-assemble-bytes (&rest bytes)
   (unless +image-bit-lsb-first-p+ (setq bytes (reverse bytes)))
   (let ((size (floor 8 (length bytes)))
@@ -1021,18 +975,18 @@ Returns a list of (host display-number screen protocol)."
                  (the (unsigned-byte ,count) ,it))))
     `(the card8 ,it)))
 
-;;; If you can write fast routines that can read and write pixarrays out of a
-;;; buffer-bytes, do it!  It makes the image code a lot faster.  The
-;;; FAST-READ-PIXARRAY, FAST-WRITE-PIXARRAY and FAST-COPY-PIXARRAY routines
-;;; return T if they can do it, NIL if they can't.
+;; If you can write fast routines that can read and write pixarrays out of a
+;; buffer-bytes, do it! It makes the image code a lot faster. The
+;; FAST-READ-PIXARRAY, FAST-WRITE-PIXARRAY and FAST-COPY-PIXARRAY routines
+;; return T if they can do it, NIL if they can't.
 
-;;; FIXME: though we have some #+sbcl -conditionalized routines in
-;;; here, they would appear not to work, and so are commented out in
-;;; the the FAST-xxx-PIXARRAY routines themseleves.  Investigate
-;;; whether the unoptimized routines are often used, and also whether
-;;; speeding them up while maintaining correctness is possible.
+;; FIXME: though we have some #+sbcl -conditionalized routines in here, they
+;; would appear not to work, and so are commented out in the FAST-xxx-PIXARRAY
+;; routines themseleves. Investigate whether the unoptimized routines are
+;; often used, and also whether speeding them up while maintaining correctness
+;; is possible.
 
-;;; FAST-READ-PIXARRAY - fill part of a pixarray from a buffer of card8s
+;; FAST-READ-PIXARRAY - fill part of a pixarray from a buffer of card8s
 (defun fast-read-pixarray-24 (buffer-bbuf index array x y width height
                               padded-bytes-per-line bits-per-pixel)
   (declare (type buffer-bytes buffer-bbuf)
@@ -1071,12 +1025,12 @@ Returns a list of (host display-number screen protocol)."
           (t
            (error "Invalid pixarray: ~S." pixarray)))))
 
-;;; COPY-BIT-RECT  --  Internal
+;; COPY-BIT-RECT  --  Internal
 
-;;;    This is the classic BITBLT operation, copying a rectangular subarray
-;;; from one array to another (but source and destination must not overlap.)
-;;; Widths are specified in bits.  Neither array can have a non-zero
-;;; displacement.  We allow extra random bit-offset to be thrown into the X.
+;; This is the classic BITBLT operation, copying a rectangular subarray
+;; from one array to another (but source and destination must not overlap.)
+;; Widths are specified in bits.  Neither array can have a non-zero
+;; displacement.  We allow extra random bit-offset to be thrown into the X.
 (defun copy-bit-rect (source source-width sx sy dest dest-width dx dy
                       height width)
   (declare (type array-index source-width sx sy dest-width dx dy height width))
@@ -1128,7 +1082,7 @@ Returns a list of (host display-number screen protocol)."
          bits-per-pixel unit byte-lsb-first-p bit-lsb-first-p)
   nil)
 
-;;; FAST-WRITE-PIXARRAY - copy part of a pixarray into an array of CARD8s
+;; FAST-WRITE-PIXARRAY - copy part of a pixarray into an array of CARD8s
 (defun fast-write-pixarray-24 (buffer-bbuf index array x y width height
                                padded-bytes-per-line bits-per-pixel)
   (declare (type buffer-bytes buffer-bbuf)
@@ -1189,7 +1143,7 @@ Returns a list of (host display-number screen protocol)."
          bits-per-pixel unit byte-lsb-first-p bit-lsb-first-p)
   nil)
 
-;;; FAST-COPY-PIXARRAY - copy part of a pixarray into another
+;; FAST-COPY-PIXARRAY - copy part of a pixarray into another
 (defun fast-copy-pixarray (pixarray copy x y width height bits-per-pixel)
   (declare (type pixarray pixarray copy)
            (type card16 x y width height)

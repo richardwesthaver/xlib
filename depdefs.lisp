@@ -232,7 +232,6 @@ If it is a list, it is interpreted by DEF-CLX-CLASS to be a list of
 type names for which DEFCLASS should be used.  If it is not a list,
 then DEFCLASS is always used.  If it is NIL, then DEFCLASS is never
 used, since NIL is the empty list."))
-
 (defmacro def-clx-class ((name &rest options) &body slots)
   (if (or (not (listp *def-clx-class-use-defclass*))
 	  (member name *def-clx-class-use-defclass*))
@@ -381,13 +380,7 @@ used, since NIL is the empty list."))
   ;; Function to call to listen for input data
   (listen-function 'buffer-listen-default)) 
 
-;;-----------------------------------------------------------------------------
-;; Printing routines.
-;;-----------------------------------------------------------------------------
-
-;;-----------------------------------------------------------------------------
 ;; Image stuff
-;;-----------------------------------------------------------------------------
 (defconstant +image-bit-lsb-first-p+
 	     #+little-endian t
 	     #-little-endian nil)
@@ -399,24 +392,3 @@ used, since NIL is the empty list."))
 (defconstant +image-unit+ 32)
 
 (defconstant +image-pad+ 32)
-
-;;-----------------------------------------------------------------------------
-;; Finding the server socket
-;;-----------------------------------------------------------------------------
-
-;; These are here because dep-openmcl.lisp, dep-lispworks.lisp and
-;; dependent.lisp need them
-(defconstant +X-unix-socket-path+
-  "/tmp/.X11-unix/X"
-  "The location of the X socket")
-
-(defun unix-socket-path-from-host (host display)
-  "Return the name of the unix domain socket for host and display, or
-nil if a network socket should be opened."
-  (cond ((or (string= host "") (string= host "unix"))
-	 (format nil "~A~D" +X-unix-socket-path+ display))
-	#+darwin
-	((or (and (> (length host) 10) (string= host "tmp/launch" :end1 10))
-	     (and (> (length host) 29) (string= host "private/tmp/com.apple.launchd" :end1 29)))
-	 (format nil "/~A:~D" host display))
-	(t nil)))

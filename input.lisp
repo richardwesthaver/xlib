@@ -735,7 +735,7 @@
 			 :event-code (the card8 (logand #x7f (read-card8 0)))
 			 :send-event-p (logbitp 7 (read-card8 0))
 			 ,@',(mapcar #'(lambda (form)
-					 (clx-macroexpand form env))
+					 (macroexpand form env))
 				     get-code))
 		       variable)))
 
