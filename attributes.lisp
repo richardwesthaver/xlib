@@ -1,42 +1,30 @@
-;;; attributes.lisp
+;;; attributes.lisp --- XLIB Window Attributes
 
-;;; Window Attributes
+;;; Commentary:
 
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
+;;	The special variable *window-attributes* is an alist containg:
+;;	(drawable attributes attribute-changes geometry geometry-changes)
+;;	Where DRAWABLE is the associated window or pixmap
+;;	      ATTRIBUTES is NIL or a reply-buffer containing the drawable's
+;;		         attributes for use by the accessors.
+;;	      ATTRIBUTE-CHANGES is NIL or an array.  The first element
+;;			 of the array is a "value-mask", indicating which
+;;			 attributes have changed.  The other elements are
+;;			 integers associated with the changed values, ready
+;;			 for insertion into a server request.
+;;	      GEOMETRY is like ATTRIBUTES, but for window geometry
+;;	      GEOMETRY-CHANGES is like ATTRIBUTE-CHANGES, but for window geometry
 
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
+;;	Attribute and Geometry accessors and SETF's look on the special variable
+;;	*window-attributes* for the drawable.  If its not there, the accessor is
+;;     NOT within a WITH-STATE, and a server request is made to get or put a value.
+;;     If an entry is found in *window-attributes*, the cache buffers are used
+;;	for the access.
 
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
+;;	All WITH-STATE has to do (re)bind *Window-attributes* to a list including
+;;	the new drawable.  The caches are initialized to NIL and allocated as needed.
 
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
-
-;;;	The special variable *window-attributes* is an alist containg:
-;;;	(drawable attributes attribute-changes geometry geometry-changes)
-;;;	Where DRAWABLE is the associated window or pixmap
-;;;	      ATTRIBUTES is NIL or a reply-buffer containing the drawable's
-;;;		         attributes for use by the accessors.
-;;;	      ATTRIBUTE-CHANGES is NIL or an array.  The first element
-;;;			 of the array is a "value-mask", indicating which
-;;;			 attributes have changed.  The other elements are
-;;;			 integers associated with the changed values, ready
-;;;			 for insertion into a server request.
-;;;	      GEOMETRY is like ATTRIBUTES, but for window geometry
-;;;	      GEOMETRY-CHANGES is like ATTRIBUTE-CHANGES, but for window geometry
-
-;;;	Attribute and Geometry accessors and SETF's look on the special variable
-;;;	*window-attributes* for the drawable.  If its not there, the accessor is
-;;;     NOT within a WITH-STATE, and a server request is made to get or put a value.
-;;;     If an entry is found in *window-attributes*, the cache buffers are used
-;;;	for the access.
-
-;;;	All WITH-STATE has to do (re)bind *Window-attributes* to a list including
-;;;	the new drawable.  The caches are initialized to NIL and allocated as needed.
+;;; Code:
 (in-package :xlib)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)

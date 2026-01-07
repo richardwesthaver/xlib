@@ -3,19 +3,7 @@
 ;; This file contains definitions for the BUFFER object for Common-Lisp X
 ;; windows version 11
 
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-
-;;; Permission is granted to any individual or institution to use, copy,
-;;; modify, and distribute this software, provided that this complete
-;;; copyright and permission notice is maintained, intact, in all copies and
-;;; supporting documentation.
-
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
+;;; Commentary:
 
 ;; A few notes:
 
@@ -43,6 +31,8 @@
 ;;  6. Care is taken to leave the buffer pointer (buffer-bbuf) set to a point
 ;;     after a complete request.  This is to ensure that a partial request
 ;;     won't be left after aborts (e.g. control-abort on a lispm).
+
+;;; Code:
 (in-package :xlib)
 
 (defconstant +requestsize+ 160) ;; Max request size (excluding variable length requests)
@@ -63,17 +53,17 @@
 	  `(flet ((.with-buffer-body. () ,@body))
 	     (declare (dynamic-extent #'.with-buffer-body.))
 	     (with-buffer-function ,buffer ,timeout #'.with-buffer-body.))
-	(let ((buf (if (or (symbolp buffer) (constantp buffer))
-		       buffer
-		     '.buffer.)))
-	  `(let (,@(unless (eq buf buffer) `((,buf ,buffer))))
-	     ,@(unless (eq buf buffer) `((declare (type buffer ,buf))))
-	     ,(declare-bufmac)
-	     (when (buffer-dead ,buf)
-	       (x-error 'closed-display :display ,buf))
-	     (holding-lock ((buffer-lock ,buf) ,buf "X Display Lock"
-			    ,@(and timeout `(:timeout ,timeout)))
-	       ,@body))))))
+	  (let ((buf (if (or (symbolp buffer) (constantp buffer))
+		         buffer
+		         '.buffer.)))
+	    `(let (,@(unless (eq buf buffer) `((,buf ,buffer))))
+	       ,@(unless (eq buf buffer) `((declare (type buffer ,buf))))
+	       ,(declare-bufmac)
+	       (when (buffer-dead ,buf)
+	         (x-error 'closed-display :display ,buf))
+	       (holding-lock ((buffer-lock ,buf) ,buf "X Display Lock"
+			      ,@(and timeout `(:timeout ,timeout)))
+	         ,@body))))))
 
 (defun with-buffer-function (buffer timeout function)
   (declare (type display buffer)
@@ -147,7 +137,7 @@
   (declare (dynamic-extent options))
   ;; Output-Size is the output-buffer size in bytes.
   (let ((byte-output (make-array output-size :element-type 'card8
-				 :initial-element 0)))
+				             :initial-element 0)))
     (apply constructor
 	   :size output-size
 	   :obuf8 byte-output
@@ -156,10 +146,10 @@
 (defun make-reply-buffer (size)
   ;; Size is the buffer size in bytes
   (let ((byte-input (make-array size :element-type 'card8
-				:initial-element 0)))
+				     :initial-element 0)))
     (make-reply-buffer-internal
-      :size size
-      :ibuf8 byte-input)))
+     :size size
+     :ibuf8 byte-input)))
 
 (defun buffer-ensure-size (buffer size)
   (declare (type buffer buffer)
@@ -169,7 +159,7 @@
       (buffer-flush buffer)
       (let* ((new-buffer-size (index-ash 1 (integer-length (index1- size))))
 	     (new-buffer (make-array new-buffer-size :element-type 'card8
-				     :initial-element 0)))
+				                     :initial-element 0)))
 	(setf (buffer-obuf8 buffer) new-buffer)))))
 
 (defun buffer-pad-request (buffer pad)
@@ -197,9 +187,9 @@
 	   (dynamic-extent request-function))
   (with-buffer (display :inline t)
     (multiple-value-prog1
-      (progn
-	(when gc-force (force-gcontext-changes-internal gc-force))
-	(without-aborts (funcall request-function display)))
+        (progn
+	  (when gc-force (force-gcontext-changes-internal gc-force))
+	  (without-aborts (funcall request-function display)))
       (display-invoke-after-function display))))
 
 (defun with-buffer-request-function-nolock (display gc-force request-function)
@@ -208,9 +198,9 @@
   (declare (type function request-function)
 	   (dynamic-extent request-function))
   (multiple-value-prog1
-    (progn
-      (when gc-force (force-gcontext-changes-internal gc-force))
-      (without-aborts (funcall request-function display)))
+      (progn
+        (when gc-force (force-gcontext-changes-internal gc-force))
+        (without-aborts (funcall request-function display)))
     (display-invoke-after-function display)))
 
 (defstruct (pending-command (:copier nil) (:predicate nil))
@@ -220,7 +210,7 @@
   (next nil #-explorer :type #-explorer (or null pending-command)))
 
 (defun with-buffer-request-and-reply-function
-       (display multiple-reply request-function reply-function)
+    (display multiple-reply request-function reply-function)
   (declare (type display display)
 	   (type generalized-boolean multiple-reply))
   (declare (type function request-function reply-function)
@@ -230,20 +220,20 @@
     (declare (type (or null pending-command) pending-command)
 	     (type (or null reply-buffer) reply-buffer))
     (unwind-protect
-	(progn 
-	  (with-buffer (display :inline t)
-	    (setq pending-command (start-pending-command display))
-	    (without-aborts (funcall request-function display))
-	    (buffer-force-output display)
-	    (display-invoke-after-function display))
-	  (cond (multiple-reply
-		 (loop
-		   (setq reply-buffer (read-reply display pending-command))
-		   (when (funcall reply-function display reply-buffer) (return nil))
-		   (deallocate-reply-buffer (shiftf reply-buffer nil))))
-		(t
-		 (setq reply-buffer (read-reply display pending-command))
-		 (funcall reply-function display reply-buffer))))
+	 (progn 
+	   (with-buffer (display :inline t)
+	     (setq pending-command (start-pending-command display))
+	     (without-aborts (funcall request-function display))
+	     (buffer-force-output display)
+	     (display-invoke-after-function display))
+	   (cond (multiple-reply
+		  (loop
+		    (setq reply-buffer (read-reply display pending-command))
+		    (when (funcall reply-function display reply-buffer) (return nil))
+		    (deallocate-reply-buffer (shiftf reply-buffer nil))))
+		 (t
+		  (setq reply-buffer (read-reply display pending-command))
+		  (funcall reply-function display reply-buffer))))
       (when reply-buffer (deallocate-reply-buffer reply-buffer))
       (when pending-command (stop-pending-command display pending-command)))))
 
@@ -277,9 +267,9 @@
     `(let* (,@(and (not (eq buf buffer)) `((,buf ,buffer)))
 	    (.saved-buffer-flush-inhibit. (buffer-flush-inhibit ,buf)))
        (unwind-protect
-	   (progn
-	     (setf (buffer-flush-inhibit ,buf) t)
-	     ,@body)
+	    (progn
+	      (setf (buffer-flush-inhibit ,buf) t)
+	      ,@body)
 	 (setf (buffer-flush-inhibit ,buf) .saved-buffer-flush-inhibit.)))))
 
 (defun buffer-force-output (buffer)
@@ -386,18 +376,18 @@
 (defmacro define-transformed-sequence-reader (name totype transformer reader)
   (let ((ntrans (gensym)))
     `(defun ,name (reply-buffer result-type nitems &optional transform data (start 0) (index 0))
-      (declare 
-       (type reply-buffer reply-buffer)
-       (type t result-type)
-       (type array-index nitems start index)
-       (type (or null sequence) data)
-       (type (or null (function (,totype) t)) transform)
-       (dynamic-extent transform))
-      (if transform
-	  (flet ((,ntrans (v) (funcall transform (,transformer v))))
-            (declare (dynamic-extent #',ntrans))
-	    (,reader reply-buffer result-type nitems #',ntrans data start index))
-	  (,reader reply-buffer result-type nitems #',transformer data start index)))))
+       (declare 
+        (type reply-buffer reply-buffer)
+        (type t result-type)
+        (type array-index nitems start index)
+        (type (or null sequence) data)
+        (type (or null (function (,totype) t)) transform)
+        (dynamic-extent transform))
+       (if transform
+	   (flet ((,ntrans (v) (funcall transform (,transformer v))))
+             (declare (dynamic-extent #',ntrans))
+	     (,reader reply-buffer result-type nitems #',ntrans data start index))
+	   (,reader reply-buffer result-type nitems #',transformer data start index)))))
 
 (define-transformed-sequence-reader read-sequence-char character 
   card8->char read-sequence-card8)
@@ -405,30 +395,30 @@
 ;;; Reading sequences of card8's
 (defmacro define-list-readers ((name tname) type size step reader)
   `(progn 
-    (defun ,name (reply-buffer nitems data start index)
-      (declare (type reply-buffer reply-buffer)
-	       (type array-index nitems start index)
-	       (type list data))
-      (with-buffer-input (reply-buffer :sizes (,size) :index index)
-	(do* ((j nitems (index- j 1))
-	      (list (nthcdr start data) (cdr list))
-	      (index 0 (index+ index ,step)))
-	     ((index-zerop j))
-	  (declare (type array-index index j) (type list list))
-	  (setf (car list) (,reader index)))))
-    (defun ,tname (reply-buffer nitems data transform start index)
-      (declare (type reply-buffer reply-buffer)
-	       (type array-index nitems start index)
-	       (type list data)
-	       (type (function (,type) t) transform)
-               (dynamic-extent transform))
-      (with-buffer-input (reply-buffer :sizes (,size) :index index)
-	(do* ((j nitems (index- j 1))
-	      (list (nthcdr start data) (cdr list))
-	      (index 0 (index+ index ,step)))
-	     ((index-zerop j))
-	  (declare (type array-index index j) (type list list))
-	  (setf (car list) (funcall transform (,reader index))))))))
+     (defun ,name (reply-buffer nitems data start index)
+       (declare (type reply-buffer reply-buffer)
+	        (type array-index nitems start index)
+	        (type list data))
+       (with-buffer-input (reply-buffer :sizes (,size) :index index)
+	 (do* ((j nitems (index- j 1))
+	       (list (nthcdr start data) (cdr list))
+	       (index 0 (index+ index ,step)))
+	      ((index-zerop j))
+	   (declare (type array-index index j) (type list list))
+	   (setf (car list) (,reader index)))))
+     (defun ,tname (reply-buffer nitems data transform start index)
+       (declare (type reply-buffer reply-buffer)
+	        (type array-index nitems start index)
+	        (type list data)
+	        (type (function (,type) t) transform)
+                (dynamic-extent transform))
+       (with-buffer-input (reply-buffer :sizes (,size) :index index)
+	 (do* ((j nitems (index- j 1))
+	       (list (nthcdr start data) (cdr list))
+	       (index 0 (index+ index ,step)))
+	      ((index-zerop j))
+	   (declare (type array-index index j) (type list list))
+	   (setf (car list) (funcall transform (,reader index))))))))
 
 (define-list-readers (read-list-card8 read-list-card8-with-transform) card8
   8 1 read-card8)
@@ -488,30 +478,30 @@
 
 (defmacro define-sequence-reader (name type (list tlist) (sa tsa) (vec tvec))
   `(defun ,name (reply-buffer result-type nitems &optional transform data (start 0) (index 0))
-    (declare
-     (type reply-buffer reply-buffer)
-     (type t result-type)
-     (type array-index nitems start index)
-     (type (or null sequence) data)
-     (type (or null (function (,type) t)) transform)
-     (dynamic-extent transform))
-    (let ((result (or data (make-sequence result-type nitems))))
-      (typecase result
-	(list
-	 (if transform
-	     (,tlist reply-buffer nitems result transform start index)
-	     (,list reply-buffer nitems result start index)))
-	#-lispm
-	((simple-array ,type (*))
-	 (if transform
-	     (,tsa reply-buffer nitems result transform start index)
-	     (,sa reply-buffer nitems result start index)))
-	;; FIXME: general sequences
-	(t 
-	 (if transform
-	     (,tvec reply-buffer nitems result transform start index)
-	     (,vec reply-buffer nitems result start index))))
-      result)))
+     (declare
+      (type reply-buffer reply-buffer)
+      (type t result-type)
+      (type array-index nitems start index)
+      (type (or null sequence) data)
+      (type (or null (function (,type) t)) transform)
+      (dynamic-extent transform))
+     (let ((result (or data (make-sequence result-type nitems))))
+       (typecase result
+	 (list
+	  (if transform
+	      (,tlist reply-buffer nitems result transform start index)
+	      (,list reply-buffer nitems result start index)))
+	 #-lispm
+	 ((simple-array ,type (*))
+	  (if transform
+	      (,tsa reply-buffer nitems result transform start index)
+	      (,sa reply-buffer nitems result start index)))
+	 ;; FIXME: general sequences
+	 (t 
+	  (if transform
+	      (,tvec reply-buffer nitems result transform start index)
+	      (,vec reply-buffer nitems result start index))))
+       result)))
 
 (define-sequence-reader read-sequence-card8 card8 
   (read-list-card8 read-list-card8-with-transform)
@@ -665,17 +655,17 @@
 (defmacro define-transformed-sequence-writer (name fromtype transformer writer)
   (let ((ntrans (gensym)))
     `(defun ,name (buffer boffset data &optional (start 0) (end (length data)) transform)
-      (declare 
-       (type buffer buffer)
-       (type sequence data)
-       (type array-index boffset start end)
-       (type (or null (function (t) ,fromtype)) transform)
-       (dynamic-extent transform))
-      (if transform
-	  (flet ((,ntrans (x) (,transformer (the ,fromtype (funcall transform x)))))
-            (declare (dynamic-extent #',ntrans))
-	    (,writer buffer boffset data start end #',ntrans))
-	  (,writer buffer boffset data start end #',transformer)))))
+       (declare 
+        (type buffer buffer)
+        (type sequence data)
+        (type array-index boffset start end)
+        (type (or null (function (t) ,fromtype)) transform)
+        (dynamic-extent transform))
+       (if transform
+	   (flet ((,ntrans (x) (,transformer (the ,fromtype (funcall transform x)))))
+             (declare (dynamic-extent #',ntrans))
+	     (,writer buffer boffset data start end #',ntrans))
+	   (,writer buffer boffset data start end #',transformer)))))
 
 (define-transformed-sequence-writer write-sequence-char character 
   char->card8 write-sequence-card8)
@@ -683,32 +673,32 @@
 ;;; Writing sequences of card8's
 (defmacro define-list-writers ((name tname) type step writer)
   `(progn
-    (defun ,name (buffer boffset data start end)
-      (declare 
-       (type buffer buffer)
-       (type list data)
-       (type array-index boffset start end))
-      (writing-buffer-chunks ,type
-	  ((list (nthcdr start data)))
-	  ((type list list))
-	(do ((j 0 (index+ j ,step)))
-	    ((index>= j chunk))
-	  (declare (type array-index j))
-	  (,writer j (pop list)))))
-    (defun ,tname (buffer boffset data start end transform)
-      (declare 
-       (type buffer buffer)
-       (type list data)
-       (type array-index boffset start end)
-       (type (function (t) ,type) transform)
-       (dynamic-extent transform))
-      (writing-buffer-chunks ,type
-	  ((list (nthcdr start data)))
-	  ((type list list))
-	(do ((j 0 (index+ j ,step)))
-	    ((index>= j chunk))
-	  (declare (type array-index j))
-	  (,writer j (funcall transform (pop list))))))))
+     (defun ,name (buffer boffset data start end)
+       (declare 
+        (type buffer buffer)
+        (type list data)
+        (type array-index boffset start end))
+       (writing-buffer-chunks ,type
+	   ((list (nthcdr start data)))
+	   ((type list list))
+	 (do ((j 0 (index+ j ,step)))
+	     ((index>= j chunk))
+	   (declare (type array-index j))
+	   (,writer j (pop list)))))
+     (defun ,tname (buffer boffset data start end transform)
+       (declare 
+        (type buffer buffer)
+        (type list data)
+        (type array-index boffset start end)
+        (type (function (t) ,type) transform)
+        (dynamic-extent transform))
+       (writing-buffer-chunks ,type
+	   ((list (nthcdr start data)))
+	   ((type list list))
+	 (do ((j 0 (index+ j ,step)))
+	     ((index>= j chunk))
+	   (declare (type array-index j))
+	   (,writer j (funcall transform (pop list))))))))
 
 (define-list-writers (write-list-card8 write-list-card8-with-transform) card8
   1 write-card8)
@@ -720,8 +710,8 @@
 	   (type array-index boffset start end))
   (with-vector (data (simple-array card8 (*)))
     (writing-buffer-chunks card8
-			   ((index start (index+ index chunk)))
-			   ((type array-index index))
+	((index start (index+ index chunk)))
+	((type array-index index))
       (buffer-replace buffer-bbuf data
 		      buffer-boffset
 		      (index+ buffer-boffset chunk)
@@ -736,8 +726,8 @@
 	   (dynamic-extent transform))
   (with-vector (data (simple-array card8 (*)))
     (writing-buffer-chunks card8
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (dotimes (j chunk)
 	(declare (type array-index j))
 	(write-card8 j (funcall transform (aref data index)))
@@ -751,8 +741,8 @@
 	   (optimize #+cmu(ext:inhibit-warnings 3)))
   (with-vector (data vector)
     (writing-buffer-chunks card8
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (dotimes (j chunk)
 	(declare (type array-index j))
 	(write-card8 j (aref data index))
@@ -767,8 +757,8 @@
 	   (dynamic-extent transform))
   (with-vector (data vector)
     (writing-buffer-chunks card8
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (dotimes (j chunk)
 	(declare (type array-index j))
 	(write-card8 j (funcall transform (aref data index)))
@@ -777,26 +767,26 @@
 
 (defmacro define-sequence-writer (name type (list tlist) (sa tsa) (vec tvec))
   `(defun ,name (buffer boffset data &optional (start 0) (end (length data)) transform)
-    (declare
-     (type buffer buffer)
-     (type sequence data)
-     (type array-index boffset start end)
-     (type (or null (function (t) ,type)) transform)
-     (dynamic-extent transform))
-    (typecase data
-      (list
-       (if transform
-	   (,tlist buffer boffset data start end transform)
-	   (,list buffer boffset data start end)))
-      #-lispm
-      ((simple-array ,type (*))
-       (if transform
-	   (,tsa buffer boffset data start end transform)
-	   (,sa buffer boffset data start end)))
-      (t ; FIXME: general sequences
-       (if transform
-	   (,tvec buffer boffset data start end transform)
-	   (,vec buffer boffset data start end))))))
+     (declare
+      (type buffer buffer)
+      (type sequence data)
+      (type array-index boffset start end)
+      (type (or null (function (t) ,type)) transform)
+      (dynamic-extent transform))
+     (typecase data
+       (list
+        (if transform
+	    (,tlist buffer boffset data start end transform)
+	    (,list buffer boffset data start end)))
+       #-lispm
+       ((simple-array ,type (*))
+        (if transform
+	    (,tsa buffer boffset data start end transform)
+	    (,sa buffer boffset data start end)))
+       (t ; FIXME: general sequences
+        (if transform
+	    (,tvec buffer boffset data start end transform)
+	    (,vec buffer boffset data start end))))))
 
 (define-sequence-writer write-sequence-card8 card8
   (write-list-card8 write-list-card8-with-transform)
@@ -816,8 +806,8 @@
 	   (type array-index boffset start end))
   (with-vector (data (simple-array card16 (*)))
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -841,8 +831,8 @@
 	   (dynamic-extent transform))
   (with-vector (data (simple-array card16 (*)))
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -857,8 +847,8 @@
 	   (type array-index boffset start end))
   (with-vector (data vector)
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -882,8 +872,8 @@
 	   (dynamic-extent transform))
   (with-vector (data vector)
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -908,8 +898,8 @@
 	   (type array-index boffset start end))
   (with-vector (data (simple-array int16 (*)))
     (writing-buffer-chunks int16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of int16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -933,8 +923,8 @@
 	   (dynamic-extent transform))
   (with-vector (data (simple-array int16 (*)))
     (writing-buffer-chunks int16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of int16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -950,8 +940,8 @@
 	   (optimize #+cmu(ext:inhibit-warnings 3)))
   (with-vector (data vector)
     (writing-buffer-chunks int16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of int16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -976,8 +966,8 @@
 	   (dynamic-extent transform))
   (with-vector (data vector)
     (writing-buffer-chunks int16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of int16's big
       (do ((j 0 (index+ j 2)))
 	  ((index>= j chunk))
@@ -1001,8 +991,8 @@
 	   (type array-index boffset start end))
   (with-vector (data (simple-array card32 (*)))
     (writing-buffer-chunks card32
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card32's big
       (do ((j 0 (index+ j 4)))
 	  ((index>= j chunk))
@@ -1026,8 +1016,8 @@
 	   (dynamic-extent transform))
   (with-vector (data (simple-array card32 (*)))
     (writing-buffer-chunks card32
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card32's big
       (do ((j 0 (index+ j 4)))
 	  ((index>= j chunk))
@@ -1042,8 +1032,8 @@
 	   (type array-index boffset start end))
   (with-vector (data vector)
     (writing-buffer-chunks card32
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card32's big
       (do ((j 0 (index+ j 4)))
 	  ((index>= j chunk))
@@ -1068,8 +1058,8 @@
 	   (dynamic-extent transform))
   (with-vector (data vector)
     (writing-buffer-chunks card32
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       ;; Depends upon the chunks being an even multiple of card32's big
       (do ((j 0 (index+ j 4)))
 	  ((index>= j chunk))
@@ -1137,8 +1127,8 @@
 	   (type array-index boffset start end))
   (with-vector (data (simple-array card16 (*)))
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (do ((j 0 (index+ j 2)))
 	  ((index>= j (1- chunk)) (setf chunk j))
 	(declare (type array-index j))
@@ -1154,8 +1144,8 @@
 	   (dynamic-extent transform))
   (with-vector (data (simple-array card16 (*)))
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (do ((j 0 (index+ j 2)))
 	  ((index>= j (1- chunk)) (setf chunk j))
 	(declare (type array-index j))
@@ -1169,8 +1159,8 @@
 	   (type array-index boffset start end))
   (with-vector (data vector)
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (do ((j 0 (index+ j 2)))
 	  ((index>= j (1- chunk)) (setf chunk j))
 	(declare (type array-index j))
@@ -1186,8 +1176,8 @@
 	   (dynamic-extent transform))
   (with-vector (data vector)
     (writing-buffer-chunks card16
-			   ((index start))
-			   ((type array-index index))
+	((index start))
+	((type array-index index))
       (do ((j 0 (index+ j 2)))
 	  ((index>= j (1- chunk)) (setf chunk j))
 	(declare (type array-index j))

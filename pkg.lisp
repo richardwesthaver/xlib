@@ -13,7 +13,7 @@
 (defpackage #:xlib
   (:use :cl :std)
   (:import-from :obj/color :x11-colormap-class)
-  (:shadow :defconstant :buffer)
+  (:shadow :buffer)
   (:use :sb-bsd-sockets)
   (:export
     *version* access-control access-error access-hosts

@@ -57,9 +57,9 @@
     (write-string "x" stream)
     (prin1 (image-depth image) stream)))
 
-(defconstant +empty-data-x+ '#.(make-sequence '(array card8 (*)) 0))
+(define-constant* +empty-data-x+ '#.(make-sequence '(array card8 (*)) 0))
 
-(defconstant +empty-data-z+
+(define-constant* +empty-data-z+
   '#.(make-array '(0 0) :element-type 'pixarray-1-element-type))
 
 (def-clx-class (image-x (:include image) (:copier nil)
@@ -461,7 +461,7 @@
 			    (byte 4 4)
 			    (the card4 (ldb (byte 4 4) byte2)))))))))))
 
-(defconstant +image-byte-reverse+
+(define-constant* +image-byte-reverse+
  '#.(coerce
      '#(
 	0 128 64 192 32 160 96 224 16 144 80 208 48 176 112 240
@@ -693,7 +693,7 @@
 ;; 	sr  s+R
 ;; 	lr  l+R
 ;; 	wr  w+R
-(defconstant +image-swap-function+
+(define-constant* +image-swap-function+
  '#.(make-array
      '(12 12) :initial-contents
      (let ((n  'image-noswap)
@@ -724,7 +724,7 @@
 ;; end of the source.
 
 ;; Defines whether the first half of a unit has the first half of the data
-(defconstant +image-swap-lsb-first-p+
+(define-constant* +image-swap-lsb-first-p+
  '#.(make-array
      12 :initial-contents
      (list t   #| 1mm |#

@@ -23,8 +23,10 @@
 ;; Finding the server socket
 
 ;; These are here because dependent.lisp needs them
-(defconstant +X-unix-socket-path+
+(define-constant +X-unix-socket-path+
   "/tmp/.X11-unix/X"
+  :test 'string-equal
+  :documentation
   "The location of the X socket")
 
 (defun unix-socket-path-from-host (host display)
