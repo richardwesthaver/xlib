@@ -1,73 +1,56 @@
-;;; This is a pretty direct translation of the Xlib selection test
-;;; program by Tor Andersson found at
-;;; <http://ghostscript.com/~tor/repos/Klipp/x11clipboard.c>, with
-;;; minor enhancements:
-;;;
-;;; * gdk requestors apparently unconditionally request UTF8_STRING
-;;;   selections without checking the TARGETS list of the selection
-;;;   owner -- and apparently even never request anything else.  This
-;;;   seems to be in contradiction with the freedesktop.org draft
-;;;   specification at
-;;;   <http://www.pps.jussieu.fr/~jch/software/UTF8_STRING/UTF8_STRING.text>
-;;;   (linked from <http://freedesktop.org/Standards>), but this is
-;;;   the real world and we have to live in it.  It would be nice if
-;;;   someone in the freedesktop community could resolve this.
-;;;
-;;; * the original C code, in the XSendEvent call, has an event mask
-;;;   of SelectionNotify.  SelectionNotify is not an event mask at
-;;;   all, however: but the code works "by accident" because
-;;;   SelectionNotify happens to have value 31, which has enough bits
-;;;   flipped on that most clients select on at least one of those
-;;;   events.  This bug is fixed below.
-;;;
-;;; * [ Update 2004-11-29, superseding to some extent the above ] in
-;;;   fact, these two things are related.  ICCCM says that the event
-;;;   disclaiming the ability to send in a given format should be sent
-;;;   with an empty event mask ("2.2 Responsibilities of the Selection
-;;;   Owner").
-;;;
-;;; * implemented the ICCCM-required TIMESTAMP and MULTIPLE targets
-;;;
-;;; As ever with these things, the divisions in intellectual property
-;;; between the writer of the original C program, Tor Andersson
-;;; (contactable at tor [dot] andersson [at] gmail [dot] com) and the
-;;; translator (Christophe Rhodes, csr21 [at] cam [dot] ac [dot] uk)
-;;; are murky, probably depend on jurisdiction, and in addition for
-;;; such a small work are essentially trivial.  To set peoples' minds
-;;; at ease, Tor wishes this information to be disseminated as widely
-;;; as possible.
+;;; demo/clipboard.lisp --- Clipboard Demo
 
-;;; Copyright (c) 2004, Christophe Rhodes
-;;;
-;;; Permission is hereby granted, free of charge, to any person
-;;; obtaining a copy of this software and associated documentation
-;;; files (the "Software"), to deal in the Software without
-;;; restriction, including without limitation the rights to use, copy,
-;;; modify, merge, publish, distribute, sublicense, and/or sell copies
-;;; of the Software, and to permit persons to whom the Software is
-;;; furnished to do so, subject to the following conditions:
-;;;
-;;; The above copyright notice and this permission notice shall be
-;;; included in all copies or substantial portions of the Software.
-;;;
-;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-;;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-;;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-;;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-;;; HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-;;; WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-;;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-;;; DEALINGS IN THE SOFTWARE.
+;;; Commentary:
 
+;; This is a pretty direct translation of the Xlib selection test
+;; program by Tor Andersson found at
+;; <http://ghostscript.com/~tor/repos/Klipp/x11clipboard.c>, with
+;; minor enhancements:
+
+;; * gdk requestors apparently unconditionally request UTF8_STRING
+;;   selections without checking the TARGETS list of the selection
+;;   owner -- and apparently even never request anything else.  This
+;;   seems to be in contradiction with the freedesktop.org draft
+;;   specification at
+;;   <http://www.pps.jussieu.fr/~jch/software/UTF8_STRING/UTF8_STRING.text>
+;;   (linked from <http://freedesktop.org/Standards>), but this is
+;;   the real world and we have to live in it.  It would be nice if
+;;   someone in the freedesktop community could resolve this.
+
+;; * the original C code, in the XSendEvent call, has an event mask
+;;   of SelectionNotify.  SelectionNotify is not an event mask at
+;;   all, however: but the code works "by accident" because
+;;   SelectionNotify happens to have value 31, which has enough bits
+;;   flipped on that most clients select on at least one of those
+;;   events.  This bug is fixed below.
+
+;; * [ Update 2004-11-29, superseding to some extent the above ] in
+;;   fact, these two things are related.  ICCCM says that the event
+;;   disclaiming the ability to send in a given format should be sent
+;;   with an empty event mask ("2.2 Responsibilities of the Selection
+;;   Owner").
+
+;; * implemented the ICCCM-required TIMESTAMP and MULTIPLE targets
+
+;; As ever with these things, the divisions in intellectual property
+;; between the writer of the original C program, Tor Andersson
+;; (contactable at tor [dot] andersson [at] gmail [dot] com) and the
+;; translator (Christophe Rhodes, csr21 [at] cam [dot] ac [dot] uk)
+;; are murky, probably depend on jurisdiction, and in addition for
+;; such a small work are essentially trivial.  To set peoples' minds
+;; at ease, Tor wishes this information to be disseminated as widely
+;; as possible.
+
+;;; Code:
 (defpackage #:xlib-demo/clipboard
   (:use "CL" "XLIB")
   (:export "MAIN"))
 
 (in-package #:xlib-demo/clipboard)
 
-;;; This is "traditional" XLIB style; I don't really know if it's the
-;;; best way -- in developing this program, style of XLIB programming
-;;; was secondary to achieving First Paste.
+;; This is "traditional" XLIB style; I don't really know if it's the
+;; best way -- in developing this program, style of XLIB programming
+;; was secondary to achieving First Paste.
 (defvar *window*)
 (defvar *time*)
 (defvar *display*)

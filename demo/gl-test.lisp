@@ -1,9 +1,11 @@
+;;; demo/gl-test.lisp --- GL Demo
+
+;;; Code:
 (defpackage #:xlib-demo/gl-test
   (:use :common-lisp :xlib :xlib/gl)
   (:export "TEST" "XLIB-TEST"))
 
 (in-package #:xlib-demo/gl-test)
-
 
 (defun test (function &key (host "localhost") (display 1) (width 200) (height 200))
   (let* ((display (open-display host :display display))
@@ -44,9 +46,7 @@
              (setf ctx (xlib/glx:create-context screen (xlib/glx:visual-id visual)))
              (map-window window)
              (xlib/glx:make-current window ctx)
-
              (funcall function display window)
-
              (unmap-window window)
              (free-gcontext gc)))
       
@@ -95,7 +95,6 @@
           (sleep 0.02)))
   (sleep 3))
 
-
 (defun anim/list (display window)
   (declare (ignore display window))
   (ortho 0.0d0 1.0d0 0.0d0 1.0d0 -1.0d0 1.0d0)
@@ -114,7 +113,6 @@
     (end)
     (xlib/glx:render)
     (end-list)
-
     (loop
        repeat 361
        for angle upfrom 0.0s0 by 1.0s0
@@ -126,7 +124,6 @@
             (pop-matrix)
             (xlib/glx:swap-buffers)
             (sleep 0.02))))
-  
   (sleep 3))
 
 ;;; glxgears
@@ -140,7 +137,6 @@
         (da (/ (* 2.0s0 +pi+) teeth 4.0s0)))
     (shade-model +flat+)
     (normal-3f 0.0s0 0.0s0 1.0s0)
-
     ;; Front face.
     (begin +quad-strip+)
     (dotimes (i (1+ teeth))
@@ -181,9 +177,7 @@
                       (* r1 (sin (+ angle (* 3 da))))
                       (* width 0.5s0))))
     (end)
-
     (normal-3f 0.0s0 0.0s0 -1.0s0)
-                 
     ;; Draw back face.
     (begin +quad-strip+)
     (dotimes (i (1+ teeth))
@@ -223,7 +217,6 @@
                       (* r1 (sin angle))
                       (* width -0.5s0))))
     (end)
-
     ;; Draw outward faces of teeth.
     (begin +quad-strip+)
     (dotimes (i teeth)
@@ -264,14 +257,10 @@
                         (* r1 (sin (+ angle (* 3 da))))
                         (* width -0.5s0))
           (normal-3f (cos angle) (sin angle) 0.0s0))))
-
     (vertex-3f (* r1 (cos 0)) (* r1 (sin 0)) (* width 0.5s0))
     (vertex-3f (* r1 (cos 0)) (* r1 (sin 0)) (* width -0.5s0))
-
     (end)
-
     (shade-model +smooth+)
-                 
     ;; Draw inside radius cylinder.
     (begin +quad-strip+)
     (dotimes (i (1+ teeth))
@@ -285,30 +274,25 @@
 
 (defun draw (gear-1 gear-2 gear-3 view-rotx view-roty view-rotz angle)
   (clear (logior +color-buffer-bit+ +depth-buffer-bit+))
-
   (push-matrix)
   (rotate-f view-rotx 1.0s0 0.0s0 0.0s0)
   (rotate-f view-roty 0.0s0 1.0s0 0.0s0)
   (rotate-f view-rotz 0.0s0 0.0s0 1.0s0)
-
   (push-matrix)
   (translate-f -3.0s0 -2.0s0 0.0s0)
   (rotate-f angle 0.0s0 0.0s0 1.0s0)
   (call-list gear-1)
   (pop-matrix)
-
   (push-matrix)
   (translate-f 3.1s0 -2.0s0 0.0s0)
   (rotate-f (- (* angle -2.0s0) 9.0s0) 0.0s0 0.0s0 1.0s0)
   (call-list gear-2)
   (pop-matrix)
-
   (push-matrix)
   (translate-f -3.1s0 4.2s0 0.0s0)
   (rotate-f (- (* angle -2.s0) 25.0s0) 0.0s0 0.0s0 1.0s0)
   (call-list gear-3)
   (pop-matrix)
-
   (pop-matrix))
 
 
@@ -318,7 +302,6 @@
     (matrix-mode +projection+)
     (load-identity)
     (frustum -1.0d0 1.0d0 (- h) h 5.0d0 60.0d0))
-
   (matrix-mode +modelview+)
   (load-identity)
   (translate-f 0.0s0 0.0s0 -40.0s0))
@@ -331,44 +314,35 @@
     ;;(enable +lighting+)
     ;;(enable +light0+)
     ;;(enable +depth-test+)
-
     ;; Make the gears.
     (setf gear-1 (gen-lists 1))
     (new-list gear-1 +compile+)
     (material-fv +front+ +ambient-and-diffuse+ '(0.8s0 0.1s0 0.0s0 1.0s0))
     (gear 1.0s0 4.0s0 1.0s0 20 0.7s0)
     (end-list)
-
     (setf gear-2 (gen-lists 1))
     (new-list gear-2 +compile+)
     (material-fv +front+ +ambient-and-diffuse+ '(0.0s0 0.8s0 0.2s0 1.0s0))
     (gear 0.5s0 2.0s0 2.0s0 10 0.7s0)
     (end-list)
-
     (setf gear-3 (gen-lists 1))
     (new-list gear-3 +compile+)
     (material-fv +front+ +ambient-and-diffuse+ '(0.2s0 0.2s0 1.0s0 1.0s0))
     (gear 1.3s0 2.0s0 0.5s0 10 0.7s0)
     (end-list)
-
     ;;(enable +normalize+)
-
     (values gear-1 gear-2 gear-3)))
 
 
 (defun gears* (display window)
   (declare (ignore display window))
-
   (enable +cull-face+)
   (enable +lighting+)
   (enable +light0+)
   (enable +normalize+)
   (enable +depth-test+)
-
   (reshape 300 300)
-
   ;;(light-fv +light0+ +position+ #(5.0s0 5.0s0 10.0s0 0.0s0))
-
   (let (list)
     (declare (ignore list))
     #-(and)
@@ -379,59 +353,42 @@
       (gear 1.0s0 4.0s0 1.0s0 20 0.7s0)
       (xlib/glx:render)
       (end-list))
-
-
     (loop
        ;;for angle from 0.0s0 below 361.0s0 by 1.0s0
        with angle of-type single-float = 0.0s0
        with dt = 0.004s0
        repeat 2500
        do (progn
-
             (incf angle (* 70.0s0 dt))       ; 70 degrees per second
             (when (< 3600.0s0 angle)
               (decf angle 3600.0s0))
-
             (clear (logior +color-buffer-bit+ +depth-buffer-bit+))
-
             (push-matrix)
             (rotate-f 20.0s0 0.0s0 1.0s0 0.0s0)
-
-
             (push-matrix)
             (translate-f -3.0s0 -2.0s0 0.0s0)
             (rotate-f angle 0.0s0 0.0s0 1.0s0)
             (material-fv +front+ +ambient-and-diffuse+ '(0.8s0 0.1s0 0.0s0 1.0s0))
             (gear 1.0s0 4.0s0 1.0s0 20 0.7s0)
             (pop-matrix)
-
-            
             (push-matrix)
             (translate-f 3.1s0 -2.0s0 0.0s0)
             (rotate-f (- (* angle -2.0s0) 9.0s0) 0.0s0 0.0s0 1.0s0)
             (material-fv +front+ +ambient-and-diffuse+ '(0.0s0 0.8s0 0.2s0 1.0s0))
             (gear 0.5s0 2.0s0 2.0s0 10 0.7s0)
             (pop-matrix)
-
-
             (push-matrix)
             (translate-f -3.1s0 4.2s0 0.0s0)
             (rotate-f (- (* angle -2.s0) 25.0s0) 0.0s0 0.0s0 1.0s0)
             (material-fv +front+ +ambient-and-diffuse+ '(0.2s0 0.2s0 1.0s0 1.0s0))
             (gear 1.3s0 2.0s0 0.5s0 10 0.7s0)
             (pop-matrix)
-
-
             (pop-matrix)
-
             (xlib/glx:swap-buffers)
             ;;(sleep 0.025)
             )))
-  
-
   ;;(sleep 3)
   )
-
 
 (defun gears (display window)
   (declare (ignore window))
@@ -444,10 +401,8 @@
         ;;(t-rot-0 -1.0d0)
         ;;(t-rate-0 -1.d0)
         gear-1 gear-2 gear-3)
-
     (multiple-value-setq (gear-1 gear-2 gear-3)
       (init))
-
     (loop
        (event-case (display :timeout 0.01 :force-output-p t)
          (configure-notify (width height)
@@ -456,15 +411,11 @@
          (key-press (code)
                     (format t "Key pressed: ~S~%" code)
                     (return-from gears t)))
-
        (incf angle (* 70.0s0 dt))       ; 70 degrees per second
        (when (< 3600.0s0 angle)
          (decf angle 3600.0s0))
-
        (draw gear-1 gear-2 gear-3 view-rotx view-roty view-rotz angle)
        (xlib/glx:swap-buffers)
-       
        (incf frames)
-
        ;; FPS calculation goes here
        )))

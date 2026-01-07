@@ -1,23 +1,6 @@
-;;; -*- Mode:Lisp; Package:XLIB; Syntax:COMMON-LISP; Base:10; Lowercase:T -*-
+;;; demo/trapezoid.lisp --- Trapezoid Extension Demo Program
 
-;;; CLX trapezoid Extension test program
-
-;;;
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-;;;
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-;;;
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-;;;
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
-;;;
-
+;;; Code:
 (in-package :xlib)
 
 
@@ -44,7 +27,6 @@
 	       :background black
 	       :foreground white)))
     (initialize-extensions display)
-    
     (map-window win)				; Map the window
     ;; Handle events
     (unwind-protect
@@ -64,7 +46,6 @@
 		(draw-filled-trapezoids window gc  #(40 50 60 70 80 90))
 		(with-gcontext (gc :trapezoid-alignment :y)
 		  (draw-filled-trapezoids window gc  #(40 50 60 70 140 240)))
-		  
 		(draw-glyphs window gc 10 10 "Press any key to exit")
 		;; Returning non-nil causes event-case to exit
 		t))

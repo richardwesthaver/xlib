@@ -1,5 +1,6 @@
-;;; hello.lisp
+;;; demo/hello.lisp --- Hello World Demo
 
+;;; Code:
 (in-package :xlib)
 
 (defun hello-world (host &rest args &key (string "Hello World") (font "fixed"))

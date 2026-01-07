@@ -1,48 +1,28 @@
-;;; -*- Mode:Lisp; Syntax: Common-lisp; Package:XLIB; Base:10; Lowercase: Yes -*-
+;;; demo/menu.lisp --- Simple XLIB Menus
 
-;;;
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-;;;
-;;;            Copyright (C) 1988 Texas Instruments Incorporated.
-;;;
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-;;;
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
-;;;
+;; These functions demonstrate a simple menu implementation described in            
+;; Kimbrough, Kerry, "Windows to the Future", Lisp Pointers, Oct-Nov, 1987.         
+;; See functions JUST-SAY-LISP and POP-UP for demonstrations.                       
 
+;;; Commentary:
+
+;; Some changes are backported from CMUCL CLX source (our implementation had
+;; errors when we tried to use menu). This one is a little shorter.
+
+;;; Code:
 (in-package :xlib)
-
-
-;;;----------------------------------------------------------------------------------+
-;;;                                                                                  |
-;;; These functions demonstrate a simple menu implementation described in            |
-;;; Kimbrough, Kerry, "Windows to the Future", Lisp Pointers, Oct-Nov, 1987.         |
-;;; See functions JUST-SAY-LISP and POP-UP for demonstrations.                       |
-;;;                                                                                  |
-;;;----------------------------------------------------------------------------------+
-
-;;; Some changes are backported from CMUCL CLX source (our implementation had
-;;; errors when we tried to use menu). This one is a little shorter.
 
 (defstruct (menu)
   "A simple menu of text strings."
   (title "choose an item:")
-  item-alist					;((item-window item-string))
+  item-alist ;((item-window item-string))
   window
   gcontext
   width
   title-width
   item-width
   item-height
-  (geometry-changed-p t))			;nil iff unchanged since displayed
-
-
+  (geometry-changed-p t)) ;nil iff unchanged since displayed
 
 (defun create-menu (parent-window text-color background-color text-font)
   (make-menu
@@ -55,15 +35,15 @@
    :window   (CREATE-WINDOW
 	      :parent       parent-window
 	      :class        :input-output
-	      :x            0			;temporary value
-	      :y            0			;temporary value
-	      :width        16			;temporary value
-	      :height       16			;temporary value
+	      :x            0	;temporary value
+	      :y            0	;temporary value
+	      :width        16	;temporary value
+	      :height       16	;temporary value
 	      :border-width 2
 	      :border       text-color
 	      :background   background-color
 	      :save-under   :on
-	      ;; :override-redirect :on		;override window mgr when positioning
+	      ;; :override-redirect :on	;override window mgr when positioning
 	      :event-mask   (MAKE-EVENT-MASK :leave-window :exposure))))
 
 (defun menu-set-item-list (menu item-strings)
@@ -80,10 +60,10 @@
 	  (dolist (item item-strings (nreverse alist))
 	    (push (list (CREATE-WINDOW
 			  :parent     (menu-window menu)
-			  :x          0         ;temporary value
-			  :y          0         ;temporary value
-			  :width      16        ;temporary value
-			  :height     16        ;temporary value
+			  :x          0  ;temporary value
+			  :y          0  ;temporary value
+			  :width      16 ;temporary value
+			  :height     16 ;temporary value
 			  :background (GCONTEXT-BACKGROUND (menu-gcontext menu))
 			  :event-mask (MAKE-EVENT-MASK :enter-window
 						       :leave-window
@@ -109,20 +89,17 @@
       (dolist (next-item items)
 	(setf item-width (max item-width
 			      (TEXT-EXTENTS menu-font (second next-item)))))
-
       ;; Compute final menu width, taking margins into account
       (setf menu-width (max title-width
 			    (+ item-width *menu-item-margin* *menu-item-margin*)))
       (let ((window  (menu-window menu))
 	    (delta-y (+ item-height *menu-item-margin*)))
-
 	;; Update width and height of menu window
 	(WITH-STATE (window)
 	  (setf (DRAWABLE-WIDTH  window) menu-width
 		(DRAWABLE-HEIGHT window) (+ *menu-item-margin*
 					    (* (1+ (length items))
 					       delta-y))))
-
 	;; Update width, height, position of item windows
 	(let ((item-left     (round (- menu-width item-width) 2))
 	      (next-item-top delta-y))
@@ -134,10 +111,8 @@
 		      (DRAWABLE-X      window) item-left
 		      (DRAWABLE-Y      window) next-item-top)))
 	    (incf next-item-top delta-y))))
-
       ;; Map all item windows
       (MAP-SUBWINDOWS (menu-window menu))
-
       ;; Save item geometry
       (setf (menu-item-width menu)         item-width
 	    (menu-item-height menu)        item-height
@@ -153,7 +128,6 @@
 			  :resource-name (menu-title menu))
   (let* ((gcontext   (menu-gcontext menu))
         (baseline-y (FONT-ASCENT (GCONTEXT-FONT gcontext))))
-
    ;; Show title centered in "reverse-video"
    (let ((fg (GCONTEXT-BACKGROUND gcontext))
 	 (bg (GCONTEXT-FOREGROUND gcontext)))
@@ -174,36 +148,29 @@
        baseline-y				;start y
        (second item)))))
 
-
 (defun menu-choose (menu x y)
   ;; Display the menu so that first item is at x,y.
   (menu-present menu x y)
-
   (let ((items (menu-item-alist menu))
 	(mw    (menu-window menu))
 	selected-item)
-
     ;; Event processing loop
     (do () (selected-item)
       (EVENT-CASE ((DRAWABLE-DISPLAY mw) :force-output-p t)
 	(:exposure     (count)
-
 	 ;; Discard all but final :exposure then display the menu
 	 (when (zerop count) (menu-refresh menu))
 	 t)
-
 	(:button-release (event-window)
 	 ;;Select an item
 	 (setf selected-item (second (assoc event-window items)))
 	 t)
-
 	(:enter-notify (window)
 	 ;;Highlight an item
 	 (let ((position (position window items :key #'first)))
 	   (when position
 	     (menu-highlight-item menu position)))
 	 t)
-
 	(:leave-notify (window kind)
 	 (if (eql mw window)
 	     ;; Quit if pointer moved out of main menu window
@@ -214,14 +181,13 @@
 	     (when position
 	       (menu-unhighlight-item menu position))))
 	 t)
-
 	(otherwise ()
 		   ;;Ignore and discard any other event
 		   t)))
 
     ;; Erase the menu
-;;;    (UNMAP-WINDOW mw)
-
+    ;; (UNMAP-WINDOW mw)
+    
     ;; Return selected item string, if any
     (unless (eq selected-item :none) selected-item)))
 
@@ -235,7 +201,6 @@
 			 box-margin))
 	 (width       (+ (menu-item-width menu) box-margin box-margin))
 	 (height      (+ (menu-item-height menu) box-margin box-margin)))
-
     ;; Draw a box in menu window around the given item.
     (DRAW-RECTANGLE (menu-window menu)
 		    (menu-gcontext menu)
@@ -272,7 +237,6 @@
 	  (WITH-STATE (menu-window)
 	    (setf (DRAWABLE-X menu-window) menu-x
 		  (DRAWABLE-Y menu-window) menu-y)))))
-
     ;; Make menu visible
     (MAP-WINDOW menu-window)))
 
@@ -285,16 +249,13 @@
          (nice-font (OPEN-FONT display font-name))
          (a-menu    (create-menu (screen-root screen) ; the menu's parent
                                  fg-color bg-color nice-font)))
-
     (setf (menu-title a-menu) "Please pick your favorite language:")
     (menu-set-item-list a-menu '("Fortran" "APL" "Forth" "Lisp"))
-
     ;; Bedevil the user until he picks a nice programming language
     (unwind-protect
         (do (choice)
             ((and (setf choice (menu-choose a-menu 100 100))
                   (string-equal "Lisp" choice))))
-
       (CLOSE-DISPLAY display))))
 
 (defun pop-up (host strings &key (title "Pick one:") (font "fixed"))

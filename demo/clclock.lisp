@@ -1,3 +1,6 @@
+;;; demo/clclock.lisp --- Clock demo
+
+;;; Code:
 (defpackage #:xlib-demo/clclock
   (:use "CL")
   (:export "CLOCK"))

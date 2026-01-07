@@ -1,11 +1,13 @@
-;;; -*- Mode:Lisp; Package:XLIB; Syntax:COMMON-LISP; Base:10; Lowercase:T -*-
+;;; demo/image.lisp --- Image Demo
 
-;;; Tests image code by randomly reading, copying and then writing images to
-;;; the exact same place on the screen.  If everything works, just the borders
-;;; of the image windows appear.  If one of these image windows is garbled,
-;;; then somewhere something is broken.  Entry point is the function
-;;; IMAGE-TEST
+;;; Commentary:
 
+;; Test image code by randomly reading, copying and then writing images to the
+;; exact same place on the screen. If everything works, just the borders of
+;; the image windows appear. If one of these image windows is garbled, then
+;; somewhere something is broken. Entry point is the function IMAGE-TEST
+
+;;; Code:
 (in-package :xlib)
 
 (export '(image-test))

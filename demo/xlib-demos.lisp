@@ -1,4 +1,4 @@
-;;; xlib-demos.lisp
+;;; demo/xlib-demos.lisp
 
 ;; This file contains various graphics hacks written and ported over the
 ;; years by various and numerous persons.

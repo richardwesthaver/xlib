@@ -1,3 +1,6 @@
+;;; demo/mandel.lisp --- Mandelbrot Demo
+
+;;; Code:
 (defpackage #:xlib-demo/mandel
   (:use "CL")
   (:export "NEW-WINDOW" "EVENT-LOOP"))
@@ -26,12 +29,12 @@
                                         :background (xlib:screen-white-pixel *screen*)))
   (init-colours))
 
-;;; OK, this is an ugly hack to make sure we can handle
-;;; shift and modstate in a sane way, alas we can't 100% rely
-;;; on "current state of keyboard", since we only process events
-;;; with a noticeable delay, at eth best of times, so a fast keyboarder
-;;; can fool us, we are, however, IIRC, guaranteed that all events are
-;;; serialised, so...
+;; OK, this is an ugly hack to make sure we can handle
+;; shift and modstate in a sane way, alas we can't 100% rely
+;; on "current state of keyboard", since we only process events
+;; with a noticeable delay, at eth best of times, so a fast keyboarder
+;; can fool us, we are, however, IIRC, guaranteed that all events are
+;; serialised, so...
 (defvar *modstate* nil)
 (declaim (list *modstate*))
 (defun make-shift-foo ()
@@ -176,10 +179,10 @@
        (n 1 (the fixnum (1+ n))))
       ((or (>= n max) (>= (+ (* x x) (* y y)) 4.0d0))
        n)))
-;;; (a+bi)^2        -->
-;;; (a+bi)(a+bi)    -->
-;;; a^2+2abi+(bi)^2 -->
-;;; a^2+2abi-b^2
+;; (a+bi)^2        -->
+;; (a+bi)(a+bi)    -->
+;; a^2+2abi+(bi)^2 -->
+;; a^2+2abi-b^2
 
 (deftype zoom-type ()
   '(member :zoom-same :zoom-new :zoom-out))
@@ -192,10 +195,10 @@
    (stop-y :accessor stop-y :initform -1 :type fixnum)
    (win :reader win :initarg :win)))
 
-;;;(defmethod print-object ((object zoomer) stream)
-;;;  (format stream "<zoomer [type ~a] [~a ~a] -> [~a ~a]>~%"
-;;;	  (zoom-type object) (start-x object) (start-y object)
-;;;	  (stop-x object) (stop-y object)))
+;;(defmethod print-object ((object zoomer) stream)
+;;  (format stream "<zoomer [type ~a] [~a ~a] -> [~a ~a]>~%"
+;;	  (zoom-type object) (start-x object) (start-y object)
+;;	  (stop-x object) (stop-y object)))
 
 (defun init-colours ()
   (unless *colmap*
@@ -485,7 +488,7 @@
 			(* (+ side x) (ms-dr sq)))
 		  hy (+ (ms-base-i sq)
 			(* (+ side y) (ms-dr sq)))))
-;;;	(format t "DEBUG: zoomer is ~a~%~%" zoomer)
+        ;; (format t "DEBUG: zoomer is ~a~%~%" zoomer)
 	(case (zoom-type zoomer)
 	  (:zoom-new (new-window lx ly hx hy (ms-maxiter sq)))
 	  (:zoom-same (empty-win *sysqueue* win)
@@ -499,7 +502,6 @@
 				   (- br (* 512 dr)) (- bi (* 512 di))
 				   (+ (* 1024 dr) br) (+ (* 1024 di) bi)
 				   (ms-maxiter sq))))
-
 	  (t (format t "Unknown/unimplemented zoom type ~a~%~%" (zoom-type zoomer))))))))
 
 (defun quit-window (window)

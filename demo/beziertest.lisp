@@ -1,23 +1,6 @@
-;;; -*- Mode:Lisp; Package:XLIB; Syntax:COMMON-LISP; Base:10; Lowercase:T -*-
+;;; demo/beziertest.lisp --- Bezier Spline Extension demo program
 
-;;; CLX Bezier Spline Extension demo program
-
-;;;
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-;;;
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-;;;
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-;;;
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
-;;;
-
+;;; Code:
 (in-package :xlib)
 
 (defun bezier-test (host &optional (pathname "/usr/X.V11R1/extensions/test/datafile"))
@@ -62,8 +45,7 @@
       (dotimes (i (length curves))
 	(setf (aref curves i)
 	      (ash (* (aref curves i) factor) -16))))
-    
-    (map-window win)				; Map the window
+    (map-window win) ; Map the window
     ;; Handle events
     (unwind-protect
 	(loop
