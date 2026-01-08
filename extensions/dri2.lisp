@@ -1,19 +1,12 @@
 ;;; extensions/dri2.lisp --- DRI2 Extensions
 
+;;; Commentary:
+
 ;;     Title: DRI Extension
 ;;   Created: 2014-11-17
 ;;    Author: Johannes Martinez <johannes.martinez@gmail.com>
 
 ;; (c) copyright 2014 by Johannes Martinez
-
-;; Permission is granted to any individual or institution to use,
-;; copy, modify, and distribute this software, provided that this
-;; complete copyright and permission notice is maintained, intact, in
-;; all copies and supporting documentation.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ;;; Code:
 (in-package :xlib)

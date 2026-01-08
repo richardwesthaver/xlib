@@ -1,26 +1,17 @@
-;;; xrender.lisp
-;;; ---------------------------------------------------------------------------
-;;;     Title: The X Render Extension
-;;;   Created: 2002-08-03
-;;;    Author: Gilbert Baumann <unk6@rz.uni-karlsruhe.de>
-;;;       $Id: xrender.lisp,v 1.5 2004/12/06 11:48:57 csr21 Exp $
-;;; ---------------------------------------------------------------------------
+;;; extensions/xrender.lisp --- X Render Extension
 
-;;; (c) copyright 2002, 2003 by Gilbert Baumann
-;;; (c) copyright 2002 by Christian Sunesson
+;;; Commentary:
+;;     Title: The X Render Extension
+;;   Created: 2002-08-03
+;;    Author: Gilbert Baumann <unk6@rz.uni-karlsruhe.de>
+;;       $Id: xrender.lisp,v 1.5 2004/12/06 11:48:57 csr21 Exp $
 
-;;; Permission is granted to any individual or institution to use,
-;;; copy, modify, and distribute this software, provided that this
-;;; complete copyright and permission notice is maintained, intact, in
-;;; all copies and supporting documentation.
+;; (c) copyright 2002, 2003 by Gilbert Baumann
+;; (c) copyright 2002 by Christian Sunesson
 
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-;;; NOTE: we need to watch maximum request sizes and somehow work
-;;; around them. Sometimes e.g. in AddGlyphs this is not possible,
-;;; which is a design failure.
+;; NOTE: we need to watch maximum request sizes and somehow work
+;; around them. Sometimes e.g. in AddGlyphs this is not possible,
+;; which is a design failure.
 
 ;;;; API issues
 
@@ -51,6 +42,8 @@
 ;; - WITH-PICTURE ?
 ;;
 ;;   (WITH-PICTURE (picture drawable ...) ...)
+
+;;; Code:
 (in-package :xlib)
 
 ;; Beginning to collect the external interface for documentation.

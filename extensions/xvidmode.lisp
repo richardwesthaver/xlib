@@ -1,37 +1,31 @@
-;;; xvidmode.lisp
-;;; ---------------------------------------------------------------------------
-;;;     Title: XFree86 video mode extension
-;;;   Created: 2003 03 28 15:28
-;;;    Author: Iban Hatchondo <hatchond@labri.fr>
-;;; ---------------------------------------------------------------------------
-;;;  (c) copyright 2003 by Iban Hatchondo
+;;; extensions/xvidmode.lisp --- XFree86 Video Mode Extension
 
-;;; Permission is granted to any individual or institution to use,
-;;; copy, modify, and distribute this software, provided that this
-;;; complete copyright and permission notice is maintained, intact, in
-;;; all copies and supporting documentation.
+;;; Commentary:
 
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+;;     Title: XFree86 video mode extension
+;;   Created: 2003 03 28 15:28
+;;    Author: Iban Hatchondo <hatchond@labri.fr>
+;;  (c) copyright 2003 by Iban Hatchondo
 
-;;; THIS IS NOT AN X CONSORTIUM STANDARD OR AN X PROJECT TEAM SPECIFICATION
+;; THIS IS NOT AN X CONSORTIUM STANDARD OR AN X PROJECT TEAM SPECIFICATION
 
-;;; DESCRIPTION
+;;;; DESCRIPTION
 
-;;; These functions provide an interface to the server extension
-;;; XFree86-VidModeExtension which allows the video modes to be
-;;; queried, adjusted dynamically and the mode switching to be
-;;; controlled.
+;; These functions provide an interface to the server extension
+;; XFree86-VidModeExtension which allows the video modes to be
+;; queried, adjusted dynamically and the mode switching to be
+;; controlled.
 
-;;; [ personal notes ]
+;; [ personal notes ]
 
-;;; The documentation on this extension is very poor, probably,
-;;; because it is not an X standard nor an X project team spec.
-;;; Because of that, it need to be tested on some XFree 3.3.6,
-;;; and XFree 4.3.x to ensure that all request are correctly
-;;; constructed as well as to indentify any obsolete/wrong
-;;; functions I made.
+;; The documentation on this extension is very poor, probably,
+;; because it is not an X standard nor an X project team spec.
+;; Because of that, it need to be tested on some XFree 3.3.6,
+;; and XFree 4.3.x to ensure that all request are correctly
+;; constructed as well as to indentify any obsolete/wrong
+;; functions I made.
+
+;;; Code:
 (in-package :xlib)
 
 (export '(mode-info

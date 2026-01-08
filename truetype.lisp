@@ -1,6 +1,12 @@
-;;; truetype.lisp
+;;; truetype.lisp --- X Truetype Font Support
+
+;;; Code:
 (defpackage #:xlib/truetype
   (:nicknames #:xft)
+  (:documentation 
+   "Package contains API for TrueType text rendering using XLIB and XRender.
+Glyphs information is obtained by DAT/TTF. Font rasterization is made by
+VEC (VEC/AA).")
   (:use #:cl #:std #:dat/ttf #:obj/cache)
   (:import-from :obj/val :get-val)
   (:import-from :ttf :size)
@@ -21,10 +27,7 @@
    :font-line-gap
    :baseline-to-baseline
    :font-lines-height
-   :*allow-fixed-pitch-p*)
-  (:documentation "Package contains API for TrueType text rendering using CLX, XRender.
-Glyphs information is obtained by DAT/TTF. Font rasterization is made by
-CL-VECTORS."))
+   :*allow-fixed-pitch-p*))
 
 (in-package #:xlib/truetype)
 
@@ -74,14 +77,14 @@ CL-VECTORS."))
 
 ;;; Screen DPI
 (defun screen-default-dpi (screen)
-  "Returns default dpi for @var{screen}. pixel width * 25.4/millimeters width"
+  "Return default dpi for SCREEN. pixel width * 25.4/millimeters width"
   (values (floor (* (xlib:screen-width screen) 25.4)
                  (xlib:screen-width-in-millimeters screen))
           (floor (* (xlib:screen-height screen) 25.4)
                  (xlib:screen-height-in-millimeters screen))))
 
 (defun screen-dpi (screen)
-  "Returns current dpi for @var{screen}."
+  "Return current dpi for SCREEN."
   (values (getf (xlib:screen-plist screen) :dpi-x
                 (floor (* (xlib:screen-width screen) 25.4)
                        (xlib:screen-width-in-millimeters screen)))
@@ -90,7 +93,7 @@ CL-VECTORS."))
                        (xlib:screen-height-in-millimeters screen)))))
 
 (defun (setf screen-dpi) (value screen)
-  "Sets current dpi for @var{screen}."
+  "Sets current dpi for SCREEN."
   (setf (getf (xlib:screen-plist screen) :dpi-x) value
         (getf (xlib:screen-plist screen) :dpi-y) value))
 
@@ -120,21 +123,21 @@ CL-VECTORS."))
     (floor (* (font-units->pixels-y dpi-y font) (ttf:descender loader)))))
 
 (defun font-ascent (drawable font)
-  "Returns ascent of @var{font}. @var{drawable} must be window, pixmap or screen."
+  "Return ascent of FONT. DRAWABLE must be window, pixmap or screen."
   (font-ascent-for-dpi (nth-value 1 (screen-dpi (drawable-screen drawable))) font))
 
 (defun font-descent (drawable font)
-  "Returns descent of @var{font}. @var{drawable} must be window, pixmap or screen."
+  "Return descent of FONT. DRAWABLE must be window, pixmap or screen."
   (font-descent-for-dpi (nth-value 1 (screen-dpi (drawable-screen drawable))) font))
 
 (defun font-line-gap (drawable font)
-  "Returns line gap of FONT. DRAWABLE must be window, pixmap or screen."
+  "Return line gap of FONT. DRAWABLE must be window, pixmap or screen."
   (with-font (loader font)
     (ceiling (* (font-units->pixels-y drawable font) (ttf:line-gap loader)))))
 
 ;;; baseline-to-baseline = ascent - descent + line gap
 (defun baseline-to-baseline (drawable font)
-  "Returns distance between baselines of FONT. DRAWABLE must be
+  "Return distance between baselines of FONT. DRAWABLE must be
 window, pixmap or screen. ascent - descent + line gap"
   (+ (font-ascent drawable font) (- (font-descent drawable font))
      (font-line-gap (screen-dpi (drawable-screen drawable)) font)))
@@ -165,7 +168,8 @@ window, pixmap or screen. ascent - descent + line gap"
                           units->pixels-y))))))
 
 (defun text-bounding-box (drawable font string &key start end)
-  "Returns text bounding box. @var{drawable} must be window, pixmap or screen. Text bounding box is only for contours. Bounding box for space (#x20) is zero."
+  "Return text bounding box. DRAWABLE must be window, pixmap or screen. Text
+bounding box is only for contours. Bounding box for space (#x20) is zero."
   (when (and start end)
     (setf string (subseq string start end)))
   (font-cache-fetch (font-string-bboxes font)
@@ -173,14 +177,15 @@ window, pixmap or screen. ascent - descent + line gap"
                     string))
 
 (defun text-width (drawable font string &key start end)
-  "Returns width of text bounding box. @var{drawable} must be window, pixmap or screen."
+  "Return width of text bounding box. Drawable must be window, pixmap or
+screen."
   (when (and start end)
     (setf string (subseq string start end)))
   (let ((bbox (text-bounding-box drawable font string)))
     (- (bbox-xmax bbox) (xmin bbox))))
 
 (defun text-height (drawable font string &key start end)
-  "Returns height of text bounding box. @var{drawable} must be window, pixmap or screen."
+  "Return height of text bounding box. DRAWABLE must be window, pixmap or screen."
   (when (and start end)
     (setf string (subseq string start end)))
   (let ((bbox (text-bounding-box drawable font string)))
@@ -205,8 +210,8 @@ in fixed-pitch fonts.")
           (do ((i 1 (1+ i)))
               ((>= i string-length))
             (incf xmax
-                  (+ (ttf:advance-width (ttf:find-glyph (elt string i) loader))
-                     (ttf:kerning-offset (elt string (1- i)) (elt string i) loader)))))
+              (+ (ttf:advance-width (ttf:find-glyph (elt string i) loader))
+                 (ttf:kerning-offset (elt string (1- i)) (elt string i) loader)))))
       (vector (floor (* xmin units->pixels-x))
               ymin
               (ceiling (* xmax
@@ -214,7 +219,7 @@ in fixed-pitch fonts.")
               ymax))))
 
 (defun text-line-bounding-box (drawable font string &key start end)
-  "Returns text line bounding box. @var{drawable} must be window, pixmap or screen. Text line bounding box is bigger than text bounding box. It's height is ascent + descent, width is sum of advance widths minus sum of kernings."
+  "Return text line bounding box. DRAWABLE must be window, pixmap or screen. Text line bounding box is bigger than text bounding box. It's height is ascent + descent, width is sum of advance widths minus sum of kernings."
   (when (and start end)
     (setf string (subseq string start end)))
   (font-cache-fetch (font-string-line-bboxes font)
@@ -222,36 +227,36 @@ in fixed-pitch fonts.")
                     string))
 
 (defun text-line-width (drawable font string &key start end)
-  "Returns width of text line bounding box. @var{drawable} must be window, pixmap or screen. It is sum of advance widths minus sum of kernings."
+  "Return width of text line bounding box. DRAWABLE must be window, pixmap or screen. It is sum of advance widths minus sum of kernings."
   (when (and start end)
     (setf string (subseq string start end)))
   (let ((bbox (text-line-bounding-box drawable font string)))
     (- (bbox-xmax bbox) (xmin bbox))))
 
 (defun text-line-height (drawable font string &key start end)
-  "Returns height of text line bounding box. @var{drawable} must be window, pixmap or screen."
+  "Return height of text line bounding box. DRAWABLE must be window, pixmap or screen."
   (when (and start end)
     (setf string (subseq string start end)))
   (let ((bbox (text-line-bounding-box drawable font string)))
     (- (bbox-ymax bbox) (bbox-ymin bbox))))
 
 (defun xmin (bounding-box)
-  "Returns left side x of @var{bounding-box}"
+  "Return left side x of BOUNDING-BOX."
   (typecase bounding-box
     (vector (elt bounding-box 0))))
 
 (defun ymin (bounding-box)
-  "Returns bottom side y of @var{bounding-box}"
+  "Return bottom side y of BOUNDING-BOX."
   (typecase bounding-box
     (vector (elt bounding-box 1))))
 
 (defun xmax (bounding-box)
-  "Returns right side x of @var{bounding-box}"
+  "Return right side x of BOUNDING-BOX."
   (typecase bounding-box
     (vector (elt bounding-box 2))))
 
 (defun ymax (bounding-box)
-  "Returns top side y of @var{bounding-box}"
+  "Return top side y of BOUNDING-BOX."
   (typecase bounding-box
     (vector (elt bounding-box 3))))
 
@@ -367,7 +372,7 @@ in fixed-pitch fonts.")
 suitable as an alpha mask, and dimensions. This function returns five
 values: alpha mask byte array, x-origin, y-origin (subtracted from
 position before rendering), horizontal and vertical advances.
-@var{drawable} must be window or pixmap."
+DRAWABLE must be window or pixmap."
   (values-list
    (font-cache-fetch
     (font-string-alpha-maps font)
@@ -437,7 +442,7 @@ position before rendering), horizontal and vertical advances.
 suitable as an alpha mask, and dimensions. This function returns five
 values: alpha mask byte array, x-origin, y-origin (subtracted from
 position before rendering), horizontal and vertical advances.
-@var{drawable} must be window or pixmap."
+DRAWABLE must be window or pixmap."
   (values-list
    (font-cache-fetch
     (font-string-line-alpha-maps font)
@@ -445,7 +450,7 @@ position before rendering), horizontal and vertical advances.
     string)))
 
 (defun update-foreground (drawable gcontext font)
-  "Lazy updates foreground for drawable. @var{drawable} must be window or pixmap."
+  "Lazy updates foreground for drawable. DRAWABLE must be window or pixmap."
   (let ((pixmap (or (getf (xlib:drawable-plist drawable) :ttf-pen-surface)
                     (setf (getf (xlib:drawable-plist drawable) :ttf-pen-surface)
                           (xlib:create-pixmap 
@@ -466,7 +471,7 @@ position before rendering), horizontal and vertical advances.
           (setf (getf (xlib:drawable-plist drawable) :ttf-foreground) color))))))
 
 (defun update-background (drawable gcontext font x y width height)
-  "Lazy updates background for drawable. @var{drawable} must be window or pixmap."
+  "Lazy updates background for drawable. DRAWABLE must be window or pixmap."
   (let ((previous-color (xlib:gcontext-foreground gcontext))
         (color (the xlib:card32 
                     (if (font-overwrite-gcontext font)
@@ -618,7 +623,7 @@ window or pixmap."
     (format t "~%")))
 
 (defun font-lines-height (drawable font lines-count)
-  "Returns text lines height in pixels. For one line height is
+  "Return text lines height in pixels. For one line height is
 ascender+descender. For more than one line height is
 ascender+descender+linegap."
   (if (> lines-count 0)

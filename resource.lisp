@@ -1,21 +1,10 @@
-;;; resource.lisp
+;;; resource.lisp --- Lispy X Resource Manager
 
 ;; RESOURCE - Lisp version of XLIB's Xrm resource manager
 
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
+;;; Code:
 (in-package :xlib)
+
 ;; The C version of this uses a 64 entry hash table at each entry.
 ;; Small hash tables lose in Lisp, so we do linear searches on lists.
 (defstruct (resource-database (:copier nil) (:predicate nil)

@@ -1,18 +1,6 @@
-;;; -*- Mode:Lisp; Package:XLIB; Syntax:COMMON-LISP; Base:10; Lowercase:YES -*-
+;;; translate.lisp --- X Key Translations
 
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
+;;; Code:
 (in-package :xlib)
 
 (defvar *keysym-sets* nil) ;; Alist of (name first-keysym last-keysym)
@@ -77,7 +65,7 @@
 	   (error "~s Isn't the name of a keysym" keysym))))))
 
 (defvar *keysym->character-map*
-	(make-hash-table :test (keysym->character-map-test) :size 400))
+  (make-hash-table :test (keysym->character-map-test) :size 400))
 
 ;; Keysym-mappings are a list of the form (object translate lowercase modifiers mask)
 ;; With the following accessor macros. Everything after OBJECT is optional.
@@ -108,8 +96,8 @@
   `(fifth ,keysym-mapping))
 
 (defvar *default-keysym-translate-mask*
-	(the (or (member :modifiers) mask16 (clx-list (or keysym state-mask-key)))
-	     (logand #xff (lognot (make-state-mask :lock))))
+  (the (or (member :modifiers) mask16 (clx-list (or keysym state-mask-key)))
+       (logand #xff (lognot (make-state-mask :lock))))
   "Default keysym state mask to use during keysym-translation.")
 
 (defun define-keysym (object keysym &key lowercase translate modifiers mask display)
@@ -158,7 +146,7 @@
 		  (merge (delete key old :key #'cadddr :test #'equal)))
 	     (if key
 		 (nconc merge (list new))
-	       (cons new merge))))
+	         (cons new merge))))
 	 (mask-check (mask)
 	   (unless (or (numberp mask)
 		       (dolist (element mask t)
@@ -184,9 +172,9 @@
 	  (let ((previous (assoc keysym (display-keysym-translation display))))
 	    (if previous
 		(setf (cdr previous) (merge-keysym-mappings entry (cdr previous)))
-	      (push (list keysym entry) (display-keysym-translation display))))
-	(setf (gethash keysym *keysym->character-map*)
-	      (merge-keysym-mappings entry (gethash keysym *keysym->character-map*)))))
+	        (push (list keysym entry) (display-keysym-translation display))))
+	  (setf (gethash keysym *keysym->character-map*)
+	        (merge-keysym-mappings entry (gethash keysym *keysym->character-map*)))))
     object))
 
 (defun undefine-keysym (object keysym &key display modifiers &allow-other-keys)	              
@@ -205,13 +193,13 @@
     (let* (entry
 	   (previous (if display
 			 (cdr (setq entry (assoc keysym (display-keysym-translation display))))
-		       (gethash keysym *keysym->character-map*)))
+		         (gethash keysym *keysym->character-map*)))
 	   (key (cons object modifiers)))
       (when (and previous (find key previous :test #'match))
 	(setq previous (delete key previous :test #'match))
 	(if display
 	    (setf (cdr entry) previous)
-	  (setf (gethash keysym *keysym->character-map*) previous))))))
+	    (setf (gethash keysym *keysym->character-map*) previous))))))
 
 (defun keysym-downcase (keysym)
   ;; If keysym has a lower-case equivalent, return it, otherwise return keysym.
@@ -304,13 +292,13 @@
   (declare (clx-values (or null character)))
   (let* ((display-mappings (cdr (assoc keysym (display-keysym-translation display))))
 	 (mapping (or ;; Find the matching display mapping
-		      (dolist (mapping display-mappings)
-			(when (mapping-matches-p display state mapping)
-			  (return mapping)))
-		      ;; Find the matching static mapping
-		      (dolist (mapping (gethash keysym *keysym->character-map*))
-			(when (mapping-matches-p display state mapping)
-			  (return mapping))))))
+		   (dolist (mapping display-mappings)
+		     (when (mapping-matches-p display state mapping)
+		       (return mapping)))
+		   ;; Find the matching static mapping
+		   (dolist (mapping (gethash keysym *keysym->character-map*))
+		     (when (mapping-matches-p display state mapping)
+		       (return mapping))))))
     (when mapping
       (funcall (or (keysym-mapping-translate mapping) 'default-keysym-translate)
 	       display state (keysym-mapping-object mapping)))))
@@ -322,28 +310,28 @@
 	   (type list mapping))
   (declare (clx-values generalized-boolean))
   (flet
-    ((modifiers->mask (display-mapping modifiers errorp &aux (mask 0))
-       ;; Convert MODIFIERS, which is a modifier mask, or a list of state-mask-keys into a mask.
-       ;; If ERRORP is non-nil, return NIL when an unknown modifier is specified,
-       ;; otherwise ignore unknown modifiers.
-       (declare (type list display-mapping)	; Alist of (keysym . mask)
-		(type (or mask16 list) modifiers)
-		(type mask16 mask))
-       (declare (clx-values (or null mask16)))
-       (if (numberp modifiers)
-	   modifiers
-	 (dolist (modifier modifiers mask)
-	   (declare (type symbol modifier))
-	   (let ((bit (position modifier (the simple-vector +state-mask-vector+) :test #'eq)))
-	     (setq mask
-		   (logior mask
-			   (if bit
-			       (ash 1 bit)
-			     (or (cdr (assoc modifier display-mapping))
-				 ;; bad modifier
-				 (if errorp
-				     (return-from modifiers->mask nil)
-				   0))))))))))
+      ((modifiers->mask (display-mapping modifiers errorp &aux (mask 0))
+         ;; Convert MODIFIERS, which is a modifier mask, or a list of state-mask-keys into a mask.
+         ;; If ERRORP is non-nil, return NIL when an unknown modifier is specified,
+         ;; otherwise ignore unknown modifiers.
+         (declare (type list display-mapping)	; Alist of (keysym . mask)
+		  (type (or mask16 list) modifiers)
+		  (type mask16 mask))
+         (declare (clx-values (or null mask16)))
+         (if (numberp modifiers)
+	     modifiers
+	     (dolist (modifier modifiers mask)
+	       (declare (type symbol modifier))
+	       (let ((bit (position modifier (the simple-vector +state-mask-vector+) :test #'eq)))
+	         (setq mask
+		       (logior mask
+			       (if bit
+			           (ash 1 bit)
+			           (or (cdr (assoc modifier display-mapping))
+				       ;; bad modifier
+				       (if errorp
+				           (return-from modifiers->mask nil)
+				           0))))))))))
 
     (let* ((display-mapping (get-display-modifier-mapping display))
 	   (mapping-modifiers (keysym-mapping-modifiers mapping))
@@ -352,10 +340,10 @@
 	   (mapping-mask (or (keysym-mapping-mask mapping)	; If no mask, use the default.
 			     (if mapping-modifiers	        ; If no modifiers, match anything.
 				 *default-keysym-translate-mask*
-			       0)))
+			         0)))
 	   (mask (if (eq mapping-mask :modifiers)
 		     modifiers
-		   (modifiers->mask display-mapping mapping-mask nil))))
+		     (modifiers->mask display-mapping mapping-mask nil))))
       (declare (type mask16 modifiers mask))
       (= (logand state mask) modifiers))))
 
@@ -374,14 +362,14 @@
 	       (type card8 keysyms-per-keycode result))
       (when (and (< result keysyms-per-keycode)
 		 (keysym-shift-p display state (keysym-uppercase-alphabetic-p
-						 (aref mapping keycode 0))))
+						(aref mapping keycode 0))))
 	(incf result))
       result)))
 
 (defun keysym-shift-p (display state uppercase-alphabetic-p &key
-		       shift-lock-xors
-		       (control-modifiers
-			 '#.(list left-meta-keysym left-super-keysym left-hyper-keysym)))
+		                                            shift-lock-xors
+		                                            (control-modifiers
+			                                     '#.(list left-meta-keysym left-super-keysym left-hyper-keysym)))
   (declare (type display display)
 	   (type card16 state)
 	   (type generalized-boolean uppercase-alphabetic-p)
@@ -431,7 +419,7 @@
 ;;;   1       1       0       #\control-shift-a        #\control-*
 ;;;   1       1       1       #\control-shift-a        #\control-8
 (defun keycode->character (display keycode state &key keysym-index
-	                   (keysym-index-function #'default-keysym-index))
+	                                              (keysym-index-function #'default-keysym-index))
   ;; keysym-index defaults to the result of keysym-index-function which
   ;; is called with the following parameters:
   ;; (char0 state caps-lock-p keysyms-per-keycode)
@@ -509,7 +497,7 @@
 	(map (display-keyboard-mapping display))
 	(jmax (min 2 (array-dimension map 1)))
 	(i min (1+ i)))
-      ((> i max))
+       ((> i max))
     (declare (type card8 min max jmax)
 	     (type (simple-array keysym (* *)) map))
     (when (and (plusp (aref keymap i))
@@ -529,7 +517,7 @@
 	(max (display-max-keycode display))
 	(jmax (array-dimension (display-keyboard-mapping display) 1))
 	(i min (1+ i)))
-      ((> i max))
+       ((> i max))
     (declare (type card8 min max jmax))
     (when (and (plusp (aref keymap i))
 	       ;; Match when character is in mapping for this keycode
@@ -551,7 +539,7 @@
 	(jmax (min 2 (array-dimension map 1)))
 	(i min (1+ i))
 	(result nil))
-      ((> i max) (values-list result))
+       ((> i max) (values-list result))
     (declare (type card8 min max jmax)
 	     (type (simple-array keysym (* *)) map))
     (dotimes (j jmax)

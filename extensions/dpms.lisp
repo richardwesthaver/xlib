@@ -1,40 +1,46 @@
+;;; extensions/dpms.lisp
 
-;;;; Original Author: Matthew Kennedy <mkennedy@gentoo.org>
-;;;;
-;;;; Documentation strings derived from DPMS.txt distributed with the Xorg X11
-;;;; server implementation.  DPMS.txt contains the following copyright:
-;;;;
-;;;;  Copyright (C) Digital Equipment Corporation, 1996
-;;;;
-;;;;  Permission to use, copy, modify, distribute, and sell this documentation
-;;;;  for any purpose is hereby granted without fee, provided that the above
-;;;;  copyright notice and this permission notice appear in all copies.  Digital
-;;;;  Equipment Corporation makes no representations about the suitability for
-;;;;  any purpose of the information in this document.  This documentation is
-;;;;  provided ``as is'' without express or implied warranty.
+;;; Commentary:
 
+;; Original Author: Matthew Kennedy <mkennedy@gentoo.org>
+
+;; Documentation strings derived from DPMS.txt distributed with the Xorg X11
+;; server implementation.  DPMS.txt contains the following copyright:
+
+;;  Copyright (C) Digital Equipment Corporation, 1996
+
+;;  Permission to use, copy, modify, distribute, and sell this documentation
+;;  for any purpose is hereby granted without fee, provided that the above
+;;  copyright notice and this permission notice appear in all copies.  Digital
+;;  Equipment Corporation makes no representations about the suitability for
+;;  any purpose of the information in this document.  This documentation is
+;;  provided ``as is'' without express or implied warranty.
+
+;;; Code:
 (defpackage #:xlib/dpms
   (:use :common-lisp)
-  (:import-from :xlib
-                "DEFINE-EXTENSION"
-                "DISPLAY"
-                "WITH-BUFFER-REQUEST-AND-REPLY"
-                "WITH-BUFFER-REQUEST"
-                "EXTENSION-OPCODE"
-                "CARD8-GET"
-                "CARD16-GET"
-                "BOOLEAN-GET"
-                "CARD8"
-                "CARD16"
-                "DATA")
-  (:export "DPMS-GET-VERSION"
-           "DPMS-CAPABLE"
-           "DPMS-GET-TIMEOUTS"
-           "DPMS-SET-TIMEOUTS"
-           "DPMS-ENABLE"
-           "DPMS-DISABLE"
-           "DPMS-FORCE-LEVEL"
-           "DPMS-INFO"))
+  (:import-from 
+   :xlib
+   "DEFINE-EXTENSION"
+   "DISPLAY"
+   "WITH-BUFFER-REQUEST-AND-REPLY"
+   "WITH-BUFFER-REQUEST"
+   "EXTENSION-OPCODE"
+   "CARD8-GET"
+   "CARD16-GET"
+   "BOOLEAN-GET"
+   "CARD8"
+   "CARD16"
+   "DATA")
+  (:export 
+   "DPMS-GET-VERSION"
+   "DPMS-CAPABLE"
+   "DPMS-GET-TIMEOUTS"
+   "DPMS-SET-TIMEOUTS"
+   "DPMS-ENABLE"
+   "DPMS-DISABLE"
+   "DPMS-FORCE-LEVEL"
+   "DPMS-INFO"))
 
 (in-package #:xlib/dpms)
 
@@ -162,7 +168,3 @@ undefined and returned as NIL."
                   (2 :dpms-mode-suspend)
                   (3 :dpms-mode-off)))
               state))))
-
-;;; Local Variables:
-;;; indent-tabs-mode: nil
-;;; End:

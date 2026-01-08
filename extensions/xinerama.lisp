@@ -1,16 +1,20 @@
-;;; xinerama.lisp
+;;; extensions/xinerama.lisp
 
-;;; Copyright (C) 2008, Julian Stecklina
+;;; Commentary:
 
-;;;   ((
-;;;    ))     This file is COFFEEWARE. As long as you retain this notice
-;;;  |   |o)  you can do whatever you want with this code. If you think,
-;;;  |___|jgs it's worth it, you may buy the author a coffee in return.
+;; Copyright (C) 2008, Julian Stecklina
 
-;;; Description:
+;;   ((
+;;    ))     This file is COFFEEWARE. As long as you retain this notice
+;;  |   |o)  you can do whatever you want with this code. If you think,
+;;  |___|jgs it's worth it, you may buy the author a coffee in return.
 
-;;; This is an implementation of the XINERAMA extension. It does not
-;;; include the obsolete PanoramiX calls.
+;;;; Description:
+
+;; This is an implementation of the XINERAMA extension. It does not
+;; include the obsolete PanoramiX calls.
+
+;;; Code:
 (defpackage #:xlib/xinerama
   (:use "COMMON-LISP" "XLIB")
   (:nicknames "XINERAMA")

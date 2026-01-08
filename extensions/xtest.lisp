@@ -1,14 +1,18 @@
-;;; -*- Mode: Lisp; Syntax: Common-Lisp; -*-
+;;; extensions/xtest.lisp --- X Test Extension
 
-;;; Implementation of the XTest extension as described by
-;;; http://www.x.org/docs/Xext/xtest.pdf
+;;; Commentary:
 
-;;; Written by Lionel Flandrin <lionel.flandrin@gmail.com> in july
-;;; 2008 and placed in the public domain.
+;; Implementation of the XTest extension as described by
+;; http://www.x.org/docs/Xext/xtest.pdf
 
-;;; TODO:
-;;; * Implement XTestSetVisualIDOfVisual and XTestDiscard
-;;; * Add the missing (declare (type ...
+;; Written by Lionel Flandrin <lionel.flandrin@gmail.com> in july
+;; 2008 and placed in the public domain.
+
+;; TODO:
+;; * Implement XTestSetVisualIDOfVisual and XTestDiscard
+;; * Add the missing (declare (type ...
+
+;;; Code:
 (defpackage #:xlib/xtest
   (:use :common-lisp :xlib)
   (:nicknames :xtest)

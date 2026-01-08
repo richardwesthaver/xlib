@@ -1,20 +1,14 @@
-;;; dbe.lisp
-;;; ---------------------------------------------------------------------------
-;;;     Title: Double Buffer Extension
-;;;   Created: 2014-11-17
-;;;    Author: Johannes Martinez <johannes.martinez@gmail.com>
-;;; ---------------------------------------------------------------------------
+;;; dbe.lisp --- Double Buffer Extension
 
-;;; (c) copyright 2014 by Johannes Martinez
+;;; Commentary:
 
-;;; Permission is granted to any individual or institution to use,
-;;; copy, modify, and distribute this software, provided that this
-;;; complete copyright and permission notice is maintained, intact, in
-;;; all copies and supporting documentation.
+;;     Title: Double Buffer Extension
+;;   Created: 2014-11-17
+;;    Author: Johannes Martinez <johannes.martinez@gmail.com>
 
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+;; (c) copyright 2014 by Johannes Martinez
+
+;;; Code:
 (in-package :xlib)
 
 (export '(;;  x requests

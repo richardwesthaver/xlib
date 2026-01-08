@@ -1,5 +1,7 @@
 ;;; xkeyboard.lisp --- X11 XKeyboard Extension
 
+;;; Commentary:
+
 ;; Written by:
 
 ;; Michael Filonenko <filonenko.mikhail at gmail.com>
@@ -7,7 +9,6 @@
 ;; Eric Wolf <eric at boese-wolf.eu>
 
 ;;; Code:
-;;; Keysym Defs
 (defpackage #:xlib/xkb
   (:use :cl :xlib)
   (:import-from :xlib :boolean-get :card16-get

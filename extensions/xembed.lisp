@@ -1,4 +1,4 @@
-;;; xembed.lisp --- XEmbed Protocol
+;;; extensions/xembed.lisp --- XEmbed Protocol
 
 ;; 
 

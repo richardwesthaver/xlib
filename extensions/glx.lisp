@@ -1,4 +1,6 @@
 ;;; extensions/glx.lisp
+
+;;; Code:
 (defpackage #:xlib/glx
   (:use :common-lisp :xlib)
   (:import-from 

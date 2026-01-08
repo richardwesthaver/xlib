@@ -33,7 +33,6 @@
 	   (type display display)
 	   (type array-index start end))
   #.(declare-buffun)
-
   (write-sequence vector (display-output-stream display) :start start :end end)
   nil)
 

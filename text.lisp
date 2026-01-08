@@ -1,20 +1,6 @@
-;;; text.lisp
+;;; text.lisp --- X Text Keyboard and Pointer Requests
 
-;;; CLX text keyboard and pointer requests
-
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
-
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
-
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
-
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
+;;; Code:
 (in-package :xlib)
 
 ;; Strings are broken up into chunks of this size
@@ -28,7 +14,7 @@
 ;; returned.
 (deftype translation-function ()
   '(function (sequence array-index array-index (or null font) vector array-index)
-	     (values array-index (or null int16 font) (or null int32))))
+    (values array-index (or null int16 font) (or null int32))))
 
 ;; In the functions below, if width is specified, it is assumed to be the pixel
 ;; width of whatever string of glyphs is actually drawn.  Specifying width will
@@ -108,8 +94,8 @@
   (declare (type (or null translation-function) translate)
 	   (dynamic-extent translate))
   (declare (clx-values width ascent descent left right
-		  font-ascent font-descent direction
-		  (or null array-index)))
+		       font-ascent font-descent direction
+		       (or null array-index)))
   (when (type? font 'gcontext)
     (force-gcontext-changes font)
     (setq font (gcontext-font font t)))
@@ -165,10 +151,10 @@
 		(setq font-ascent (the int16 (font-ascent font))
 		      font-descent (the int16 (font-descent font))
 		      font-direction (font-direction font)))
-	    ;; Let the server calculate text extents
-	    (multiple-value-setq
-	      (w a d l r font-ascent font-descent font-direction)
-	      (text-extents-server font wbuf 0 buf-end)))
+	      ;; Let the server calculate text extents
+	      (multiple-value-setq
+	          (w a d l r font-ascent font-descent font-direction)
+	        (text-extents-server font wbuf 0 buf-end)))
 	  (incf width (the int32 w))
 	  (cond ((index= src-start start)
 		 (setq left-bearing (the int32 l))
@@ -245,9 +231,9 @@
 	      ((integerp new-font) (incf width (the int32 new-font))))
 	
 	(incf width
-	      (if (or (font-char-infos-internal font) (font-local-only-p font))
-		  (text-extents-local font wbuf 0 buf-end :width-only)
-		(text-width-server font wbuf 0 buf-end)))
+	  (if (or (font-char-infos-internal font) (font-local-only-p font))
+	      (text-extents-local font wbuf 0 buf-end :width-only)
+	      (text-width-server font wbuf 0 buf-end)))
 	(when (type? new-font 'font)
 	  (setq font new-font))))
     (values width next-start)))
@@ -264,20 +250,20 @@
 	     (type array-index length)
 	     (type resource-id font-id))
     (with-buffer-request-and-reply (display +x-querytextextents+ 28 :sizes (8 16 32))
-	 (((data boolean) (oddp length))
-	  (length (index+ (index-ceiling length 2) 2))
-	  (resource-id font-id)
-	  ((sequence :format char2b :start start :end end :appending t)
-	   sequence))
+	(((data boolean) (oddp length))
+	 (length (index+ (index-ceiling length 2) 2))
+	 (resource-id font-id)
+	 ((sequence :format char2b :start start :end end :appending t)
+	  sequence))
       (values
-	(integer-get 16)
-	(int16-get 12)
-	(int16-get 14)
-	(integer-get 20)
-	(integer-get 24)
-	(int16-get 8)
-	(int16-get 10)
-	(member8-get 1 :left-to-right :right-to-left)))))
+       (integer-get 16)
+       (int16-get 12)
+       (int16-get 14)
+       (integer-get 20)
+       (integer-get 24)
+       (int16-get 8)
+       (int16-get 10)
+       (member8-get 1 :left-to-right :right-to-left)))))
 
 (defun text-width-server (font sequence start end)
   (declare (type (or font gcontext) font)
@@ -291,11 +277,11 @@
 	     (type array-index length)
 	     (type resource-id font-id))
     (with-buffer-request-and-reply (display +x-querytextextents+ 28 :sizes 32)
-	 (((data boolean) (oddp length))
-	  (length (index+ (index-ceiling length 2) 2))
-	  (resource-id font-id)
-	  ((sequence :format char2b :start start :end end :appending t)
-	   sequence))
+	(((data boolean) (oddp length))
+	 (length (index+ (index-ceiling length 2) 2))
+	 (resource-id font-id)
+	 ((sequence :format char2b :start start :end end :appending t)
+	  sequence))
       (values (integer-get 16)))))
 
 (defun text-extents-local (font sequence start end width-only-p)
@@ -318,98 +304,98 @@
 		   (type int32 width))
 	  (if width-only-p
 	      width
-	    (values width
-		    font-ascent
-		    font-descent
-		    (max-char-left-bearing font)
-		    (+ width (- font-width) (max-char-right-bearing font)))))
-      ;; Variable-width font
-      (let* ((first-col (font-info-min-byte2 font-info))
-	     (num-cols (1+ (- (font-info-max-byte2 font-info) first-col)))
-	     (first-row (font-info-min-byte1 font-info))
-	     (last-row (font-info-max-byte1 font-info))
-	     (num-rows (1+ (- last-row first-row))))
-	(declare (type card8 first-col first-row last-row)
-		 (type card16 num-cols num-rows))
-	(if (or (plusp first-row) (plusp last-row))
-	    ;; Matrix (16 bit) font
-	    (macrolet ((char-info-elt (sequence elt)
-			 `(let* ((char (the card16 (elt ,sequence ,elt)))
-				 (row (- (ash char -8) first-row))
-				 (col (- (logand char #xff) first-col)))
-			    (declare (type card16 char)
-				     (type int16 row col))
-			    (if (and (< -1 row num-rows) (< -1 col num-cols))
-				(index* 6 (index+ (index* row num-cols) col))
-			      -1))))
-	      (if width-only-p
-		  (do ((i start (index1+ i))
-		       (width 0))
-		      ((index>= i end) width)
-		    (declare (type array-index i)
-			     (type int32 width))
-		    (let ((n (char-info-elt sequence i)))
-		      (declare (type fixnum n))
-		      (unless (minusp n)  ;; Ignore characters not in the font
-			(incf width (the int16 (aref char-infos (index+ 2 n)))))))
-		;; extents
-		(do ((i start (index1+ i))
-		     (width 0)
-		     (ascent #x-7fff)
-		     (descent #x-7fff)
-		     (left #x7fff)
-		     (right #x-7fff))
-		    ((index>= i end)
-		     (values width ascent descent left right))
-		  (declare (type array-index i)
-			   (type int16 ascent descent)
-			   (type int32 width left right))
-		  (let ((n (char-info-elt sequence i)))
-		    (declare (type fixnum n))
-		    (unless (minusp n) ;; Ignore characters not in the font
-		      (setq left (min left (+ width (aref char-infos n))))
-		      (setq right (max right (+ width (aref char-infos (index1+ n)))))
-		      (incf width (aref char-infos (index+ 2 n)))
-		      (setq ascent (max ascent (aref char-infos (index+ 3 n))))
-		      (setq descent (max descent (aref char-infos (index+ 4 n)))))))))
-	  ;; Non-matrix (8 bit) font
-	  ;; The code here is identical to the above, except for the following macro:
-	  (macrolet ((char-info-elt (sequence elt)
-		       `(let ((col (- (the card16 (elt ,sequence ,elt)) first-col)))
-			  (declare (type int16 col))
-			  (if (< -1 col num-cols)
-			      (index* 6 col)
-			    -1))))
-	    (if width-only-p
-		(do ((i start (index1+ i))
-		     (width 0))
-		    ((index>= i end) width)
-		  (declare (type array-index i)
-			   (type int32 width))
-		  (let ((n (char-info-elt sequence i)))
-		    (declare (type fixnum n))
-		    (unless (minusp n) ;; Ignore characters not in the font
-		      (incf width (the int16 (aref char-infos (index+ 2 n)))))))
-	      ;; extents
-	      (do ((i start (index1+ i))
-		   (width 0)
-		   (ascent #x-7fff)
-		   (descent #x-7fff)
-		   (left #x7fff)
-		   (right #x-7fff))
-		  ((index>= i end)
-		   (values width ascent descent left right))
-		(declare (type array-index i)
-			 (type int16 ascent descent)
-			 (type int32 width left right))
-		(let ((n (char-info-elt sequence i)))
-		  (declare (type fixnum n))
-		  (unless (minusp n) ;; Ignore characters not in the font
-		    (setq left (min left (+ width (aref char-infos n))))
-		    (setq right (max right (+ width (aref char-infos (index1+ n)))))
-		    (incf width (aref char-infos (index+ 2 n)))
-		    (setq ascent (max ascent (aref char-infos (index+ 3 n))))
-		    (setq descent (max descent (aref char-infos (index+ 4 n))))))))))))))
+	      (values width
+		      font-ascent
+		      font-descent
+		      (max-char-left-bearing font)
+		      (+ width (- font-width) (max-char-right-bearing font)))))
+        ;; Variable-width font
+        (let* ((first-col (font-info-min-byte2 font-info))
+	       (num-cols (1+ (- (font-info-max-byte2 font-info) first-col)))
+	       (first-row (font-info-min-byte1 font-info))
+	       (last-row (font-info-max-byte1 font-info))
+	       (num-rows (1+ (- last-row first-row))))
+	  (declare (type card8 first-col first-row last-row)
+		   (type card16 num-cols num-rows))
+	  (if (or (plusp first-row) (plusp last-row))
+	      ;; Matrix (16 bit) font
+	      (macrolet ((char-info-elt (sequence elt)
+			   `(let* ((char (the card16 (elt ,sequence ,elt)))
+				   (row (- (ash char -8) first-row))
+				   (col (- (logand char #xff) first-col)))
+			      (declare (type card16 char)
+				       (type int16 row col))
+			      (if (and (< -1 row num-rows) (< -1 col num-cols))
+				  (index* 6 (index+ (index* row num-cols) col))
+			          -1))))
+	        (if width-only-p
+		    (do ((i start (index1+ i))
+		         (width 0))
+		        ((index>= i end) width)
+		      (declare (type array-index i)
+			       (type int32 width))
+		      (let ((n (char-info-elt sequence i)))
+		        (declare (type fixnum n))
+		        (unless (minusp n)  ;; Ignore characters not in the font
+			  (incf width (the int16 (aref char-infos (index+ 2 n)))))))
+		    ;; extents
+		    (do ((i start (index1+ i))
+		         (width 0)
+		         (ascent #x-7fff)
+		         (descent #x-7fff)
+		         (left #x7fff)
+		         (right #x-7fff))
+		        ((index>= i end)
+		         (values width ascent descent left right))
+		      (declare (type array-index i)
+			       (type int16 ascent descent)
+			       (type int32 width left right))
+		      (let ((n (char-info-elt sequence i)))
+		        (declare (type fixnum n))
+		        (unless (minusp n) ;; Ignore characters not in the font
+		          (setq left (min left (+ width (aref char-infos n))))
+		          (setq right (max right (+ width (aref char-infos (index1+ n)))))
+		          (incf width (aref char-infos (index+ 2 n)))
+		          (setq ascent (max ascent (aref char-infos (index+ 3 n))))
+		          (setq descent (max descent (aref char-infos (index+ 4 n)))))))))
+	      ;; Non-matrix (8 bit) font
+	      ;; The code here is identical to the above, except for the following macro:
+	      (macrolet ((char-info-elt (sequence elt)
+		           `(let ((col (- (the card16 (elt ,sequence ,elt)) first-col)))
+			      (declare (type int16 col))
+			      (if (< -1 col num-cols)
+			          (index* 6 col)
+			          -1))))
+	        (if width-only-p
+		    (do ((i start (index1+ i))
+		         (width 0))
+		        ((index>= i end) width)
+		      (declare (type array-index i)
+			       (type int32 width))
+		      (let ((n (char-info-elt sequence i)))
+		        (declare (type fixnum n))
+		        (unless (minusp n) ;; Ignore characters not in the font
+		          (incf width (the int16 (aref char-infos (index+ 2 n)))))))
+	            ;; extents
+	            (do ((i start (index1+ i))
+		         (width 0)
+		         (ascent #x-7fff)
+		         (descent #x-7fff)
+		         (left #x7fff)
+		         (right #x-7fff))
+		        ((index>= i end)
+		         (values width ascent descent left right))
+		      (declare (type array-index i)
+			       (type int16 ascent descent)
+			       (type int32 width left right))
+		      (let ((n (char-info-elt sequence i)))
+		        (declare (type fixnum n))
+		        (unless (minusp n) ;; Ignore characters not in the font
+		          (setq left (min left (+ width (aref char-infos n))))
+		          (setq right (max right (+ width (aref char-infos (index1+ n)))))
+		          (incf width (aref char-infos (index+ 2 n)))
+		          (setq ascent (max ascent (aref char-infos (index+ 3 n))))
+		          (setq descent (max descent (aref char-infos (index+ 4 n))))))))))))))
 
 ;; This controls the element size of the dst buffer given to translate.  If
 ;; :default is specified, the size will be based on the current font, if known,
@@ -475,7 +461,7 @@
 	(card8 (ldb (byte 8 0) elt))
 	(card8 (ldb (byte 8 8) elt)))
       (values t width))))
-  
+
 (defun draw-glyphs (drawable gcontext x y sequence
 		    &key (start 0) end translate width (size :default))
   ;; First result is new start, if end was not reached.  Second result is
@@ -559,7 +545,7 @@
 		    src-start new-start)
 	      (if translated-width
 		  (when overall-width (incf overall-width translated-width))
-		(setq overall-width nil))
+		  (setq overall-width nil))
 	      (when (index-plusp dst-chunk)
 		(setf (aref buffer-bbuf boffset) dst-chunk)
 		(setf (aref buffer-bbuf (index+ boffset 1)) offset)
@@ -661,7 +647,7 @@
 	      (write-sequence-char2b display (index+ boffset 2) buffer 0 dst-chunk)
 	      (if translated-width
 		  (when overall-width (incf overall-width translated-width))
-		(setq overall-width nil))
+		  (setq overall-width nil))
 	      (when (index-plusp dst-chunk)
 		(setf (aref buffer-bbuf boffset) dst-chunk)
 		(setf (aref buffer-bbuf (index+ boffset 1)) offset)
@@ -933,8 +919,8 @@
     (replace data mod4 :start1 (index* 6 keycodes-per-modifier))
     (replace data mod5 :start1 (index* 7 keycodes-per-modifier))
     (with-buffer-request-and-reply (display +x-setmodifiermapping+ 4 :sizes 8)
-	 ((data keycodes-per-modifier)
-	  ((sequence :format card8) data))
+	((data keycodes-per-modifier)
+	 ((sequence :format card8) data))
       (values (member8-get 1 :success :busy :failed)))))
 
 (defun modifier-mapping (display)
@@ -943,7 +929,7 @@
   (declare (clx-values shift lock control mod1 mod2 mod3 mod4 mod5))
   (let ((lists nil))
     (with-buffer-request-and-reply (display +x-getmodifiermapping+ nil :sizes 8)
-	 ()
+	()
       (do* ((keycodes-per-modifier (card8-get 1))
 	    (advance-by +replysize+ keycodes-per-modifier)
 	    (keys nil nil)
@@ -960,7 +946,7 @@
 ;; Either we will want lots of defconstants for well-known values, or perhaps
 ;; an integer-to-keyword translation function for well-known values.
 (defun change-keyboard-mapping
-       (display keysyms &key (start 0) end (first-keycode start))
+    (display keysyms &key (start 0) end (first-keycode start))
   ;; start/end give subrange of keysyms
   ;; first-keycode is the first-keycode to store at
   (declare (type display display)
@@ -1010,7 +996,7 @@
   (unless start (setq start first-keycode))
   (unless end (setq end (1+ (display-max-keycode display))))
   (with-buffer-request-and-reply (display +x-getkeyboardmapping+ nil :sizes (8 32))
-       ((card8 first-keycode (index- end start)))
+      ((card8 first-keycode (index- end start)))
     (do* ((keysyms-per-keycode (card8-get 1))
 	  (bytes-per-keycode (* keysyms-per-keycode 4))
 	  (advance-by +replysize+ bytes-per-keycode)
@@ -1021,8 +1007,8 @@
 			   (>= (array-dimension data 0) (index+ start keycode-count))
 			   (>= (array-dimension data 1) keysyms-per-keycode))
 		      data
-		    (make-array `(,(index+ start keycode-count) ,keysyms-per-keycode)
-				:element-type 'keysym :initial-element 0)))
+		      (make-array `(,(index+ start keycode-count) ,keysyms-per-keycode)
+				  :element-type 'keysym :initial-element 0)))
 	  (i start (1+ i)))
 	 ((zerop keycode-count) (setq data result))
       (advance-buffer-offset advance-by)

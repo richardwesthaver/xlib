@@ -1,22 +1,12 @@
 ;;; extensions/screensaver.lisp
 
+;;; Commentary:
+
 ;;     Title: X11 MIT Screensaver extension
 ;;   Created: 2005-08-28 01:41
 ;;    Author: Istvan Marko <mi-clx@kismala.com>
 
-;;  (c) copyright 2005 by Istvan Marko
-
-;;
-;; Permission is granted to any individual or institution to use,
-;; copy, modify, and distribute this software, provided that this
-;; complete copyright and permission notice is maintained, intact, in
-;; all copies and supporting documentation.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-;;; Description:
+;;;; Description:
 
 ;; This is a partial interface to the MIT-SCREEN-SAVER extension. Only the
 ;; ScreenSaverQueryVersion and ScreenSaverQueryInfo requests are implemented

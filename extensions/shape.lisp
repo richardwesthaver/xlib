@@ -1,24 +1,17 @@
-;;; shape.lisp
-;;; ---------------------------------------------------------------------------
-;;;     Title: X11 Shape extension
-;;;   Created: 1999-05-14 11:31
-;;;    Author: Gilbert Baumann <unk6@rz.uni-karlsruhe.de>
-;;; ---------------------------------------------------------------------------
-;;;  (c) copyright 1999 by Gilbert Baumann
+;;; extensions/shape.lisp
 
-;;;
-;;; Permission is granted to any individual or institution to use,
-;;; copy, modify, and distribute this software, provided that this
-;;; complete copyright and permission notice is maintained, intact, in
-;;; all copies and supporting documentation.
-;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-;;;
+;;; Commentary:
 
-;;; Use xc/doc/hardcopy/Xext/shape.PS.gz obtainable from e.g.
+;;     Title: X11 Shape extension
+;;   Created: 1999-05-14 11:31
+;;    Author: Gilbert Baumann <unk6@rz.uni-karlsruhe.de>
+
+;;  (c) copyright 1999 by Gilbert Baumann
+
+;; Use xc/doc/hardcopy/Xext/shape.PS.gz obtainable from e.g.
 ;;  ftp://ftp.xfree86.org/pub/XFree86/current/untarred/xc/hardcopy/Xext/shape.PS.gz
+
+;;; Code:
 (in-package :xlib)
 
 (export '(shape-query-version
