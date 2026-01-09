@@ -19,11 +19,6 @@
 ;;;
 ;;; Franz Incorporated provides this software "as is" without express
 ;;; or implied warranty.
-(defpackage :xlib-system (:use :cl :asdf))
-(in-package :xlib-system)  
-
-(defclass xlib-source-file (cl-source-file) ())
-
 (defsystem #:xlib
   :description "An implementation of the X Window System protocol in Lisp."
   :author "Texas Instruments Incorporated.
@@ -34,7 +29,6 @@ Independent FOSS developers"
   :depends-on (:sb-bsd-sockets :obj)
   :version "0.7.7"
   :serial t
-  :default-component-class xlib-source-file
   :in-order-to ((test-op (test-op "xlib/tests")))
   :components
   ((:file "pkg")
@@ -77,26 +71,6 @@ Independent FOSS developers"
              (:file "composite")
              (:file "xkeyboard")
              (:file "xembed")))))
-
-(defsystem #:xlib/demo
-  :depends-on ("xlib")
-  :components
-  ((:module "demo"
-	    :components
-	    ((:file "menu")
-             (:file "bezier")
-	     (:file "beziertest" :depends-on ("bezier"))
-	     (:file "clclock")
-	     (:file "clipboard")
-	     (:file "xlib-demos")
-	     (:file "gl-test")
-	     ;; FIXME: compiling this generates 30-odd spurious code
-	     ;; deletion notes.  Find out why, and either fix or
-	     ;; workaround the problem.
-	     (:file "mandel")
-	     (:file "zoid")
-	     (:file "image")
-	     (:file "trapezoid" :depends-on ("zoid"))))))
 
 (defsystem #:xlib/truetype
   :serial t

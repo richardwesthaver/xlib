@@ -45,26 +45,7 @@
     (:file "xkeyboard")
     (:file "xembed"))))
  :provide
- ((:sys :xlib/demo
-   :require (:xlib)
-   :components
-   ((:mod "demo"
-     :components
-     ((:file "menu")
-      (:file "bezier")
-      (:file "beziertest" :require ("bezier"))
-      (:file "clclock")
-      (:file "clipboard")
-      (:file "xlib-demos")
-      (:file "gl-test")
-      ;; FIXME: compiling this generates 30-odd spurious code
-      ;; deletion notes.  Find out why, and either fix or
-      ;; workaround the problem.
-      (:file "mandel")
-      (:file "zoid")
-      (:file "image")
-      (:file "trapezoid" :require ("zoid"))))))
-  (:sys :xlib/truetype
+ ((:sys :xlib/truetype
    :description "xlib/truetype is pure common lisp solution for antialiased TrueType font
 rendering using XLIB and XRender extension."
    :require
