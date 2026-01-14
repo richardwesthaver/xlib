@@ -74,7 +74,7 @@ Independent FOSS developers"
 
 (defsystem #:xlib/truetype
   :serial t
-  :description "xlib/truetype is pure common lisp solution for antialiased TrueType font
+  :description "xlib/truetype is pure CL solution for antialiased TrueType font
 rendering using XLIB and XRender extension."
   :author "Michael Filonenko <filonenko.mikhail@gmail.com>"
   :license "MIT"

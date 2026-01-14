@@ -8,7 +8,6 @@
 Glyphs information is obtained by DAT/TTF. Font rasterization is made by
 VEC (VEC/AA).")
   (:use #:cl #:std #:dat/ttf #:obj/cache)
-  (:import-from :obj/val :get-val)
   (:import-from :ttf :size)
   (:export
    :drawable-screen
@@ -61,7 +60,7 @@ VEC (VEC/AA).")
      :policy :lfu)))
 
 (defun font-cache-fetch (cache dpi string)
-  (get-val (get-val cache dpi) string))
+  (cache-fetch (cache-fetch cache dpi) string))
 
 (defmethod initialize-instance :after
     ((font font) &key (dpi-cache-size 10) (string-cache-size 1000) &allow-other-keys)
