@@ -26,12 +26,6 @@
                  (,@(std:ensure-list function-form) ,@param-list))))))
 
 ;;; Macros
-(defmacro with-default-display (display &body body)
-  `(let ((,display (xlib:open-default-display)))
-     (unwind-protect
-          (progn ,@body)
-       (xlib:close-display ,display))))
-
 (declaim (special *display* *screen* *root* *black* *white* *window* *font* *gcontext*))
 (defmacro with-test-window (&body body)
   `(let* ((*display* (xlib:open-default-display))

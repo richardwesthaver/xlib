@@ -69,10 +69,7 @@
   (declare (type display buffer)
            (type (or null real) timeout)
            (type function function)
-           (dynamic-extent function)
-           ;; FIXME: This is probably more a bug in SBCL (logged as
-           ;; bug #243)
-           (ignorable timeout))
+           (dynamic-extent function))
   (with-buffer (buffer :timeout timeout :inline t)
     (funcall function)))
 

@@ -98,12 +98,13 @@
           command)))
 
 (defsetf wm-command set-wm-command)
+
 (defun set-wm-command (window command)
   ;; Uses PRIN1 inside the ANSI common lisp form WITH-STANDARD-IO-SYNTAX (or
-  ;; equivalent), with elements of command separated by NULL characters.  This
-  ;; enables
+  ;; equivalent), with elements of command separated by NULL characters. This
+  ;; enables the following to recover a lisp command:
+
   ;;   (with-standard-io-syntax (mapcar #'read-from-string (wm-command window)))
-  ;; to recover a lisp command.
   (declare (type window window)
            (type list command))
   (change-property window :WM_COMMAND

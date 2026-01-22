@@ -28,7 +28,7 @@
     char->card8 char-ascent char-attributes char-descent
     char-left-bearing char-right-bearing char-width character->keysyms
     character-in-map-p circulate-window-down circulate-window-up clear-area
-    close-display close-down-mode close-font closed-display color
+    close-display with-default-display close-down-mode close-font closed-display color
     color-blue color-green color-p color-red color-rgb colormap
     colormap-display colormap-equal colormap-error colormap-id colormap-p
     colormap-plist colormap-visual-info connection-failure convert-selection

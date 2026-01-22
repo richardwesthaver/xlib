@@ -327,7 +327,6 @@ used, since NIL is the empty list."))
   (dead nil :type (or null (not null)))
   ;; T makes buffer-flush a noop.  Manipulated with with-buffer-flush-inhibited.
   (flush-inhibit nil :type (or null (not null)))
-  
   ;; Change these functions when using shared memory buffers to the server
   ;; Function to call when writing the buffer
   (write-function 'buffer-write-default)
@@ -342,15 +341,8 @@ used, since NIL is the empty list."))
   ;; Function to call to listen for input data
   (listen-function 'buffer-listen-default)) 
 
-;; Image stuff
-(defconstant +image-bit-lsb-first-p+
-  #+little-endian t
-  #-little-endian nil)
-
-(defconstant +image-byte-lsb-first-p+
-  #+little-endian t
-  #-little-endian nil)
-
+;; Image constants
+(defconstant +image-bit-lsb-first-p+ #.(when (little-endian-p) t))
+(defconstant +image-byte-lsb-first-p+ #.(when (little-endian-p) t))
 (defconstant +image-unit+ 32)
-
 (defconstant +image-pad+ 32)
