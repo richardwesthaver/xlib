@@ -149,7 +149,7 @@
 
 ;; Internal function called from DRAW-LINES
 (defun fill-polygon (drawable gcontext points relative-p shape)
-  ;; This is clever about appending to previous requests.  Should it be?
+  ;; This is clever about appending to previous requests. Should it be?
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
 	   (type sequence points)		;(repeat-seq (integer x) (integer y))
@@ -368,9 +368,9 @@
     (list (draw-arcs-list drawable gcontext arcs fill-p))
     (vector (draw-arcs-vector drawable gcontext arcs fill-p))))
 
-;; The following image routines are bare minimum.  It may be useful to define
+;; The following image routines are bare minimum. It may be useful to define
 ;; some form of "image" object to hide representation details and format
-;; conversions.  It also may be useful to provide stream-oriented interfaces
+;; conversions. It also may be useful to provide stream-oriented interfaces
 ;; for reading and writing the data.
 (defun put-raw-image (drawable gcontext data &key
 		      (start 0)
@@ -383,7 +383,7 @@
 		      (format (required-arg format)))
   ;; Data must be a sequence of 8-bit quantities, already in the appropriate format
   ;; for transmission; the caller is responsible for all byte and bit swapping and
-  ;; compaction.  Start is the starting index in data; the end is computed from the
+  ;; compaction. Start is the starting index in data; the end is computed from the
   ;; other arguments.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
@@ -415,7 +415,7 @@
 		      (result-type '(vector card8)))
   ;; If data is given, it is modified in place (and returned), otherwise a new sequence
   ;; is created and returned, with a size computed from the other arguments and the
-  ;; returned depth.  The sequence is filled with 8-bit quantities, in transmission
+  ;; returned depth. The sequence is filled with 8-bit quantities, in transmission
   ;; format; the caller is responsible for any byte and bit swapping and compaction
   ;; required for further local use.
   (declare (type drawable drawable)

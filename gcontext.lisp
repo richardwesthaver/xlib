@@ -22,20 +22,20 @@
 ;;
 ;;	GContext changes are cached until force-GContext-changes is called.
 ;;	All the requests that use GContext (including the GContext accessors,
-;;	but not the SETF's) call force-GContext-changes.  In addition, the
+;;	but not the SETF's) call force-GContext-changes. In addition, the
 ;;	macro WITH-GCONTEXT may be used to provide a local view if a GContext.
 ;;
 ;;	Each GContext keeps a copy of the values the server has seen, and a
-;;	copy altered by SETF, called the LOCAL-STATE (bad name...).  The SETF
-;;	accessors increment a timestamp in the GContext.  When the timestamp
+;;	copy altered by SETF, called the LOCAL-STATE (bad name...). The SETF
+;;	accessors increment a timestamp in the GContext. When the timestamp
 ;;	in a GContext isn't equal to the timestamp in the local-state, changes
 ;;	have been made, and force-GContext-changes loops through the GContext
 ;;	and local-state, sending differences to the server, and updating
 ;;	GContext.
 ;;
 ;;	WITH-GCONTEXT works by BINDING the local-state slot in a GContext to a
-;;	private copy.  This is easy (and fast) for lisp machines, but other
-;;	lisps will have problems.  Fortunately, most other lisps don't care,
+;;	private copy. This is easy (and fast) for lisp machines, but other
+;;	lisps will have problems. Fortunately, most other lisps don't care,
 ;;	because they don't run in a multi-processing shared-address space
 ;;	environment.
 (in-package :xlib)
@@ -330,9 +330,9 @@
   dashes)
 
 (defun gcontext-font (gcontext &optional metrics-p)
-  ;; If the stored font is known, it is returned.  If it is not known and
-  ;; metrics-p is false, then nil is returned.  If it is not known and
-  ;; metrics-p is true, then a pseudo font is returned.  Full metric and
+  ;; If the stored font is known, it is returned. If it is not known and
+  ;; metrics-p is false, then nil is returned. If it is not known and
+  ;; metrics-p is true, then a pseudo font is returned. Full metric and
   ;; property information can be obtained, but the font does not have a name or
   ;; a resource-id, and attempts to use it where a resource-id is required will
   ;; result in an invalid-font error.
@@ -486,7 +486,7 @@
         (force-gcontext-changes-internal gcontext)))))
 
 ;;; WARNING: WITH-GCONTEXT WORKS MUCH MORE EFFICIENTLY WHEN THE OPTIONS BEING "BOUND" ARE
-;;;          SET IN THE GCONTEXT ON ENTRY.  BECAUSE THERE'S NO WAY TO GET THE VALUE OF AN
+;;;          SET IN THE GCONTEXT ON ENTRY. BECAUSE THERE'S NO WAY TO GET THE VALUE OF AN
 ;;;          UNKNOWN GC COMPONENT, WITH-GCONTEXT MUST CREATE A TEMPORARY GC, COPY THE UNKNOWN
 ;;;          COMPONENTS TO THE TEMPORARY GC, ALTER THE GC BEING USED, THEN COPY COMPOMENTS
 ;;;          BACK.
@@ -497,7 +497,7 @@
   ;; "Binds" the gcontext components specified by options within the
   ;; dynamic scope of the body (i.e., indefinite scope and dynamic
   ;; extent), on a per-process basis in a multi-process environment.
-  ;; The body is not surrounded by a with-display.  If cache-p is nil or
+  ;; The body is not surrounded by a with-display. If cache-p is nil or
   ;; the some component states are unknown, this will implement
   ;; save/restore by creating a temporary gcontext and doing
   ;; copy-gcontext-components to and from it.
@@ -663,14 +663,14 @@
                                         (cache-p t)
                                         &allow-other-keys)
   ;; Only non-nil components are passed on in the request, but for effective caching
-  ;; assumptions have to be made about what the actual protocol defaults are.  For
+  ;; assumptions have to be made about what the actual protocol defaults are. For
   ;; all gcontext components, a value of nil causes the default gcontext value to be
-  ;; used.  For clip-mask, this implies that an empty rect-seq cannot be represented
-  ;; as a list.  Note:  use of stringable as font will cause an implicit open-font.
-  ;; Note:  papers over protocol SetClipRectangles and SetDashes special cases.  If
+  ;; used. For clip-mask, this implies that an empty rect-seq cannot be represented
+  ;; as a list. Note:  use of stringable as font will cause an implicit open-font.
+  ;; Note:  papers over protocol SetClipRectangles and SetDashes special cases. If
   ;; cache-p is true, then gcontext state is cached locally, and changing a gcontext
   ;; component will have no effect unless the new value differs from the cached
-  ;; value.  Component changes (setfs and with-gcontext) are always deferred
+  ;; value. Component changes (setfs and with-gcontext) are always deferred
   ;; regardless of the cache mode, and sent over the protocol only when required by a
   ;; local operation or by an explicit call to force-gcontext-changes.
   (declare (type drawable drawable) ; Required to be non-null
@@ -885,7 +885,7 @@
   ;; This will define a new gcontext accessor called NAME.
   ;; Defines the gcontext-NAME accessor function and its defsetf.
   ;; Gcontext's will cache DEFAULT-VALUE and the last value SETF'ed when
-  ;; gcontext-cache-p is true.  The NAME keyword will be allowed in
+  ;; gcontext-cache-p is true. The NAME keyword will be allowed in
   ;; CREATE-GCONTEXT, WITH-GCONTEXT, and COPY-GCONTEXT-COMPONENTS.
   ;; SET-FUNCTION will be called with parameters (GCONTEXT NEW-VALUE)
   ;; from create-gcontext, and force-gcontext-changes.
@@ -941,11 +941,11 @@
        ',name)))
 
 ;; GContext extension fields are treated in much the same way as normal GContext
-;; components.  The current value is stored in a slot of the gcontext-local-state,
+;; components. The current value is stored in a slot of the gcontext-local-state,
 ;; and the value known to the server is in a slot of the gcontext-server-state.
 ;; The slot-number is defined by its position in the *gcontext-extensions* list.
 ;; The value of the special variable |Internal-GCONTEXT-name| (where "name" is
-;; the extension component name) reflects this position.  The position within
+;; the extension component name) reflects this position. The position within
 ;; *gcontext-extensions* and the value of the special value are determined at
 ;; LOAD time to facilitate merging of seperately compiled extension files.
 (defun add-gcontext-extension (name default-value set-function copy-function)

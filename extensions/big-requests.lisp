@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; No new events or errors are defined by this extension.  (Big
+;; No new events or errors are defined by this extension. (Big
 ;; Requests Extension, section 3)
 
 ;; The name of this extension is "BIG-REQUESTS" (Big Requests

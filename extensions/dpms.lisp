@@ -5,15 +5,15 @@
 ;; Original Author: Matthew Kennedy <mkennedy@gentoo.org>
 
 ;; Documentation strings derived from DPMS.txt distributed with the Xorg X11
-;; server implementation.  DPMS.txt contains the following copyright:
+;; server implementation. DPMS.txt contains the following copyright:
 
 ;;  Copyright (C) Digital Equipment Corporation, 1996
 
 ;;  Permission to use, copy, modify, distribute, and sell this documentation
 ;;  for any purpose is hereby granted without fee, provided that the above
-;;  copyright notice and this permission notice appear in all copies.  Digital
+;;  copyright notice and this permission notice appear in all copies. Digital
 ;;  Equipment Corporation makes no representations about the suitability for
-;;  any purpose of the information in this document.  This documentation is
+;;  any purpose of the information in this document. This documentation is
 ;;  provided ``as is'' without express or implied warranty.
 
 ;;; Code:
@@ -74,11 +74,11 @@ version of the protocol the client wants the server to implement."
 
 (defun dpms-capable (display)
   "True if the currently running server's devices are capable of
-DPMS operations.  
+DPMS operations. 
 
 The truth value of this request is implementation defined, but is
 generally based on the capabilities of the graphic card and
-monitor combination.  Also, the return value in the case of
+monitor combination. Also, the return value in the case of
 heterogeneous multi-head servers is implementation defined."
   (declare (type display display))
   (with-buffer-request-and-reply (display (dpms-opcode display) nil)
@@ -87,8 +87,8 @@ heterogeneous multi-head servers is implementation defined."
 
 (defun dpms-get-timeouts (display)
   "Return three values: the current values of the DPMS timeout
-values.  The timeout values are (in order returned): standby,
-suspend and off.  All values are in units of seconds.  A value of
+values. The timeout values are (in order returned): standby,
+suspend and off. All values are in units of seconds.  A value of
 zero for any timeout value indicates that the mode is disabled."
   (declare (type display display))
   (with-buffer-request-and-reply (display (dpms-opcode display) nil)
@@ -98,8 +98,8 @@ zero for any timeout value indicates that the mode is disabled."
             (card16-get 12))))
 
 (defun dpms-set-timeouts (display standby suspend off)
-  "Set the values of the DPMS timeouts.  All values are in units
-of seconds.  A value of zero for any timeout value disables that
+  "Set the values of the DPMS timeouts. All values are in units
+of seconds. A value of zero for any timeout value disables that
 mode."
   (declare (type display display))
   (with-buffer-request (display (dpms-opcode display))
@@ -112,7 +112,7 @@ mode."
 
 (defun dpms-enable (display)
   "Enable the DPMS characteristics of the server using the
-server's currently stored timeouts.  If DPMS is already enabled,
+server's currently stored timeouts. If DPMS is already enabled,
 no change is affected."
   (declare (type display display))
   (with-buffer-request (display (dpms-opcode display))
@@ -120,8 +120,8 @@ no change is affected."
   (values))
 
 (defun dpms-disable (display)
-  "Disable the DPMS characteristics of the server.  It does not
-affect the core or extension screen savers.  If DPMS is already
+  "Disable the DPMS characteristics of the server. It does not
+affect the core or extension screen savers. If DPMS is already
 disabled, no change is effected.
 
 This request is provided so that DPMS may be disabled without
@@ -132,7 +132,7 @@ damaging the server's stored timeout values."
   (values))
 
 (defun dpms-force-level (display power-level)
-  "Forces a specific DPMS level on the server.  Valid keyword
+  "Forces a specific DPMS level on the server. Valid keyword
 values for POWER-LEVEL are: DPMS-MODE-ON, DPMS-MODE-STANDBY,
 DPMS-MODE-SUSPEND and DPMS-MODE-OFF."
   (declare (type display display))
@@ -153,7 +153,7 @@ State is one of the keywords DPMS-ENABLED or DPMS-DISABLED.
 
 If state is DPMS-ENABLED, then power level is returned as one of
 the keywords DPMS-MODE-ON, DPMS-MODE-STANDBY, DPMS-MODE-SUSPEND
-or DPMS-MODE-OFF.  If state is DPMS-DISABLED, then power-level is
+or DPMS-MODE-OFF. If state is DPMS-DISABLED, then power-level is
 undefined and returned as NIL."
   (declare (type display display))
   (with-buffer-request-and-reply (display (dpms-opcode display) nil)

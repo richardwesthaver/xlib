@@ -124,7 +124,7 @@
 (defun add-resource (database name-list value)
   ;; name-list is a list of either strings or symbols. If a symbol, 
   ;; case-insensitive comparisons will be used, if a string,
-  ;; case-sensitive comparisons will be used.  The symbol '* or
+  ;; case-sensitive comparisons will be used. The symbol '* or
   ;; string "*" are used as wildcards, matching anything or nothing.
   (declare (type resource-database database)
 	   (type (clx-list stringable) name-list)
@@ -307,7 +307,7 @@
       ;; top-level loose without further tight/loose databases.
 
       ;; (Hack: these bindings belong in ANY search table, so recomputing them
-      ;; is a drag.  True fix involves redesigning entire lookup
+      ;; is a drag. True fix involves redesigning entire lookup
       ;; data-structure/algorithm.)
       (let ((universal-bindings
 	      (remove nil loose :test-not #'eq
@@ -435,8 +435,8 @@
 (defun read-resources (database pathname &key key test test-not)
   ;; Merges resources from a file in standard X11 format with DATABASE.
   ;; KEY is a function used for converting value-strings, the default is
-  ;; identity.  TEST and TEST-NOT are predicates used for filtering
-  ;; which resources to include in the database.  They are called with
+  ;; identity. TEST and TEST-NOT are predicates used for filtering
+  ;; which resources to include in the database. They are called with
   ;; the name and results of the KEY function.
   (declare (type resource-database database)
 	   (type (or pathname string stream) pathname)
@@ -522,7 +522,7 @@
   ;; Write resources to PATHNAME in the standard X11 format.
   ;; WRITE is a function used for writing values, the default is #'princ
   ;; TEST and TEST-NOT are predicates used for filtering which resources
-  ;; to include in the database.  They are called with the name and value.
+  ;; to include in the database. They are called with the name and value.
   (declare (type resource-database database)
 	   (type (or pathname string stream) pathname)
 	   (type (or null (function (string stream) t)) write)
@@ -554,8 +554,8 @@
   ;; Takes the resources associated with the RESOURCE_MANAGER property
   ;; of WINDOW (if any) and merges them with DATABASE.
   ;; KEY is a function used for converting value-strings, the default is
-  ;; identity.  TEST and TEST-NOT are predicates used for filtering
-  ;; which resources to include in the database.  They are called with
+  ;; identity. TEST and TEST-NOT are predicates used for filtering
+  ;; which resources to include in the database. They are called with
   ;; the name and results of the KEY function.
   (declare (type resource-database database)
 	   (type window window)
@@ -576,7 +576,7 @@
   ;; of WINDOW.
   ;; WRITE is a function used for writing values, the default is #'princ
   ;; TEST and TEST-NOT are predicates used for filtering which resources
-  ;; to include in the database.  They are called with the name and value.
+  ;; to include in the database. They are called with the name and value.
   (declare (type resource-database database)
 	   (type window window)
 	   (type (or null (function (string stream) t)) write)
@@ -596,7 +596,7 @@
    returned.
 
    TEST and TEST-NOT are predicates for selecting which resources are
-   read.  Arguments are a resource name list and a resource value. The KEY
+   read. Arguments are a resource name list and a resource value. The KEY
    function, if given, is called to convert a resource value string to the
    value given to TEST or TEST-NOT."
 
@@ -618,8 +618,8 @@
    given SCREEN. If SCREEN is a display, then its default screen is used. 
 
    TEST and TEST-NOT are predicates for selecting which resources from the
-   DATABASE are written.  Arguments are a resource name list and a resource
-   value.  The WRITE function is used to convert a resource value into a
+   DATABASE are written. Arguments are a resource name list and a resource
+   value. The WRITE function is used to convert a resource value into a
    string stored in the property."
 
   (declare (type (or screen display) screen)

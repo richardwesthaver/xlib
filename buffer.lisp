@@ -8,19 +8,19 @@
 ;; A few notes:
 
 ;;  1. The BUFFER implements a two-way buffered byte / half-word / word
-;;     stream.  Hooks are left for implementing this with a shared memory
+;;     stream. Hooks are left for implementing this with a shared memory
 ;;     buffer, or with efficiency hooks to the network code.
 
 ;;  2. The BUFFER object uses overlapping displaced arrays for inserting and
 ;;     removing bytes half-words and words.
 
 ;;  3. The BYTE component of these arrays is written to a STREAM associated
-;;     with the BUFFER.  The stream has its own buffer.  This may be made more
+;;     with the BUFFER. The stream has its own buffer.  This may be made more
 ;;     efficient by using the Zetalisp :Send-Output-Buffer operation.
 
-;;  4. The BUFFER object is INCLUDED in the DISPLAY object.  This was done to
+;;  4. The BUFFER object is INCLUDED in the DISPLAY object. This was done to
 ;;     reduce access time when sending requests, while maintaing some code
-;;     modularity.  Several buffer functions are duplicated (with-buffer,
+;;     modularity. Several buffer functions are duplicated (with-buffer,
 ;;     buffer-force-output, close-buffer) to keep the naming conventions
 ;;     consistent.
 
@@ -29,7 +29,7 @@
 ;;     protocol. (see the INTERFACE file)
 
 ;;  6. Care is taken to leave the buffer pointer (buffer-bbuf) set to a point
-;;     after a complete request.  This is to ensure that a partial request
+;;     after a complete request. This is to ensure that a partial request
 ;;     won't be left after aborts (e.g. control-abort on a lispm).
 
 ;;; Code:
@@ -41,7 +41,7 @@
 ;; without macros and bufmac being loaded.
 (defmacro with-buffer ((buffer &key timeout inline)
 		       &body body &environment env)
-  ;; This macro is for use in a multi-process environment.  It provides
+  ;; This macro is for use in a multi-process environment. It provides
   ;; exclusive access to the local buffer object for request generation and
   ;; reply processing.
   `(macrolet ((with-buffer ((buffer &key timeout) &body body)
@@ -105,7 +105,7 @@
   (declare (arglist (buffer &key sizes) &body body))
   ;; BODY may contain calls to (READ32 &optional index) etc.
   ;; These calls will read from the input buffer at byte
-  ;; offset INDEX.  If INDEX is not supplied, then the next
+  ;; offset INDEX. If INDEX is not supplied, then the next
   ;; word, half-word or byte is returned.
   `(with-buffer-input (,event ,@options) ,@body))
 

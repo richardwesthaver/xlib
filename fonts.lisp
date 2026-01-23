@@ -126,7 +126,7 @@
     
 (defun open-font (display name)
   ;; Font objects may be cached and reference counted locally within the display
-  ;; object.  This function might not execute a with-display if the font is cached.
+  ;; object. This function might not execute a with-display if the font is cached.
   ;; The protocol QueryFont request happens on-demand under the covers.
   (declare (type display display)
 	   (type stringable name))
@@ -169,7 +169,7 @@
     id))
 
 (defun discard-font-info (font)
-  ;; Discards any state that can be re-obtained with QueryFont.  This is
+  ;; Discards any state that can be re-obtained with QueryFont. This is
   ;; simply a performance hint for memory-limited systems.
   (declare (type font font))
   (setf (font-font-info-internal font) nil
@@ -256,9 +256,9 @@
 (defun list-fonts (display pattern &key (max-fonts 65535) (result-type 'list))
   ;; Note: Was called list-fonts-with-info.
   ;; Returns "pseudo" fonts that contain basic font metrics and properties, but
-  ;; no per-character metrics and no resource-ids.  These pseudo fonts will be
+  ;; no per-character metrics and no resource-ids. These pseudo fonts will be
   ;; converted (internally) to real fonts dynamically as needed, by issuing an
-  ;; OpenFont request.  However, the OpenFont might fail, in which case the
+  ;; OpenFont request. However, the OpenFont might fail, in which case the
   ;; invalid-font error can arise.
   (declare (type display display)
 	   (type string pattern)

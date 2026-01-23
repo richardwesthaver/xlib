@@ -32,9 +32,9 @@
 		      backing-store backing-planes backing-pixel save-under
 		      event-mask do-not-propagate-mask override-redirect
 		      colormap cursor)
-  ;; Display is obtained from parent.  Only non-nil attributes are passed on in
+  ;; Display is obtained from parent. Only non-nil attributes are passed on in
   ;; the request: the function makes no assumptions about what the actual protocol
-  ;; defaults are.  Width and height are the inside size, excluding border.
+  ;; defaults are. Width and height are the inside size, excluding border.
   (declare (type (or null window) window)
 	   (type window parent)		; required
 	   (type int16 x y) ;required
@@ -460,7 +460,7 @@
 		   &key propagate-p display &allow-other-keys)
   ;; Additional arguments depend on event-key, and are as specified further below
   ;; with declare-event, except that both resource-ids and resource objects are
-  ;; accepted in the event components.  The display argument is only required if the
+  ;; accepted in the event components. The display argument is only required if the
   ;; window is :pointer-window or :input-focus.
   (declare (type (or (member :pointer-window :input-focus) window) window)
 	   (type event-key event-key)
@@ -1262,9 +1262,9 @@
 
 ;;  The base volume should
 ;; be considered to be the "desired" volume in the normal case; that is, a
-;; typical application should call XBell with 0 as the percent.  Rather
+;; typical application should call XBell with 0 as the percent. Rather
 ;; than using a simple sum, the percent argument is instead used as the
-;; percentage of the remaining range to alter the base volume by.  That is,
+;; percentage of the remaining range to alter the base volume by. That is,
 ;; the actual volume is:
 ;;	 if percent>=0:    base - [(base * percent) / 100] + percent
 ;;	 if percent<0:     base + [(base * percent) / 100]

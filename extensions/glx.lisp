@@ -146,8 +146,8 @@ property types and property values."
 
 
 ;;; FIXME: DEFINE-ACCESSOR interns getter and setter in XLIB package
-;;; (using XINTERN).  Therefore the accessors defined below can only
-;;; be accessed using double-colon, which is a bad style.  Or these
+;;; (using XINTERN). Therefore the accessors defined below can only
+;;; be accessed using double-colon, which is a bad style. Or these
 ;;; forms must be taken to another file so the accessors exist before
 ;;; we get to this file.
 
@@ -163,20 +163,20 @@ property types and property values."
 
 
 ;;; FIXME: I'm just not sure we need a seperate accessors for what
-;;; essentially are aliases for other types.  Maybe use compiler
+;;; essentially are aliases for other types. Maybe use compiler
 ;;; macros?
 ;;;
 ;;; This trick won't do because CLX wants e.g. CONTEXT-TAG to be a
-;;; known accessor.  The only trick left I think is to change the
+;;; known accessor. The only trick left I think is to change the
 ;;; XINTERN function to intern the new symbols in the same package as
-;;; he symbol part of it comes from.  Don't know if it would break
-;;; anything, thought.  (I would be quite surprised if it did -- there
+;;; he symbol part of it comes from. Don't know if it would break
+;;; anything, thought. (I would be quite surprised if it did -- there
 ;;; is only one package in CLX after all: XLIB.)
 ;;;
 ;;; I also found the origin of the error (about symbol not being a
-;;; known accessor): INDEX-INCREMENT function.  Looks like all we have
+;;; known accessor): INDEX-INCREMENT function. Looks like all we have
 ;;; to do is to add an XLIB::BYTE-WIDTH property to the type symbol
-;;; plist.  But accessors are macros, not functions, anyway.
+;;; plist. But accessors are macros, not functions, anyway.
 
 #-(and)
 (progn
@@ -195,12 +195,12 @@ property types and property values."
   (tag 0 :type card32)
   (drawable nil :type (or null drawable))
   ;; TODO: There can only be one current context (as far as I
-  ;; understand).  If so, we'd need only one buffer (otherwise it's a
+  ;; understand). If so, we'd need only one buffer (otherwise it's a
   ;; big waste to have a quarter megabyte buffer for each context; or
   ;; we could allocate/grow the buffer on demand).
   ;;
-  ;; 256k buffer for Render command.  Big requests are served with
-  ;; RenderLarge command.  First 8 octets are Render request fields.
+  ;; 256k buffer for Render command. Big requests are served with
+  ;; RenderLarge command. First 8 octets are Render request fields.
   ;;
   (rbuf (make-array (+ 8 (* 256 1024)) :element-type '(unsigned-byte 8)) :type buffer-bytes)
   ;; Index into RBUF where the next rendering command should be inserted.
@@ -315,7 +315,7 @@ property types and property values."
     (card32 3) ; minor
     (card32 0))) ; n
 
-;;; XXX: This looks like an internal thing.  Should name appropriately.
+;;; XXX: This looks like an internal thing. Should name appropriately.
 (defun make-context (display)
   (let ((ctx (%make-context :display display)))
     (setf (context-id ctx)
@@ -482,7 +482,7 @@ property types and property values."
                                                       (card32-get (incf index 4))))))))))))
 
 (defun choose-visual (screen attributes)
-  "ATTRIBUTES is a list of desired attributes for a visual.  The elements may be
+  "ATTRIBUTES is a list of desired attributes for a visual. The elements may be
 either a symbol, which means that the boolean attribute with that name must be true; or
 it can be a list of the form: (attribute-name value &optional (test '<=)) which means that
 the attribute named attribute-name must satisfy the test when applied to the given value and
@@ -558,7 +558,7 @@ Example: '(:glx-rgba (:glx-alpha-size 4) :glx-double-buffer (:glx-class 4 =)."
       (resource-id (drawable-id (context-drawable ctx))))
     (display-force-output display)))
 
-;; FIXME: These two are more complicated than sending messages.  As I
+;; FIXME: These two are more complicated than sending messages. As I
 ;; understand it, wait-gl should inhibit any X requests until all GL
 ;; requests are sent...
 (defun wait-gl ()

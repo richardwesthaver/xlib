@@ -68,10 +68,10 @@
 ;;; 01/28/88	L.Oren		Add character translation facility
 ;;; 02/**/87	J.Irwin		Allegro 2.2 support
 
-;;; This is considered a somewhat changeable interface.  Discussion of better
+;;; This is considered a somewhat changeable interface. Discussion of better
 ;;; integration with CLOS, support for user-specified subclassess of basic
 ;;; objects, and the additional functionality to match the C Xlib is still in
-;;; progress.  Bug reports should be addressed to bug-clx@expo.lcs.mit.edu.
+;;; progress. Bug reports should be addressed to bug-clx@expo.lcs.mit.edu.
 
 ;; Note: all of the following is in the package XLIB.
 (in-package :xlib)
@@ -83,21 +83,21 @@
 (defparameter *x-tcp-port* 6000) ;; add display number
 
 ;; Note: if you have read the Version 11 protocol document or C Xlib manual,
-;; most of the relationships should be fairly obvious.  We have no intention
+;; most of the relationships should be fairly obvious. We have no intention
 ;; of writing yet another moby document for this interface.
 
 ;; Types employed: display, window, pixmap, cursor, font, gcontext, colormap,
-;; color.  These types are defined solely by a functional interface; we do not
+;; color. These types are defined solely by a functional interface; we do not
 ;; specify whether they are implemented as structures or flavors or ...
 ;; Although functions below are written using DEFUN, this is not an
 ;; implementation requirement (although it is a requirement that they be
-;; functions as opposed to macros or special forms).  It is unclear whether
+;; functions as opposed to macros or special forms). It is unclear whether
 ;; with-slots in the Common Lisp Object System must work on them.
 
 ;; Windows, pixmaps, cursors, fonts, gcontexts, and colormaps are all
-;; represented as compound objects, rather than as integer resource-ids.  This
+;; represented as compound objects, rather than as integer resource-ids. This
 ;; allows applications to deal with multiple displays without having an
-;; explicit display argument in the most common functions.  Every function
+;; explicit display argument in the most common functions. Every function
 ;; uses the display object indicated by the first argument that is or contains
 ;; a display; it is an error if arguments contain different displays, and
 ;; predictable results are not guaranteed.
@@ -107,8 +107,8 @@
 
 ;(defun make-<mumble> (display resource-id)
 ;  ;; This function should almost never be called by applications, except in handling
-;  ;; events.  To minimize consing in some implementations, this may use a cache in
-;  ;; the display.  Make-gcontext creates with :cache-p nil.  Make-font creates with
+;  ;; events. To minimize consing in some implementations, this may use a cache in
+;  ;; the display. Make-gcontext creates with :cache-p nil.  Make-font creates with
 ;  ;; cache-p true.
 ;  (declare (type display display)
 ;	   (type integer resource-id)
@@ -816,9 +816,9 @@
 ;;; Event-mask encode/decode functions
 ;;;    Converts from keyword-lists to integer and back
 (defun encode-mask (key-vector key-list key-type)
-  ;; KEY-VECTOR is a vector containg bit-position keywords.  The
+  ;; KEY-VECTOR is a vector containg bit-position keywords. The
   ;; position of the keyword in the vector indicates its bit position
-  ;; in the resulting mask.  KEY-LIST is either a mask or a list of
+  ;; in the resulting mask. KEY-LIST is either a mask or a list of
   ;; KEY-TYPE Returns NIL when KEY-LIST is not a list or mask.
   (declare (type (simple-array keyword (*)) key-vector)
 	   (type (or mask32 list) key-list))

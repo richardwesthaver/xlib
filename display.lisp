@@ -64,7 +64,7 @@
                       (:internet (coerce address-data 'list))
                       ;; FIXME: we can probably afford not to support
                       ;; :DECNET or :CHAOSNET in this modern age, but
-                      ;; :INTERNET6 probably deserve support.  -- CSR,
+                      ;; :INTERNET6 probably deserve support. -- CSR,
                       ;; 2005-08-07
                       (t nil))))
               ;; if ADDRESS is NIL by this time, we will never match
@@ -75,10 +75,10 @@
   ;; parse .Xauthority, extract the cookie for DISPLAY on HOST.
   ;; PROTOCOL determines whether the server connection is using an
   ;; Internet protocol (value of :internet) or a non-network
-  ;; protocol such as Unix domain sockets (value of :local).  Returns
+  ;; protocol such as Unix domain sockets (value of :local). Returns
   ;; two strings: an authorization name (very likely the string
   ;; "MIT-MAGIC-COOKIE-1") and an authorization key, represented as
-  ;; fixnums in a vector.  If we fail to find an appropriate cookie,
+  ;; fixnums in a vector. If we fail to find an appropriate cookie,
   ;; return two empty strings.
   (let ((pathname (authority-pathname)))
     (when pathname
@@ -224,7 +224,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 					    (values ,type t))))
 				  (cond ((not foundp)
 					 ,type)
-					;; Found.  Check the type
+					;; Found. Check the type
 					,(cond ((null +type-check?+)
 						`(t ,type))
 					       ((member type '(window pixmap))
@@ -236,7 +236,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 							  :display display
 							  :type ',type
 							  :object ,type))))))
-			       ;; Not being cached.  Create a new one each time.
+			       ;; Not being cached. Create a new one each time.
 			       `(,(xintern 'make- type)
 				 :display display :id id))))
 		   types))))
@@ -342,10 +342,10 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   "Open a connection to DISPLAY-NAME if supplied, or to the appropriate
 default display as given by GET-DEFAULT-DISPLAY otherwise.
 
-OPEN-DISPLAY-NAME always attempts to do display authorization.  The
+OPEN-DISPLAY-NAME always attempts to do display authorization. The
 hostname is resolved to an address, then authorization data for the
 (protocol, host-address, displaynumber) triple is looked up in the
-file given by AUTHORITY_PATHNAME (typically $HOME/.Xauthority).  If
+file given by AUTHORITY_PATHNAME (typically $HOME/.Xauthority). If
 the protocol is :local, or if the hostname resolves to the local host,
 authority data for the local machine's actual hostname - as returned by
 gethostname(3) - is used instead."
@@ -357,17 +357,17 @@ gethostname(3) - is used instead."
 
 (defun open-display (host &key (display 0) protocol authorization-name authorization-data)
   ;; Implementation specific routine to setup the buffer for a
-  ;; specific host and display.  This must interface with the local
+  ;; specific host and display. This must interface with the local
   ;; network facilities, and will probably do special things to
   ;; circumvent the nework when displaying on the local host.
   ;;
   ;; A string must be acceptable as a host, but otherwise the possible types
   ;; for host and protocol are not constrained, and will likely be very
-  ;; system dependent.  The default protocol is system specific.  Authorization,
+  ;; system dependent. The default protocol is system specific.  Authorization,
   ;; if any, is assumed to come from the environment somehow.
   (declare (type integer display))
   (declare (clx-values display))
-  ;; Get the authorization mechanism from the environment.  Handle the
+  ;; Get the authorization mechanism from the environment. Handle the
   ;; special case of a host name of "" and "unix" which means the
   ;; protocol is :local
   (when (null authorization-name)
@@ -578,10 +578,10 @@ gethostname(3) - is used instead."
 #+comment ;; defined by the DISPLAY defstruct
 (defsetf display-error-handler (display) (handler)
   ;; All errors (synchronous and asynchronous) are processed by
-  ;; calling an error handler in the display.  If handler is a
+  ;; calling an error handler in the display. If handler is a
   ;; sequence it is expected to contain handler functions specific to
   ;; each error; the error code is used to index the sequence,
-  ;; fetching the appropriate handler.  Any results returned by the
+  ;; fetching the appropriate handler. Any results returned by the
   ;; handler are ignored; it is assumed the handler either takes care
   ;; of the error completely, or else signals. For all core errors,
   ;; the keyword/value argument pairs are:
@@ -603,9 +603,9 @@ gethostname(3) - is used instead."
 ;; setf'able
 ;; If defined, called after every protocol request is generated,
 ;; even those inside explicit with-display's, but never called from
-;; inside the after-function itself.  The function is called inside
-;; the effective with-display for the associated request.  Default
-;; value is nil.  Can be set, for example, to #'display-force-output
+;; inside the after-function itself. The function is called inside
+;; the effective with-display for the associated request. Default
+;; value is nil. Can be set, for example, to #'display-force-output
 ;; or #'display-finish-output.
 
 (defvar *inside-display-after-function* nil)

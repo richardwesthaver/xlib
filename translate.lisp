@@ -7,8 +7,8 @@
 
 (defun define-keysym-set (set first-keysym last-keysym)
   ;; Define all keysyms from first-keysym up to and including
-  ;; last-keysym to be in the keysym set named SET.  SET is a keyword
-  ;; (i.e., a symbol in the package named KEYWORD).  When the function
+  ;; last-keysym to be in the keysym set named SET. SET is a keyword
+  ;; (i.e., a symbol in the package named KEYWORD). When the function
   ;; KEYSYM-SET is called with a keysym, the SET of the keysym set to
   ;; which the keysym belongs is returned.
 
@@ -45,7 +45,7 @@
 
     ;; If KEYSYM is an integer, it is used as the most significant
     ;; bits of the keysym, and BYTES are used to specify low order
-    ;; bytes. The last parameter is always byte4 of the keysym.  If
+    ;; bytes. The last parameter is always byte4 of the keysym. If
     ;; KEYSYM is not an integer, the keysym associated with KEYSYM is
     ;; returned.
 
@@ -53,7 +53,7 @@
     ;; compile-time lookup. All arguments are evaluated.
 
     ;; FIXME: The above means that this shouldn't really be a macro at
-    ;; all, but a compiler macro.  Probably, anyway.
+    ;; all, but a compiler macro. Probably, anyway.
     (declare (type t keysym)
 	     (type list bytes)
 	     (clx-values keysym))
@@ -79,7 +79,7 @@
   `(second ,keysym-mapping))
 
 (defmacro keysym-mapping-lowercase (keysym-mapping)
-  ;; LOWERCASE is used for uppercase alphabetic keysyms.  The value
+  ;; LOWERCASE is used for uppercase alphabetic keysyms. The value
   ;; is the associated lowercase keysym.
   `(third ,keysym-mapping))
 
@@ -92,7 +92,7 @@
 (defmacro keysym-mapping-mask (keysym-mapping)
   ;; MASK is either a modifier-mask or list containing intermixed
   ;; keysyms and state-mask-keys specifying which modifiers to look at
-  ;; (i.e.  modifiers not specified are don't-cares)
+  ;; (i.e. modifiers not specified are don't-cares)
   `(fifth ,keysym-mapping))
 
 (defvar *default-keysym-translate-mask*
@@ -102,25 +102,25 @@
 
 (defun define-keysym (object keysym &key lowercase translate modifiers mask display)
   ;; Define the translation from keysym/modifiers to a (usually
-  ;; character) object.  Any previous keysym definition with KEYSYM
+  ;; character) object. Any previous keysym definition with KEYSYM
   ;; and MODIFIERS is deleted before the new definition is added.
 
   ;; MODIFIERS is either a modifier-mask or list containing intermixed
   ;; keysyms and state-mask-keys specifying when to use this
-  ;; keysym-translation.  The default is NIL.
+  ;; keysym-translation. The default is NIL.
 
   ;; MASK is either a modifier-mask or list containing intermixed
   ;; keysyms and state-mask-keys specifying which modifiers to look at
-  ;; (i.e.  modifiers not specified are don't-cares).
+  ;; (i.e. modifiers not specified are don't-cares).
   ;; If mask is :MODIFIERS then the mask is the same as the modifiers
-  ;; (i.e.  modifiers not specified by modifiers are don't cares)
+  ;; (i.e. modifiers not specified by modifiers are don't cares)
   ;; The default mask is *default-keysym-translate-mask*
 
   ;; If DISPLAY is specified, the translation will be local to DISPLAY,
   ;; otherwise it will be the default translation for all displays.
 
-  ;; LOWERCASE is used for uppercase alphabetic keysyms.  The value
-  ;; is the associated lowercase keysym.  This information is used
+  ;; LOWERCASE is used for uppercase alphabetic keysyms. The value
+  ;; is the associated lowercase keysym. This information is used
   ;; by the keysym-both-case-p predicate (for caps-lock computations)
   ;; and by the keysym-downcase function.
 

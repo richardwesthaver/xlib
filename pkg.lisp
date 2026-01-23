@@ -1,7 +1,7 @@
 ;;; package.lisp --- XLIB Packages
 
 ;; Copyright 1990 Massachusetts Institute of Technology, Cambridge,
-;; Massachusetts.  All Rights Reserved.
+;; Massachusetts. All Rights Reserved.
 
 ;; Permission to use, copy, modify, and distribute this software and its
 ;; documentation for any purpose and without fee is hereby granted, provided

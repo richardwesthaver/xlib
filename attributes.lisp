@@ -7,22 +7,22 @@
 ;;	Where DRAWABLE is the associated window or pixmap
 ;;	      ATTRIBUTES is NIL or a reply-buffer containing the drawable's
 ;;		         attributes for use by the accessors.
-;;	      ATTRIBUTE-CHANGES is NIL or an array.  The first element
+;;	      ATTRIBUTE-CHANGES is NIL or an array. The first element
 ;;			 of the array is a "value-mask", indicating which
-;;			 attributes have changed.  The other elements are
+;;			 attributes have changed. The other elements are
 ;;			 integers associated with the changed values, ready
 ;;			 for insertion into a server request.
 ;;	      GEOMETRY is like ATTRIBUTES, but for window geometry
 ;;	      GEOMETRY-CHANGES is like ATTRIBUTE-CHANGES, but for window geometry
 
 ;;	Attribute and Geometry accessors and SETF's look on the special variable
-;;	*window-attributes* for the drawable.  If its not there, the accessor is
+;;	*window-attributes* for the drawable. If its not there, the accessor is
 ;;     NOT within a WITH-STATE, and a server request is made to get or put a value.
 ;;     If an entry is found in *window-attributes*, the cache buffers are used
 ;;	for the access.
 
 ;;	All WITH-STATE has to do (re)bind *Window-attributes* to a list including
-;;	the new drawable.  The caches are initialized to NIL and allocated as needed.
+;;	the new drawable. The caches are initialized to NIL and allocated as needed.
 
 ;;; Code:
 (in-package :xlib)
@@ -63,13 +63,13 @@
 (defmacro with-state ((drawable) &body body)
   ;; Allows a consistent view to be obtained of data returned by GetWindowAttributes
   ;; and GetGeometry, and allows a coherent update using ChangeWindowAttributes and
-  ;; ConfigureWindow.  The body is not surrounded by a with-display.  Within the
+  ;; ConfigureWindow. The body is not surrounded by a with-display.  Within the
   ;; indefinite scope of the body, on a per-process basis in a multi-process
   ;; environment, the first call within an Accessor Group on the specified drawable
   ;; (the object, not just the variable) causes the complete results of the protocol
-  ;; request to be retained, and returned in any subsequent accessor calls.  Calls
+  ;; request to be retained, and returned in any subsequent accessor calls. Calls
   ;; within a Setf Group are delayed, and executed in a single request on exit from
-  ;; the body.  In addition, if a call on a function within an Accessor Group follows
+  ;; the body. In addition, if a call on a function within an Accessor Group follows
   ;; a call on a function in the corresponding Setf Group, then all delayed setfs for
   ;; that group are executed, any retained accessor information for that group is
   ;; discarded, the corresponding protocol request is (re)issued, and the results are

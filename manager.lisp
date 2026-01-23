@@ -129,7 +129,7 @@
   (icon-y nil :type (or null card16))
   (icon-mask nil :type (or null pixmap))
   (window-group nil :type (or null resource-id))
-  (flags 0 :type card32)    ;; Extension-hook.  Exclusive-Or'ed with the FLAGS field
+  (flags 0 :type card32)    ;; Extension-hook. Exclusive-Or'ed with the FLAGS field
   ;; may be extended in the future
   )
 
@@ -315,7 +315,7 @@
             (setf (wm-size-hints-max-aspect hints) (/ (aref vector 13) low)))))
       (when (> (length vector) 15)
         ;; This test is for backwards compatibility since old Xlib programs
-        ;; can set a size-hints structure that is too small.  See ICCCM.
+        ;; can set a size-hints structure that is too small. See ICCCM.
         (when (logbitp 8 flags)
           (setf (wm-size-hints-base-width hints) (aref vector 15)
                 (wm-size-hints-base-height hints) (aref vector 16)))

@@ -40,7 +40,7 @@ nil if a network socket should be opened."
          (format nil "/~A:~D" host display))
         (t nil)))
 
-;; The size of the output buffer.  Must be a multiple of 4.
+;; The size of the output buffer. Must be a multiple of 4.
 (defparameter *output-buffer-size* #x10000)
 
 ;; Number of seconds to wait for a reply to a server request
@@ -71,7 +71,7 @@ nil if a network socket should be opened."
   ;; It's my impression that in lucid there's some way to make a
   ;; declaration called fast-entry or something that causes a function
   ;; to not do some checking on args. Sadly, we have no lucid manuals
-  ;; here.  If such a declaration is available, it would be a good
+  ;; here. If such a declaration is available, it would be a good
   ;; idea to make it here when +buffer-speed+ is 3 and +buffer-safety+
   ;; is 0.
   (defun declare-buffun ()
@@ -328,11 +328,11 @@ nil if a network socket should be opened."
   (the short-float (* (the int16 value) #.(coerce (/ pi 180.0 64.0) 'short-float))))
 
 (progn
-;;; This overrides the (probably incorrect) definition in clx.lisp.  Since PI
-;;; is irrational, there can't be a precise rational representation.  In
-;;; particular, the different float approximations will always be /=.  This
+;;; This overrides the (probably incorrect) definition in clx.lisp. Since PI
+;;; is irrational, there can't be a precise rational representation. In
+;;; particular, the different float approximations will always be /=. This
 ;;; causes problems with type checking, because people might compute an
-;;; argument in any precision.  What we do is discard all the excess precision
+;;; argument in any precision. What we do is discard all the excess precision
 ;;; in the value, and see if the protocol encoding falls in the desired range
 ;;; (64'ths of a degree.)
 ;;;
@@ -429,7 +429,7 @@ nil if a network socket should be opened."
                                     (error "Invalid CHAR code ~D." card8))))
                          (dotimes (i 256)
                            (unless (= i (char->card8 (card8->char i)))
-                             (warn "The card8->char mapping is not invertible through char->card8.  Info:~%~S"
+                             (warn "The card8->char mapping is not invertible through char->card8. Info:~%~S"
                                    (list i
                                          (card8->char i)
                                          (char->card8 (card8->char i))))
@@ -437,7 +437,7 @@ nil if a network socket should be opened."
                          (dotimes (i (length *char-to-card8-translation-table*))
                            (let ((char (code-char i)))
                              (unless (eql char (card8->char (char->card8 char)))
-                               (warn "The char->card8 mapping is not invertible through card8->char.  Info:~%~S"
+                               (warn "The char->card8 mapping is not invertible through card8->char. Info:~%~S"
                                      (list char
                                            (char->card8 char)
                                            (card8->char (char->card8 char))))
@@ -457,7 +457,7 @@ nil if a network socket should be opened."
 ;; Process Locking
 
 ;;	Common-Lisp doesn't provide process locking primitives, so we define
-;;	our own here, based on Zetalisp primitives.  Holding-Lock is very
+;;	our own here, based on Zetalisp primitives. Holding-Lock is very
 ;;	similar to with-lock on The TI Explorer, and a little more efficient
 ;;	than with-process-lock on a Symbolics.
 
@@ -469,7 +469,7 @@ nil if a network socket should be opened."
                                       &key timeout)
                         &body body)
   ;; This macro is used by WITH-DISPLAY, which claims to be callable
-  ;; recursively.  So, had better use a recursive lock.
+  ;; recursively. So, had better use a recursive lock.
   (declare (ignore display whostate)
            (sb-ext:muffle-conditions style-warning))
   `(sb-thread:with-recursive-lock (,lock ,@(when timeout
@@ -478,7 +478,7 @@ nil if a network socket should be opened."
 
 ;;; WITHOUT-ABORTS
 ;; If you can inhibit asynchronous keyboard aborts inside the body of this
-;; macro, then it is a good idea to do this.  This macro is wrapped around
+;; macro, then it is a good idea to do this. This macro is wrapped around
 ;; request writing and reply reading to ensure that requests are atomically
 ;; written and replies are atomically read from the stream.
 (defmacro without-aborts (&body body)
@@ -506,7 +506,7 @@ nil if a network socket should be opened."
 ;; FIXME: the below implementation for threaded PROCESS-BLOCK using
 ;; queues and condition variables might seem better, but in fact it
 ;; turns out to make performance extremely suboptimal, at least as
-;; measured by McCLIM on linux 2.4 kernels.  -- CSR, 2003-11-10
+;; measured by McCLIM on linux 2.4 kernels. -- CSR, 2003-11-10
 #+(or)
 (defvar *process-conditions* (make-hash-table))
 
@@ -654,7 +654,7 @@ nil if a network socket should be opened."
 
 ;; 1. Do the equivalent of check-type on every argument.
 
-;; 2. Simply report TYPE-ERROR.  This eliminates overhead of all the format
+;; 2. Simply report TYPE-ERROR. This eliminates overhead of all the format
 ;;    strings generated by check-type.
 
 ;; 3. Do error checking only on arguments that are likely to have errors
@@ -664,7 +664,7 @@ nil if a network socket should be opened."
 ;;    on a non-tagged machine (i.e. when storing into a structure that has
 ;;    been passed in)
 
-;; 5. No extra error detection code.  On lispm's, ASET may barf trying to
+;; 5. No extra error detection code. On lispm's, ASET may barf trying to
 ;;    store a non-integer into a number array.
 
 ;; How extensive should the error checking be?  For example, if the server
@@ -685,12 +685,12 @@ nil if a network socket should be opened."
 ;; TYPE? is used to allow the code to do error checking at a different level
 ;; from the declarations. It also does some optimizations for systems that
 ;; don't have good compiler support for TYPEP. The definitions for CARD32,
-;; CARD16, INT16, etc.  include range checks. You can modify TYPE? to do less
+;; CARD16, INT16, etc. include range checks. You can modify TYPE? to do less
 ;; extensive checking for these types if you desire.
 
 ;;
 ;; ### This comment is a lie!  TYPE? is really also used for run-time type
-;; dispatching, not just type checking.  -- Ram.
+;; dispatching, not just type checking. -- Ram.
 
 (defmacro type? (object type)
   `(typep ,object ,type))
@@ -727,8 +727,8 @@ nil if a network socket should be opened."
 ;;; X-ERROR for CMU Common Lisp
 
 ;; We detect a couple condition types for which we disable event handling in
-;; our system.  This prevents going into the debugger or returning to a
-;; command prompt with CLX repeatedly seeing the same condition.  This occurs
+;; our system. This prevents going into the debugger or returning to a
+;; command prompt with CLX repeatedly seeing the same condition. This occurs
 ;; because CMU Common Lisp provides for all events (that is, X, input on file
 ;; descriptors, Mach messages, etc.) to come through one routine anyone can
 ;; use to wait for input.
@@ -796,7 +796,7 @@ nil if a network socket should be opened."
 #+unix
 (defun get-default-display (&optional display-name)
   "Parse the argument DISPLAY-NAME, or the environment variable $DISPLAY
-if it is NIL.  Display names have the format
+if it is NIL. Display names have the format
 
   [protocol/] [hostname] : [:] displaynumber [.screennumber]
 
@@ -1031,8 +1031,8 @@ Returns a list of (host display-number screen protocol)."
 
 ;; This is the classic BITBLT operation, copying a rectangular subarray
 ;; from one array to another (but source and destination must not overlap.)
-;; Widths are specified in bits.  Neither array can have a non-zero
-;; displacement.  We allow extra random bit-offset to be thrown into the X.
+;; Widths are specified in bits. Neither array can have a non-zero
+;; displacement. We allow extra random bit-offset to be thrown into the X.
 (defun copy-bit-rect (source source-width sx sy dest dest-width dx dy
                       height width)
   (declare (type array-index source-width sx sy dest-width dx dy height width))

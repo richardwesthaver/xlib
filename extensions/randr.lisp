@@ -463,7 +463,7 @@ screen and sub-pixel order."
        ))))
 
 (defun rr-select-input (window enable)
-  "Enables event reception for given window.  Enable may be a select-mask or list of select-keys "
+  "Enables event reception for given window. Enable may be a select-mask or list of select-keys "
   (let ((display (window-display window))
         (select-mask (if (consp enable) (make-rr-select-mask enable) enable)))
     (declare (type display display)
@@ -674,7 +674,7 @@ values consisting of:
        (sequence-get :format card32 :result-type result-type :length num-atoms :index +replysize+ :transform #'(lambda (id) (atom-name display id)))))))
 
 (defun rr-query-output-property (display output atom &key (result-type 'list))
-  "Querys the current properties of an atom.  Atom may be referenced by either id or keyword"
+  "Querys the current properties of an atom. Atom may be referenced by either id or keyword"
   (let ((atom (if (typep atom 'keyword) (find-atom display atom) atom)))
     (declare (type display display)
              (type card32 atom))
@@ -908,7 +908,7 @@ values consisting of:
 
 
 ;; (defun rr-set-crtc-transform (display crtc transform &key filter-name filter-parameters)
-;;   "FIXME:Transfrom may be a list or vector of length 9.  ?perhaps allow length 6?"
+;;   "FIXME:Transfrom may be a list or vector of length 9. ?perhaps allow length 6?"
 ;;   (let ((seq (if filter-parameters (coerce filter-parameters 'vector) nil ))
 ;;      (param-length (length filter-parameters))
 ;;      (name-length (length filter-name)))

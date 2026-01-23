@@ -20,7 +20,7 @@
 ;;   rasterization library you obviously want high performance entry points as
 ;;   RENDER-TRIANGLES-1.
 
-;; - We want to extend XLIB:COLOR into something with alpha channel.  How to
+;; - We want to extend XLIB:COLOR into something with alpha channel. How to
 ;;   name it? -- maybe XLIB:COLOR*?
 
 ;; - WITH-UNIFORM-COLOR-PICTURE (var picture r g b &optional alpha) &body body

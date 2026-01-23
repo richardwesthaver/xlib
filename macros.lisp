@@ -17,7 +17,7 @@
 ;;; Commentary: 
 
 ;; CLX basically implements a very low overhead remote procedure call to the
-;; server.  This file contains macros which generate the code for both the
+;; server. This file contains macros which generate the code for both the
 ;; client AND the server, given a specification of the interface. This was
 ;; done to eliminate errors that may occur because the client and server code
 ;; get/put bytes in different places, and it makes it easier to extend the
@@ -183,11 +183,11 @@
 (define-accessor font (32)
   ((index &optional (buffer '%buffer))
    `(lookup-font ,buffer (read-card29 ,index)))
-  ;; The FONT-ID accessor may make a OpenFont request.  Since we don't support recursive
+  ;; The FONT-ID accessor may make a OpenFont request. Since we don't support recursive
   ;; with-buffer-request, issue a compile time error, rather than barf at run-time.
   ((index thing)
    (declare (ignore index thing))
-   (error "FONT-ID must be called OUTSIDE with-buffer-request.  Use RESOURCE-ID instead.")))
+   (error "FONT-ID must be called OUTSIDE with-buffer-request. Use RESOURCE-ID instead.")))
 
 ;; Needed to get and put xatom's in events
 (define-accessor keyword (32)
@@ -527,7 +527,7 @@
 ;; the MASK type...
 ;;     is used to specify a subset of a collection of "optional" arguments.
 ;;     A mask type consists of a 32 bit mask word followed by a word for each one-bit
-;;     in the mask.  The MASK type is ALWAYS the LAST item in a request.
+;;     in the mask. The MASK type is ALWAYS the LAST item in a request.
 (setf (get 'mask 'byte-width) nil)
 
 (defun mask-get (index type-values body-function)

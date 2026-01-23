@@ -2279,7 +2279,7 @@
                     (type fixnum .length.))
            (when (< (- (length .rbuf.) 8)
                     (+ .index. .length.))
-             (error "Rendering command sequence too long.  Implement automatic buffer flushing."))
+             (error "Rendering command sequence too long. Implement automatic buffer flushing."))
 
            (aset-card16 .length. .rbuf. (the array-index .index0.))
            (aset-card16 ,opcode .rbuf. (the array-index (+ .index0. 2)))

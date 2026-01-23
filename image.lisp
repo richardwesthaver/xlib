@@ -652,7 +652,7 @@
 
 ;; The following table gives the bit ordering within bytes (when accessed
 ;; sequentially) for a scanline containing 32 bits, with bits numbered 0 to
-;; 31, where bit 0 should be leftmost on the display.  For a given byte
+;; 31, where bit 0 should be leftmost on the display. For a given byte
 ;; labelled A-B, A is for the most significant bit of the byte, and B is
 ;; for the least significant bit.
 
@@ -681,7 +681,7 @@
 ;; 4Ll	07-00 15-08 23-16 31-24
 
 ;; The following table gives the required conversion between any two
-;; formats.  It is based strictly on the table above.  If you believe one,
+;; formats. It is based strictly on the table above.  If you believe one,
 ;; you should believe the other.
 
 ;; legend:
@@ -718,7 +718,7 @@
 	(list #| 2Ll |# r   r   r   n   s   l   r   sr  lr  n   n   n )
 	(list #| 4Ll |# r   r   r   n   s   l   r   sr  lr  n   n   n )))))
 
-;; Of course, the table above is a lie.  We also need to factor in the
+;; Of course, the table above is a lie. We also need to factor in the
 ;; order of the source data to cope with swapping half of a unit at the
 ;; end of a scanline, since we are trying to avoid de-ref'ing off the
 ;; end of the source.
@@ -1976,7 +1976,7 @@
 				(image-x (image-x-bits-per-pixel image)))
 			      (pixmap-format-bits-per-pixel pixmap-format)))
 		      ;; We could try to use the "/* XXX slow, but works */"
-		      ;; code in XPutImage from X11R4 here.  However, that
+		      ;; code in XPutImage from X11R4 here. However, that
 		      ;; would require considerable support code
 		      ;; (see XImUtil.c, etc).
 		      (error "The bits-per-pixel of the image ~s does not match any server pixmap format." image))
@@ -2491,7 +2491,7 @@
 
 (defun write-bitmap-file (pathname image &optional name)
   ;; Writes an image to a C include file in standard X11 format
-  ;; NAME argument used for variable prefixes.  Defaults to "image"
+  ;; NAME argument used for variable prefixes. Defaults to "image"
   (declare (type (or pathname string stream) pathname)
 	   (type image image)
 	   (type (or null stringable) name))
@@ -2519,7 +2519,7 @@
 	     (type image-depth depth)
 	     (type array-index bits-per-line bytes-per-line count last))
     ;; Move x-hot by left-pad, if there is an x-hot, so image readers that
-    ;; don't know about left pad get the hot spot in the right place.  We have
+    ;; don't know about left pad get the hot spot in the right place. We have
     ;; already increased width by left-pad.
     (when (getf plist :x-hot)
       (setq plist (copy-list plist))

@@ -7,9 +7,9 @@
 (defparameter *max-string-size* 254)
 
 ;; In the functions below, the transform is used to convert an element of the
-;; sequence into a font index.  The transform is applied to each element of the
+;; sequence into a font index. The transform is applied to each element of the
 ;; (sub)sequence, until either the transform returns nil or the end of the
-;; (sub)sequence is reached.  If transform returns nil for an element, the
+;; (sub)sequence is reached. If transform returns nil for an element, the
 ;; index of that element in the sequence is returned, otherwise nil is
 ;; returned.
 (deftype translation-function ()
@@ -17,25 +17,25 @@
     (values array-index (or null int16 font) (or null int32))))
 
 ;; In the functions below, if width is specified, it is assumed to be the pixel
-;; width of whatever string of glyphs is actually drawn.  Specifying width will
+;; width of whatever string of glyphs is actually drawn. Specifying width will
 ;; allow for appending the output of subsequent calls to the same protocol
-;; request, provided gcontext has not been modified in the interim.  If width
+;; request, provided gcontext has not been modified in the interim. If width
 ;; is not specified, appending of subsequent output might not occur.
-;; Specifying width is simply a hint, for performance.  Note that specifying
+;; Specifying width is simply a hint, for performance. Note that specifying
 ;; width may be difficult if transform can return nil.
 (defun translate-default (src src-start src-end font dst dst-start)
   ;; dst is guaranteed to have room for (- src-end src-start) integer elements,
   ;; starting at dst-start; whether dst holds 8-bit or 16-bit elements depends
-  ;; on context.  font is the current font, if known.  The function should
+  ;; on context. font is the current font, if known.  The function should
   ;; translate as many elements of src as possible into indexes in the current
   ;; font, and store them into dst.
   ;;
   ;; The first return value should be the src index of the first untranslated
-  ;; element.  If no further elements need to be translated, the second return
-  ;; value should be nil.  If a horizontal motion is required before further
+  ;; element. If no further elements need to be translated, the second return
+  ;; value should be nil. If a horizontal motion is required before further
   ;; translation, the second return value should be the delta in x coordinate.
   ;; If a font change is required for further translation, the second return
-  ;; value should be the new font.  If known, the pixel width of the translated
+  ;; value should be the new font. If known, the pixel width of the translated
   ;; text can be returned as the third value; this can allow for appending of
   ;; subsequent output to the same protocol request, if no overall width has
   ;; been specified at the higher level.
@@ -78,16 +78,16 @@
 	      (setf (aref dst j) elt))))))
 
 ;; There is a question below of whether translate should always be required, or
-;; if not, what the default should be or where it should come from.  For
+;; if not, what the default should be or where it should come from. For
 ;; example, the default could be something that expected a string as src and
 ;; translated the CL standard character set to ASCII indexes, and ignored fonts
-;; and bits.  Or the default could expect a string but otherwise be "system
-;; dependent".  Or the default could be something that expected a vector of
-;; integers and did no translation.  Or the default could come from the
+;; and bits. Or the default could expect a string but otherwise be "system
+;; dependent". Or the default could be something that expected a vector of
+;; integers and did no translation. Or the default could come from the
 ;; gcontext (but what about text-extents and text-width?).
 (defun text-extents (font sequence &key (start 0) end translate)
   ;; If multiple fonts are involved, font-ascent and font-descent will be the
-  ;; maximums.  If multiple directions are involved, the direction will be nil.
+  ;; maximums. If multiple directions are involved, the direction will be nil.
   ;; Translate will always be called with a 16-bit dst buffer.
   (declare (type sequence sequence)
 	   (type (or font gcontext) font))
@@ -397,13 +397,13 @@
 		          (setq ascent (max ascent (aref char-infos (index+ 3 n))))
 		          (setq descent (max descent (aref char-infos (index+ 4 n))))))))))))))
 
-;; This controls the element size of the dst buffer given to translate.  If
+;; This controls the element size of the dst buffer given to translate. If
 ;; :default is specified, the size will be based on the current font, if known,
-;; and otherwise 16 will be used.  [An alternative would be to pass the buffer
+;; and otherwise 16 will be used. [An alternative would be to pass the buffer
 ;; size to translate, and allow it to return the desired size if it doesn't
-;; like the current size.  The problem is that the protocol doesn't allow
+;; like the current size. The problem is that the protocol doesn't allow
 ;; switching within a single request, so to allow switching would require
-;; knowing the width of text, which isn't necessarily known.  We could call
+;; knowing the width of text, which isn't necessarily known. We could call
 ;; text-width to compute it, but perhaps that is doing too many favors?]  [An
 ;; additional possibility is to allow an index-size of :two-byte, in which case
 ;; translate would be given a double-length 8-bit array, and translate would be
@@ -411,11 +411,11 @@
 (deftype index-size () '(member :default 8 16))
 
 ;; In the functions below, if width is specified, it is assumed to be the total
-;; pixel width of whatever string of glyphs is actually drawn.  Specifying
+;; pixel width of whatever string of glyphs is actually drawn. Specifying
 ;; width will allow for appending the output of subsequent calls to the same
 ;; protocol request, provided gcontext has not been modified in the interim.
 ;; If width is not specified, appending of subsequent output might not occur
-;; (unless translate returns the width).  Specifying width is simply a hint,
+;; (unless translate returns the width). Specifying width is simply a hint,
 ;; for performance.
 (defun draw-glyph (drawable gcontext x y elt
 		   &key translate width (size :default))
@@ -464,7 +464,7 @@
 
 (defun draw-glyphs (drawable gcontext x y sequence
 		    &key (start 0) end translate width (size :default))
-  ;; First result is new start, if end was not reached.  Second result is
+  ;; First result is new start, if end was not reached. Second result is
   ;; overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
@@ -485,7 +485,7 @@
 		       (or translate #'translate-default) width))))
 
 (defun draw-glyphs8 (drawable gcontext x y sequence start end translate width)
-  ;; First result is new start, if end was not reached.  Second result is
+  ;; First result is new start, if end was not reached. Second result is
   ;; overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
@@ -584,7 +584,7 @@
 ;; NOTE: After the first font change by the TRANSLATE function, characters are no-longer
 ;;       on 16bit boundaries and this function garbles the bytes.
 (defun draw-glyphs16 (drawable gcontext x y sequence start end translate width)
-  ;; First result is new start, if end was not reached.  Second result is
+  ;; First result is new start, if end was not reached. Second result is
   ;; overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
@@ -686,7 +686,7 @@
 (defun draw-image-glyph (drawable gcontext x y elt
 			 &key translate width (size :default))
   ;; Returns true if elt is output, nil if translate refuses to output it.
-  ;; Second result is overall width, if known.  An initial font change is
+  ;; Second result is overall width, if known. An initial font change is
   ;; allowed from translate.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
@@ -733,11 +733,11 @@
 			  &key (start 0) end translate width (size :default))
   ;; An initial font change is allowed from translate, but any subsequent font
   ;; change or horizontal motion will cause termination (because the protocol
-  ;; doesn't support chaining).  [Alternatively, font changes could be accepted
+  ;; doesn't support chaining). [Alternatively, font changes could be accepted
   ;; as long as they are accompanied with a width return value, or always
-  ;; accept font changes and call text-width as required.  However, horizontal
+  ;; accept font changes and call text-width as required. However, horizontal
   ;; motion can't really be accepted, due to semantics.]  First result is new
-  ;; start, if end was not reached.  Second result is overall width, if known.
+  ;; start, if end was not reached. Second result is overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
 	   (type int16 x y)
@@ -759,11 +759,11 @@
 (defun draw-image-glyphs8 (drawable gcontext x y sequence start end translate width)
   ;; An initial font change is allowed from translate, but any subsequent font
   ;; change or horizontal motion will cause termination (because the protocol
-  ;; doesn't support chaining).  [Alternatively, font changes could be accepted
+  ;; doesn't support chaining). [Alternatively, font changes could be accepted
   ;; as long as they are accompanied with a width return value, or always
-  ;; accept font changes and call text-width as required.  However, horizontal
+  ;; accept font changes and call text-width as required. However, horizontal
   ;; motion can't really be accepted, due to semantics.]  First result is new
-  ;; start, if end was not reached.  Second result is overall width, if known.
+  ;; start, if end was not reached. Second result is overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
 	   (type int16 x y)
@@ -821,11 +821,11 @@
 (defun draw-image-glyphs16 (drawable gcontext x y sequence start end translate width)
   ;; An initial font change is allowed from translate, but any subsequent font
   ;; change or horizontal motion will cause termination (because the protocol
-  ;; doesn't support chaining).  [Alternatively, font changes could be accepted
+  ;; doesn't support chaining). [Alternatively, font changes could be accepted
   ;; as long as they are accompanied with a width return value, or always
-  ;; accept font changes and call text-width as required.  However, horizontal
+  ;; accept font changes and call text-width as required. However, horizontal
   ;; motion can't really be accepted, due to semantics.]  First result is new
-  ;; start, if end was not reached.  Second result is overall width, if known.
+  ;; start, if end was not reached. Second result is overall width, if known.
   (declare (type drawable drawable)
 	   (type gcontext gcontext)
 	   (type int16 x y)
