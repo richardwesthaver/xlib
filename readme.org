@@ -8,17 +8,17 @@ This is a fork of CLX built for the Cursed Linux environment.
 #+CALL: project-details(vc='nil) :dir ~/comp/shed/xlib/
 
 #+RESULTS:
-|-------------+------------------------------------------|
-| name        | xlib                                     |
-| version     | 1.0.0                                    |
-| description | A fork of CLX maintained by Sharplispers |
-| skel-id     | 3818250095842153598                      |
-| root        | ~/comp/shed/xlib/                        |
-| tags        | (x)                                      |
-| updated     | Tue Nov 11 16:47:00 2025 -0500           |
-| langs       | lisp org                                 |
-| lines       | 34082 :λ 27419 :# 3826 :_ 2837           |
-|-------------+------------------------------------------|
+|-------------+---------------------------------------------|
+| name        | xlib                                        |
+| version     | 1.0.0                                       |
+| description | A fork of CLX maintained by Sharplispers    |
+| id          | 3818250095842153598                         |
+| root        | ~/comp/shed/xlib/                           |
+| tags        | x                                           |
+| updated     | Sat Jan 24 20:57:56 2026 -0500              |
+| langs       | lisp org                                    |
+| lines       | 30406 :code 24762 :comment 3162 :blank 2482 |
+|-------------+---------------------------------------------|
 
 #+END:
 
