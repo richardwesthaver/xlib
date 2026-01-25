@@ -1194,7 +1194,7 @@
 
 ;; EVENT-CASE
 (defmacro event-case ((&rest args) &body clauses)
-"If force-output-p is true, first invokes display-force-output. Executes the
+  "If force-output-p is true, first invokes display-force-output. Executes the
 matching clause for each queued event until a clause returns non-nil, and that
 returned object is then returned by event-case. If peek-p is true, then the
 event is not removed from the queue. If discard-p is true, then events for

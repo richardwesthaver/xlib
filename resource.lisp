@@ -60,20 +60,6 @@
     (dolist (loose (resource-database-loose entry))
       (print-db loose (+ 2 level) 'loose))))
 
-;; DEBUG FUNCTION
-#+comment
-(defun print-search-table (table)
-  (terpri)
-  (dolist (dbase-list table)
-    (format t "~%~s" dbase-list)
-    (dolist (db dbase-list)
-      (print-db db)
-      (dolist (dblist table)
-	(unless (eq dblist dbase-list)
-	  (when (member db dblist)
-	    (format t "  duplicate at ~s" db))))
-      )))
-
 ;; If this is true, resource symbols will be compared in a case-insensitive
 ;; manner, and converting a resource string to a keyword will uppercaseify it.
 (defparameter *uppercase-resource-symbols* nil)

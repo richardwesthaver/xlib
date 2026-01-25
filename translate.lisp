@@ -116,6 +116,7 @@
   ;; (i.e. modifiers not specified by modifiers are don't cares)
   ;; The default mask is *default-keysym-translate-mask*
 
+  ;; NOTE 2026-01-24: this option is unused in our code
   ;; If DISPLAY is specified, the translation will be local to DISPLAY,
   ;; otherwise it will be the default translation for all displays.
 

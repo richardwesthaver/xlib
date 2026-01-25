@@ -575,31 +575,6 @@ gethostname(3) - is used instead."
   (declare (type display display))
   (length (display-roots display)))
 
-#+comment ;; defined by the DISPLAY defstruct
-(defsetf display-error-handler (display) (handler)
-  ;; All errors (synchronous and asynchronous) are processed by
-  ;; calling an error handler in the display. If handler is a
-  ;; sequence it is expected to contain handler functions specific to
-  ;; each error; the error code is used to index the sequence,
-  ;; fetching the appropriate handler. Any results returned by the
-  ;; handler are ignored; it is assumed the handler either takes care
-  ;; of the error completely, or else signals. For all core errors,
-  ;; the keyword/value argument pairs are:
-  ;;    :display display
-  ;;    :error-key error-key
-  ;;    :major integer
-  ;;    :minor integer
-  ;;    :sequence integer
-  ;;    :current-sequence integer
-  ;; For :colormap, :cursor, :drawable, :font, :gcontext, :id-choice, :pixmap, and
-  ;; :window errors another pair is:
-  ;;    :resource-id integer
-  ;; For :atom errors, another pair is:
-  ;;    :atom-id integer
-  ;; For :value errors, another pair is:
-  ;;    :value integer
-  )
-
 ;; setf'able
 ;; If defined, called after every protocol request is generated,
 ;; even those inside explicit with-display's, but never called from
@@ -607,7 +582,6 @@ gethostname(3) - is used instead."
 ;; the effective with-display for the associated request. Default
 ;; value is nil. Can be set, for example, to #'display-force-output
 ;; or #'display-finish-output.
-
 (defvar *inside-display-after-function* nil)
 
 (defun display-invoke-after-function (display)
@@ -623,7 +597,7 @@ gethostname(3) - is used instead."
   ;; errors and events have been received.
   (declare (type display display))
   (with-buffer-request-and-reply (display +x-getinputfocus+ 16 :sizes (8 32))
-      ()
+                                 ()
     )
   ;; Report asynchronous errors here if the user wants us to.
   (report-asynchronous-errors display :after-finish-output))

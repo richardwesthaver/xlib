@@ -11,7 +11,7 @@
 ;; publicity pertaining to distribution of the software without specific,
 ;; written prior permission.
 (defpackage #:xlib
-  (:use :cl :std)
+  (:use :cl :std :io/kbd)
   (:import-from :obj/color :x11-colormap-class)
   (:shadow :buffer)
   (:use :sb-bsd-sockets)
@@ -39,7 +39,7 @@
     cursor-id cursor-p cursor-plist cut-buffer declare-event decode-core-error
     default-error-handler default-keysym-index default-keysym-translate
     define-error define-extension define-gcontext-accessor
-    define-keysym define-keysym-set delete-property delete-resource
+    delete-property delete-resource
     destroy-subwindows destroy-window device-busy device-event-mask
     device-event-mask-class discard-current-event discard-font-info display
     display-after-function display-authorization-data display-authorization-name
@@ -91,8 +91,8 @@
     image-z-pixarray implementation-error input-focus install-colormap
     installed-colormaps int16 int32 int8 intern-atom invalid-font
     keyboard-control keyboard-mapping keycode->character keycode->keysym
-    keysym keysym->character keysym->keycodes keysym-in-map-p
-    keysym-set kill-client kill-temporary-clients length-error
+    keysym->character keysym->keycodes keysym-in-map-p
+    kill-client kill-temporary-clients length-error
     list-extensions list-font-names list-fonts list-properties
     lookup-color lookup-error make-color make-event-handlers
     make-event-keys make-event-mask make-resource-database make-state-keys

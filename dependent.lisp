@@ -1125,8 +1125,8 @@ Returns a list of (host display-number screen protocol)."
                  (index* (array-dimension pixarray 1) bits-per-pixel)
                  x y
                  bbuf
-                 (index* padded-bytes-per-line #+cmu vm:byte-bits #+sbcl sb-vm:n-byte-bits)
-                 (index* boffset #+cmu vm:byte-bits #+sbcl sb-vm:n-byte-bits) 0
+                 (index* padded-bytes-per-line sb-vm:n-byte-bits)
+                 (index* boffset sb-vm:n-byte-bits) 0
                  height
                  (index* width bits-per-pixel))
   t)

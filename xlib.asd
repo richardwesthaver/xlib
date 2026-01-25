@@ -48,7 +48,6 @@ Independent FOSS developers"
    (:file "text")
    (:file "attributes")
    (:file "translate")
-   (:file "keysyms")
    (:file "manager")
    (:file "image")
    (:file "resource")

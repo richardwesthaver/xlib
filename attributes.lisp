@@ -61,46 +61,47 @@
   ''window-equal)
 
 (defmacro with-state ((drawable) &body body)
-  ;; Allows a consistent view to be obtained of data returned by GetWindowAttributes
-  ;; and GetGeometry, and allows a coherent update using ChangeWindowAttributes and
-  ;; ConfigureWindow. The body is not surrounded by a with-display.  Within the
-  ;; indefinite scope of the body, on a per-process basis in a multi-process
-  ;; environment, the first call within an Accessor Group on the specified drawable
-  ;; (the object, not just the variable) causes the complete results of the protocol
-  ;; request to be retained, and returned in any subsequent accessor calls. Calls
-  ;; within a Setf Group are delayed, and executed in a single request on exit from
-  ;; the body. In addition, if a call on a function within an Accessor Group follows
-  ;; a call on a function in the corresponding Setf Group, then all delayed setfs for
-  ;; that group are executed, any retained accessor information for that group is
-  ;; discarded, the corresponding protocol request is (re)issued, and the results are
-  ;; (again) retained, and returned in any subsequent accessor calls.
+  "Allows a consistent view to be obtained of data returned by
+GetWindowAttributes and GetGeometry, and allows a coherent update using
+ChangeWindowAttributes and ConfigureWindow. The body is not surrounded by a
+with-display. Within the indefinite scope of the body, on a per-process basis
+in a multi-process environment, the first call within an Accessor Group on the
+specified drawable (the object, not just the variable) causes the complete
+results of the protocol request to be retained, and returned in any subsequent
+accessor calls. Calls within a Setf Group are delayed, and executed in a
+single request on exit from the body. In addition, if a call on a function
+within an Accessor Group follows a call on a function in the corresponding
+Setf Group, then all delayed setfs for that group are executed, any retained
+accessor information for that group is discarded, the corresponding protocol
+request is (re)issued, and the results are (again) retained, and returned in
+any subsequent accessor calls.
 
-  ;; Accessor Group A (for GetWindowAttributes):
-  ;; window-visual, window-visual-info, window-class, window-gravity, window-bit-gravity,
-  ;; window-backing-store, window-backing-planes, window-backing-pixel,
-  ;; window-save-under, window-colormap, window-colormap-installed-p,
-  ;; window-map-state, window-all-event-masks, window-event-mask,
-  ;; window-do-not-propagate-mask, window-override-redirect
+Accessor Group A (for GetWindowAttributes):
+window-visual, window-visual-info, window-class, window-gravity, window-bit-gravity,
+window-backing-store, window-backing-planes, window-backing-pixel,
+window-save-under, window-colormap, window-colormap-installed-p,
+window-map-state, window-all-event-masks, window-event-mask,
+window-do-not-propagate-mask, window-override-redirect
 
-  ;; Setf Group A (for ChangeWindowAttributes):
-  ;; window-gravity, window-bit-gravity, window-backing-store, window-backing-planes,
-  ;; window-backing-pixel, window-save-under, window-event-mask,
-  ;; window-do-not-propagate-mask, window-override-redirect, window-colormap,
-  ;; window-cursor
+Setf Group A (for ChangeWindowAttributes):
+window-gravity, window-bit-gravity, window-backing-store, window-backing-planes,
+window-backing-pixel, window-save-under, window-event-mask,
+window-do-not-propagate-mask, window-override-redirect, window-colormap,
+window-cursor
 
-  ;; Accessor Group G (for GetGeometry):
-  ;; drawable-root, drawable-depth, drawable-x, drawable-y, drawable-width,
-  ;; drawable-height, drawable-border-width
+Accessor Group G (for GetGeometry):
+drawable-root, drawable-depth, drawable-x, drawable-y, drawable-width,
+drawable-height, drawable-border-width
 
-  ;; Setf Group G (for ConfigureWindow):
-  ;; drawable-x, drawable-y, drawable-width, drawable-height, drawable-border-width,
-  ;; window-priority
+Setf Group G (for ConfigureWindow):
+drawable-x, drawable-y, drawable-width, drawable-height, drawable-border-width,
+window-priority"
   (let ((state-entry (gensym)))
-     ;; alist of (drawable attributes attribute-changes geometry geometry-changes)
+    ;; alist of (drawable attributes attribute-changes geometry geometry-changes)
     `(with-stack-list (,state-entry ,drawable nil nil nil nil)
        (with-stack-list* (*window-attributes* ,state-entry *window-attributes*)
 	 (multiple-value-prog1
-	   (progn ,@body)
+	     (progn ,@body)
 	   (cleanup-state-entry ,state-entry))))))
 
 (defun cleanup-state-entry (state)
@@ -137,14 +138,13 @@
 	    (setf (aref changes 0) 0)) ;; Initialize mask to zero
 	  (setf (aref changes 0) (logior (aref changes 0) (ash 1 number))) ;; set mask bit
 	  (setf (aref changes (1+ number)) value))	;; save value
-						; Send change to the server
-      (with-buffer-request ((window-display window) +x-changewindowattributes+)
-	(window window)
-	(card32 (ash 1 number) value)))))
-;;
+                                        ; Send change to the server
+        (with-buffer-request ((window-display window) +x-changewindowattributes+)
+	  (window window)
+	  (card32 (ash 1 number) value)))))
+
 ;; These two are twins (change-window-attribute change-drawable-geometry)
 ;; If you change one, you probably need to change the other...
-;;
 (defun change-drawable-geometry (drawable number value)
   ;; Called from drawable geometry SETF's to alter an attribute value
   ;; number is the change-attributes request mask bit number
@@ -164,11 +164,11 @@
 	    (setf (aref changes 0) 0)) ;; Initialize mask to zero
 	  (setf (aref changes 0) (logior (aref changes 0) (ash 1 number))) ;; set mask bit
 	  (setf (aref changes (1+ number)) value))	;; save value
-						; Send change to the server
-      (with-buffer-request ((drawable-display drawable) +x-configurewindow+)
-	(drawable drawable)
-	(card16 (ash 1 number))
-	(card29 value)))))
+                                        ; Send change to the server
+        (with-buffer-request ((drawable-display drawable) +x-configurewindow+)
+	  (drawable drawable)
+	  (card16 (ash 1 number))
+	  (card29 value)))))
 
 (defun get-window-attributes-buffer (window)
   (declare (type window window))
@@ -188,7 +188,7 @@
 	      (setf (state-attribute-changes state-entry) nil))
 	    ;; Get window attributes
 	    (with-buffer-request-and-reply (display +x-getwindowattributes+ size :sizes (8))
-		 ((window window))
+		                           ((window window))
 	      (let ((repbuf (or (state-attributes state-entry) (allocate-context))))
 		(declare (type reply-buffer repbuf))
 		;; Copy into repbuf from reply buffer
@@ -196,10 +196,8 @@
 		(when state-entry (setf (state-attributes state-entry) repbuf))
 		repbuf)))))))
 
-;;
 ;; These two are twins (get-window-attributes-buffer get-drawable-geometry-buffer)
 ;; If you change one, you probably need to change the other...
-;;
 (defun get-drawable-geometry-buffer (drawable)
   (declare (type drawable drawable))
   (let ((state-entry nil)
@@ -218,7 +216,7 @@
 	      (setf (state-geometry-changes state-entry) nil))
 	    ;; Get drawable attributes
 	    (with-buffer-request-and-reply (display +x-getgeometry+ size :sizes (8))
-		 ((drawable drawable))
+		                           ((drawable drawable))
 	      (let ((repbuf (or (state-geometry state-entry) (allocate-context))))
 		(declare (type reply-buffer repbuf))
 		;; Copy into repbuf from reply buffer
@@ -249,10 +247,9 @@
 		   (type array-index i request-size))
 	  (when (oddp bits)
 	    (card32-put (index* (index-incf request-size) 4) (aref changes i))))))))
-;;
+
 ;; These two are twins (put-window-attribute-changes put-drawable-geometry-changes)
 ;; If you change one, you probably need to change the other...
-;;
 (defun put-drawable-geometry-changes (window changes)
   ;; change window attributes or geometry (depending on request-number...)
   ;; Always from Called within a WITH-DISPLAY
@@ -282,7 +279,7 @@
   `(let ((.with-attributes-reply-buffer. (get-window-attributes-buffer ,window)))
      (declare (type reply-buffer .with-attributes-reply-buffer.))
      (prog1
-       (with-buffer-input (.with-attributes-reply-buffer. ,@options) ,@body)
+         (with-buffer-input (.with-attributes-reply-buffer. ,@options) ,@body)
        (unless *window-attributes*
 	 (deallocate-context .with-attributes-reply-buffer.)))))
 
@@ -292,7 +289,7 @@
   `(let ((.with-geometry-reply-buffer. (get-drawable-geometry-buffer ,window)))
      (declare (type reply-buffer .with-geometry-reply-buffer.))
      (prog1
-       (with-buffer-input (.with-geometry-reply-buffer. ,@options) ,@body)
+         (with-buffer-input (.with-geometry-reply-buffer. ,@options) ,@body)
        (unless *window-attributes*
 	 (deallocate-context .with-geometry-reply-buffer.)))))
 
@@ -363,7 +360,7 @@
 
 (defun set-window-bit-gravity (window gravity)
   (change-window-attribute
-    window 4 (encode-type (member-vector +bit-gravity-vector+) gravity))
+   window 4 (encode-type (member-vector +bit-gravity-vector+) gravity))
   gravity)
 
 (defsetf window-bit-gravity set-window-bit-gravity)
@@ -377,7 +374,7 @@
 
 (defun set-window-gravity (window gravity)
   (change-window-attribute
-    window 5 (encode-type (member-vector +win-gravity-vector+) gravity))
+   window 5 (encode-type (member-vector +win-gravity-vector+) gravity))
   gravity)
 
 (defsetf window-gravity set-window-gravity)
@@ -491,7 +488,7 @@
 
 (defun set-window-colormap (window colormap)
   (change-window-attribute
-    window 13 (encode-type (or (member :copy) colormap) colormap))
+   window 13 (encode-type (or (member :copy) colormap) colormap))
   colormap)
 
 (defsetf window-colormap set-window-colormap)
@@ -504,7 +501,7 @@
 
 (defun (setf window-cursor) (cursor window)
   (change-window-attribute
-    window 14 (encode-type (or (member :none) cursor) cursor))
+   window 14 (encode-type (or (member :none) cursor) cursor))
   cursor)
 
 (defun window-colormap-installed-p (window)
@@ -611,7 +608,7 @@
 	   (type (or null window) sibling))
   (with-state (window)
     (change-drawable-geometry
-      window 6 (encode-type (member :above :below :top-if :bottom-if :opposite) mode))
+     window 6 (encode-type (member :above :below :top-if :bottom-if :opposite) mode))
     (when sibling
       (change-drawable-geometry window 5 (encode-type window sibling))))
   mode)

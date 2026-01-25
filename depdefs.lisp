@@ -2,18 +2,17 @@
 
 ;; This file contains some of the system dependent code for CLX
 
-;;
 ;;			 TEXAS INSTRUMENTS INCORPORATED
 ;;				  P.O. BOX 2909
 ;;			       AUSTIN, TEXAS 78769
-;;
+
 ;; Copyright (C) 1987 Texas Instruments Incorporated.
-;;
+
 ;; Permission is granted to any individual or institution to use, copy, modify,
 ;; and distribute this software, provided that this complete copyright and
 ;; permission notice is maintained, intact, in all copies and supporting
 ;; documentation.
-;;
+
 ;; Texas Instruments Incorporated provides this software "as is" without
 ;; express or implied warranty.
 

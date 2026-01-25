@@ -750,13 +750,12 @@
 		      :local-only-p local-only-p
 		      :font-info-internal font-info-internal))
 
-; For each component (<name> <unspec> :type <type>) of font-info,
-; there is a corresponding function:
+;; For each component (<name> <unspec> :type <type>) of font-info,
+;; there is a corresponding function:
 
-;(defun font-<name> (font)
-;  (declare (type font font)
-;	   (clx-values <type>)))
-
+;; (defun font-<name> (font)
+;;  (declare (type font font)
+;;	   (clx-values <type>)))
 (macrolet ((make-font-info-accessors (useless-name &body fields)
 	     `(within-definition (,useless-name make-font-info-accessors)
 		,@(mapcar
