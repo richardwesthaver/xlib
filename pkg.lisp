@@ -132,7 +132,7 @@
     set-wm-properties set-wm-resources state-keysym-p state-mask-key
     store-color store-colors stringable text-extents text-width
     timestamp transient-for translate-coordinates translate-default
-    translation-function undefine-keysym unexpected-reply
+    translation-function unexpected-reply
     ungrab-button ungrab-key ungrab-keyboard ungrab-pointer
     ungrab-server uninstall-colormap unknown-error unmap-subwindows
     unmap-window value-error visual-info visual-info-bits-per-rgb
