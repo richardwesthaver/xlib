@@ -86,7 +86,7 @@ nil if a network socket should be opened."
 
 (defun card8->int8 (x)
   (declare (type card8 x))
-  (declare (clx-values int8))
+  (declare (values int8))
   #.(declare-buffun)
   (the int8 (if (logbitp 7 x)
                 (the int8 (- x #x100))
@@ -94,13 +94,13 @@ nil if a network socket should be opened."
 
 (defun int8->card8 (x)
   (declare (type int8 x))
-  (declare (clx-values card8))
+  (declare (values card8))
   #.(declare-buffun)
   (the card8 (ldb (byte 8 0) x)))
 
 (defun card16->int16 (x)
   (declare (type card16 x))
-  (declare (clx-values int16))
+  (declare (values int16))
   #.(declare-buffun)
   (the int16 (if (logbitp 15 x)
                  (the int16 (- x #x10000))
@@ -108,13 +108,13 @@ nil if a network socket should be opened."
 
 (defun int16->card16 (x)
   (declare (type int16 x))
-  (declare (clx-values card16))
+  (declare (values card16))
   #.(declare-buffun)
   (the card16 (ldb (byte 16 0) x)))
 
 (defun card32->int32 (x)
   (declare (type card32 x))
-  (declare (clx-values int32))
+  (declare (values int32))
   #.(declare-buffun)
   (the int32 (if (logbitp 31 x)
                  (the int32 (- x #x100000000))
@@ -122,7 +122,7 @@ nil if a network socket should be opened."
 
 (defun int32->card32 (x)
   (declare (type int32 x))
-  (declare (clx-values card32))
+  (declare (values card32))
   #.(declare-buffun)
   (the card32 (ldb (byte 32 0) x)))
 
@@ -131,7 +131,7 @@ nil if a network socket should be opened."
 (defun aref-card8 (a i)
   (declare (type buffer-bytes a)
            (type array-index i))
-  (declare (clx-values card8))
+  (declare (values card8))
   #.(declare-buffun)
   (the card8 (aref a i)))
 
@@ -145,7 +145,7 @@ nil if a network socket should be opened."
 (defun aref-int8 (a i)
   (declare (type buffer-bytes a)
            (type array-index i))
-  (declare (clx-values int8))
+  (declare (values int8))
   #.(declare-buffun)
   (card8->int8 (aref a i)))
 
@@ -160,7 +160,7 @@ nil if a network socket should be opened."
   (defun aref-card16 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (clx-values card16))
+    (declare (values card16))
     #.(declare-buffun)
     (the card16
          (logior (the card16
@@ -180,7 +180,7 @@ nil if a network socket should be opened."
   (defun aref-int16 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (clx-values int16))
+    (declare (values int16))
     #.(declare-buffun)
     (the int16
          (logior (the int16
@@ -200,7 +200,7 @@ nil if a network socket should be opened."
   (defun aref-card32 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (clx-values card32))
+    (declare (values card32))
     #.(declare-buffun)
     (the card32
          (logior (the card32
@@ -226,7 +226,7 @@ nil if a network socket should be opened."
   (defun aref-int32 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (clx-values int32))
+    (declare (values int32))
     #.(declare-buffun)
     (the int32
          (logior (the int32
@@ -252,7 +252,7 @@ nil if a network socket should be opened."
   (defun aref-card29 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (clx-values card29))
+    (declare (values card29))
     #.(declare-buffun)
     (the card29
          (logior (the card29
@@ -300,7 +300,7 @@ nil if a network socket should be opened."
 (defun rgb-val->card16 (value)
   ;; Short floats are good enough
   (declare (type rgb-val value))
-  (declare (clx-values card16))
+  (declare (values card16))
   #.(declare-buffun)
   ;; Convert VALUE from float to card16
   (the card16 (values (round (the rgb-val value) #.(/ 1.0s0 #xffff)))))
@@ -308,7 +308,7 @@ nil if a network socket should be opened."
 (defun card16->rgb-val (value)
   ;; Short floats are good enough
   (declare (type card16 value))
-  (declare (clx-values short-float))
+  (declare (values short-float))
   #.(declare-buffun)
   ;; Convert VALUE from card16 to float
   (the short-float (* (the card16 value) #.(/ 1.0s0 #xffff))))
@@ -316,14 +316,14 @@ nil if a network socket should be opened."
 (defun radians->int16 (value)
   ;; Short floats are good enough
   (declare (type angle value))
-  (declare (clx-values int16))
+  (declare (values int16))
   #.(declare-buffun)
   (the int16 (values (round (the angle value) #.(float (/ pi 180.0s0 64.0s0) 0.0s0)))))
 
 (defun int16->radians (value)
   ;; Short floats are good enough
   (declare (type int16 value))
-  (declare (clx-values short-float))
+  (declare (values short-float))
   #.(declare-buffun)
   (the short-float (* (the int16 value) #.(coerce (/ pi 180.0 64.0) 'short-float))))
 
@@ -740,7 +740,7 @@ nil if a network socket should be opened."
   ;; and cdr is a list of network address bytes.
   (declare (type stringable host)
            (type (or null (member :internet :decnet :chaos) card8) family))
-  (declare (clx-values list))
+  (declare (values list))
   (let ((hostent (get-host-by-name (string host))))
     (ecase family
       ((:internet nil 0)
@@ -869,7 +869,7 @@ Returns a list of (host display-number screen protocol)."
            (type card16 state)
            (type t object)
            (ignore display state)
-           (clx-values t))
+           (values t))
   object)
 
 ;;; Image stuff

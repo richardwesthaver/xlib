@@ -302,7 +302,6 @@
 	   (type vector vector)
 	   (type array-index start end)
 	   (type (or null real) timeout))
-  (declare (clx-values eof-p))
   (when (buffer-dead buffer)
     (x-error 'closed-display :display buffer))
   (unless (= start end)
@@ -320,7 +319,6 @@
   ;; Returns :TIMEOUT when timeout exceeded
   (declare (type buffer buffer)
 	   (type (or null number) timeout))
-  (declare (clx-values timeout))
   (when (buffer-dead buffer)
     (x-error 'closed-display :display buffer))
   (let ((result
@@ -335,7 +333,6 @@
   ;; Returns T if there is input available for the buffer. This should never
   ;; block, so it can be called from the scheduler.
   (declare (type buffer buffer))
-  (declare (clx-values input-available))
   (or (not (null (buffer-dead buffer)))
       (wrap-buf-input (buffer)
 	(funcall (buffer-listen-function buffer) buffer))))

@@ -158,7 +158,7 @@
 (defun screen-position (screen display)
   (declare (type display display)
 	   (type screen screen))
-  (declare (clx-values position))
+  (declare (values position))
   (let ((position (position screen (xlib:display-roots display))))
     (if (not (numberp position))
 	(error "screen ~A not found in display ~A" screen display)
@@ -226,7 +226,7 @@ return a mode-info structure fields with the server answer.
 If there are any server  private  values (currently  only
 applicable  to  the S3 server) the function will store it
 into the returned structure."
-  (declare (clx-values mode-info)
+  (declare (values mode-info)
 	   (type display display)
 	   (type screen screen))
   (let ((major (xfree86-vidmode-query-version display))

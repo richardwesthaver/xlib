@@ -149,7 +149,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 (defun resourcealloc (display)
   ;; Allocate a resource-id for use in DISPLAY
   (declare (type display display))
-  (declare (clx-values resource-id))
+  (declare (values resource-id))
   (loop for next-count upfrom (1+ (display-resource-id-count display))
         repeat (1+ (display-resource-id-mask display))
         as id = (dpb next-count
@@ -189,10 +189,9 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 
 (defun save-id (display id object)
   ;; cache the object associated with ID for this display.
-  (declare (type display display)
-	   (type integer id)
-	   (type t object))
-  (declare (clx-values object))
+  (declare (display display)
+	   (integer id)
+	   (t object))
   ;; we can't cache objects from other clients, because they may
   ;; become invalid without us being told about that.
   (let ((base (display-resource-id-base display))
@@ -211,7 +210,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 			    (display id)
 			  (declare (type display display)
 				   (type resource-id id))
-			  (declare (clx-values ,type))
+			  (declare (values ,type))
 			  ,(if (member type +clx-cached-types+)
 			       `(multiple-value-bind (,type foundp)
 				    (with-display (display)
@@ -253,14 +252,14 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   ;; Return the cached atom for an atom ID
   (declare (type resource-id id)
 	   (type display display))
-  (declare (clx-values (or null keyword)))
+  (declare (values (or null keyword)))
   (gethash id (display-atom-id-map display)))
 
 (defun atom-id (atom display)
   ;; Return the ID for an atom in DISPLAY
   (declare (type xatom atom)
 	   (type display display))
-  (declare (clx-values (or null resource-id)))
+  (declare (values (or null resource-id)))
   (gethash (if (or (null atom) (keywordp atom)) atom (kintern atom))
 	   (display-atom-cache display)))
 
@@ -269,7 +268,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   (declare (type xatom atom)
 	   (type display display)
 	   (type resource-id id))
-  (declare (clx-values resource-id))
+  (declare (values resource-id))
   (let ((atom (if (or (null atom) (keywordp atom)) atom (kintern atom))))
     (setf (gethash id (display-atom-id-map display)) atom)
     (setf (gethash atom (display-atom-cache display)) id)
@@ -285,7 +284,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 (defun visual-info (display visual-id)
   (declare (type display display)
 	   (type resource-id visual-id)
-	   (clx-values visual-info))
+	   (values visual-info))
   (when (zerop visual-id)
     (return-from visual-info nil))
   (dolist (screen (display-roots display))
@@ -366,7 +365,7 @@ gethostname(3) - is used instead."
   ;; system dependent. The default protocol is system specific.  Authorization,
   ;; if any, is assumed to come from the environment somehow.
   (declare (type integer display))
-  (declare (clx-values display))
+  (declare (values display))
   ;; Get the authorization mechanism from the environment. Handle the
   ;; special case of a host name of "" and "unix" which means the
   ;; protocol is :local
@@ -561,13 +560,11 @@ gethostname(3) - is used instead."
 
 (defun display-protocol-version (display)
   (declare (type display display))
-  (declare (clx-values major minor))
   (values (display-protocol-major-version display)
 	  (display-protocol-minor-version display)))
 
 (defun display-vendor (display)
   (declare (type display display))
-  (declare (clx-values name release))
   (values (display-vendor-name display)
 	  (display-release-number display)))
 

@@ -193,7 +193,7 @@
 
 ;; (defun make-mode-flag-keys (mode-flag-mask)
 ;;   (declare (type mask32 mode-flag-mask))
-;;   (declare (clx-values (clx-list mode-flag-mask)))
+;;   (declare (values (clx-list mode-flag-mask)))
 ;;   (decode-mask +mode-flag-mask-vector+ mode-flag-mask))
 
 ;; (defun make-rotation-mask (key-list)
@@ -207,7 +207,7 @@
          (encode-mask ,mask-vector key-list ',mask-type))
        (defun ,decode-fn (bit-mask)
          (declare (type ,mask-size bit-mask))
-         (declare (clx-values (clx-list ,mask-type)))
+         (declare (values (clx-list ,mask-type)))
          (decode-mask ,mask-vector bit-mask)))))
 
 (define-mask-fns mode-flag card32 +mode-flag-mask-vector+ mode-flag-mask)

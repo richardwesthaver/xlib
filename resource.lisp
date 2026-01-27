@@ -82,7 +82,7 @@
   ;; Compare two stringables.
   ;; Ignore case when comparing to a symbol.
   (declare (type stringable a b))
-  (declare (clx-values generalized-boolean))
+  (declare (values generalized-boolean))
   (etypecase a
     (string
       (etypecase b
@@ -194,7 +194,7 @@
   (declare (type resource-database database)
 	   (type stringable value-name value-class)
 	   (type (clx-list stringable) full-name full-class))
-  (declare (clx-values value))
+  (declare (values value))
   (let ((names (append full-name (list value-name)))
 	(classes (append full-class (list value-class))))
     (let* ((result (get-entry (resource-database-tight database)
@@ -278,7 +278,7 @@
   ;; Return a search table for use with get-search-resource.
   (declare (type resource-database database)
 	   (type (clx-list stringable) full-name full-class))
-  (declare (clx-values value))
+  (declare (values value))
   (let* ((tight (resource-database-tight database))
 	 (loose (resource-database-loose database))
 	 (result (cons nil nil))
@@ -359,7 +359,7 @@
 	   (type (function (list t &rest t) t) function)
 	   (dynamic-extent function)
 	   (dynamic-extent args))
-  (declare (clx-values nil))
+  (declare (values nil))
   (labels ((map-resource-internal (database function args name)
 	     (declare (type resource-database database)
 		      (type (function (list t &rest t) t) function)
@@ -390,7 +390,7 @@
 
 (defun merge-resources (database with-database)
   (declare (type resource-database database with-database))
-  (declare (clx-values resource-database))
+  (declare (values resource-database))
   (map-resource
     database
     #'(lambda (name value database)
@@ -429,7 +429,7 @@
 	   (type (or null (function (string) t)) key)
 	   (type (or null (function (list t) generalized-boolean))
                  test test-not))
-  (declare (clx-values resource-database))
+  (declare (values resource-database))
   (resource-with-open-file (stream pathname)
     (loop
       (let ((string (read-line stream nil :eof)))
@@ -472,7 +472,7 @@
   (declare (type string string)
 	   (type array-index start)
 	   (type (or null array-index) end))
-  (declare (clx-values name-list value))
+  (declare (values name-list value))
   (do ((i start)
        (end (or end (length string)))
        (term)
@@ -548,7 +548,7 @@
 	   (type (or null (function (string) t)) key)
 	   (type (or null (function (list t) generalized-boolean))
                  test test-not))
-  (declare (clx-values resource-database))
+  (declare (values resource-database))
   (let ((string (get-property window :RESOURCE_MANAGER :type :STRING
 			      :result-type 'string
 			      :transform #'xlib::card8->char)))
@@ -590,7 +590,7 @@
 	   (type (or null resource-database) database)
 	   (type (or null (function (string) t)) key)
 	   (type (or null (function (list t) generalized-boolean)) test test-not)
-	   (clx-values resource-database))
+	   (values resource-database))
   (let* ((screen (if (type? screen 'display)
 		     (display-default-screen screen)
 		   screen))
@@ -612,7 +612,7 @@
 	(type (or null resource-database) database)
 	(type (or null (function (list t) generalized-boolean)) test test-not)
 	(type (or null (function (string stream) t)) write)
-	(clx-values resource-database))
+	(values resource-database))
   (let* ((screen (if (type? screen 'display)
 		     (display-default-screen screen)
 		   screen))

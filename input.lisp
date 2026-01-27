@@ -99,7 +99,6 @@
   (defun canonicalize-event-name (event)
     ;; Returns the event name keyword given an event name stringable
     (declare (type stringable event))
-    (declare (clx-values event-key))
     (kintern event)))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -134,7 +133,6 @@
   ;; Returns NIL when the event-code is for an extension that isn't handled.
   (declare (type display display)
 	   (type card8 code))
-  (declare (clx-values (or null card8)))
   (setq code (logand #x7f code))
   (if (< code *first-extension-event-code*)
       code
@@ -153,7 +151,6 @@
   ;; Given an X11 event name, return the event-code
   (declare (type display display)
 	   (type event-key event))
-  (declare (clx-values card8))
   (let ((code (get-event-code event)))
     (declare (type (or null card8) code))
     (when (>= code *first-extension-event-code*)
@@ -543,9 +540,8 @@
 ;;;
 (defun event-listen (display &optional (timeout 0))
   (declare (type display display)
-	   (type (or null number) timeout)
-	   (clx-values number-of-events-queued eof-or-timeout))
-  ;; Returns the number of events queued locally, if any, else nil. Hangs
+	   (type (or null number) timeout))
+  ;; Returns the number of events queued locally, if any, else nil.  Hangs
   ;; waiting for events, forever if timeout is nil, else for the specified
   ;; number of seconds.
   (let* ((current-event-symbol (car (display-current-event-symbol display)))
@@ -635,8 +631,8 @@
      (setf (svref *event-key-vector* ,code) ',name)
      (setf (get ',name 'event-code) ,code)))
 
-;; Event names. Used in "type" field in XEvent structures.  Not to be
-;; confused with event masks above. They start from 2 because 0 and 1
+;; Event names.  Used in "type" field in XEvent structures.  Not to be
+;; confused with event masks above.  They start from 2 because 0 and 1
 ;; are reserved in the protocol for errors and replies. */
 (define-event :key-press 2)
 (define-event :key-release 3)
@@ -680,8 +676,8 @@
   ;; defined by a preceding DEFINE-EXTENSION.
   ;; The body is a list of declarations, each of which has the form:
   ;; (type . items)  Where type is a data-type, and items is a list of
-  ;; symbol names. The item order corresponds to the order of fields
-  ;; in the event sent by the server. An item may be a list of items.
+  ;; symbol names.  The item order corresponds to the order of fields
+  ;; in the event sent by the server.  An item may be a list of items.
   ;; In this case, each item is aliased to the same event field.
   ;; This is used to give all events an EVENT-WINDOW item.
   ;; See the INPUT file for lots of examples.
@@ -971,9 +967,7 @@
 
 ;; EVENT-LOOP
 (defun event-loop-setup (display)
-  (declare (type display display)
-	   (clx-values progv-vars progv-vals
-		       current-event-symbol current-event-discarded-p-symbol))
+  (declare (display display))
   (let* ((progv-vars (display-current-event-symbol display))
 	 (current-event-symbol (first progv-vars))
 	 (current-event-discarded-p-symbol (second progv-vars)))
@@ -995,11 +989,10 @@
      current-event-discarded-p-symbol)))
 
 (defun event-loop-step-before (display timeout force-output-p current-event-symbol)
-  (declare (type display display)
-	   (type (or null real) timeout)
-	   (type generalized-boolean force-output-p)
-	   (type symbol current-event-symbol)
-	   (clx-values event eof-or-timeout))
+  (declare (display display)
+	   ((or null real) timeout)
+	   (generalized-boolean force-output-p)
+	   (symbol current-event-symbol))
   (unless (symbol-value current-event-symbol)
     (let ((eof-or-timeout (wait-for-event display timeout force-output-p)))
       (when eof-or-timeout
@@ -1013,9 +1006,8 @@
     (values event nil)))
 
 (defun dequeue-event (display event)
-  (declare (type display display)
-	   (type reply-buffer event)
-	   (clx-values next))
+  (declare (display display)
+	   (reply-buffer event))
   ;; Remove the current event from the event queue
   (with-event-queue-internal (display)
     (let ((next (reply-next event))
@@ -1104,7 +1096,7 @@
   ;; inside even-case, event-cond or process-event when :peek-p is T and
   ;; :discard-p is NIL.
   (declare (type display display)
-	   (clx-values generalized-boolean))
+	   (values generalized-boolean))
   (let* ((symbols (display-current-event-symbol display))
 	 (event
 	   (let ((current-event-symbol (first symbols)))
@@ -1124,18 +1116,18 @@
 
 ;; PROCESS-EVENT
 (defun process-event (display &key handler timeout peek-p discard-p (force-output-p t))
-  ;; If force-output-p is true, first invokes display-force-output. Invokes handler
+  ;; If force-output-p is true, first invokes display-force-output.  Invokes handler
   ;; on each queued event until handler returns non-nil, and that returned object is
-  ;; then returned by process-event. If peek-p is true, then the event is not
-  ;; removed from the queue. If discard-p is true, then events for which handler
-  ;; returns nil are removed from the queue, otherwise they are left in place. Hangs
+  ;; then returned by process-event.  If peek-p is true, then the event is not
+  ;; removed from the queue.  If discard-p is true, then events for which handler
+  ;; returns nil are removed from the queue, otherwise they are left in place.  Hangs
   ;; until non-nil is generated for some event, or for the specified timeout (in
   ;; seconds, if given); however, it is acceptable for an implementation to wait only
-  ;; once on network data, and therefore timeout prematurely. Returns nil on
-  ;; timeout. If handler is a sequence, it is expected to contain handler functions
+  ;; once on network data, and therefore timeout prematurely.  Returns nil on
+  ;; timeout.  If handler is a sequence, it is expected to contain handler functions
   ;; specific to each event class; the event code is used to index the sequence,
-  ;; fetching the appropriate handler. Handler is called with raw resource-ids, not
-  ;; with resource objects. The arguments to the handler are described using declare-event.
+  ;; fetching the appropriate handler.  Handler is called with raw resource-ids, not
+  ;; with resource objects.  The arguments to the handler are described using declare-event.
   ;;
   ;; T for peek-p means the event (for which the handler returns non-nil) is not removed
   ;; from the queue (it is left in place), NIL means the event is removed.
@@ -1172,29 +1164,28 @@
 (defun make-event-handlers (&key (type 'vector) default)
   (declare (type t type)			;Sequence type specifier
 	   (type (or null function) default)
-	   (clx-values sequence))			;Default handler for initial content
+	   (values sequence))			;Default handler for initial content
   ;; Makes a handler sequence suitable for process-event
   (make-sequence type +max-events+ :initial-element default))
 
 (defun event-handler (handlers event-key)
   (declare (type sequence handlers)
 	   (type event-key event-key)
-	   (clx-values function))
+	   (values function))
   ;; Accessor for a handler sequence
   (elt handlers (position event-key *event-key-vector* :test #'eq)))
 
 (defun set-event-handler (handlers event-key handler)
   (declare (type sequence handlers)
 	   (type event-key event-key)
-	   (type function handler)
-	   (clx-values handler))
+	   (type function handler))
   (setf (elt handlers (position event-key *event-key-vector* :test #'eq)) handler))
 
 (defsetf event-handler set-event-handler)
 
 ;; EVENT-CASE
 (defmacro event-case ((&rest args) &body clauses)
-  "If force-output-p is true, first invokes display-force-output. Executes the
+"If force-output-p is true, first invokes display-force-output. Executes the
 matching clause for each queued event until a clause returns non-nil, and that
 returned object is then returned by event-case. If peek-p is true, then the
 event is not removed from the queue. If discard-p is true, then events for
@@ -1229,9 +1220,9 @@ that returns nil."
   ;;
   ;; EVENT-OR-EVENTS	event-key or a list of event-keys (but they
   ;;			need not be typed as keywords) or the symbol t
-  ;;			or otherwise (but only in the last clause). If
+  ;;			or otherwise (but only in the last clause).  If
   ;;			no t/otherwise clause appears, it is equivalent
-  ;;			to having one that returns nil. The keys are
+  ;;			to having one that returns nil.  The keys are
   ;;			not evaluated, and it is an error for the same
   ;;			key to appear in more than one clause.
   ;;
@@ -1239,14 +1230,14 @@ that returns nil."
   ;;			corresponding values (if any) are bound to
   ;;			variables with these names (i.e., the binding-list
   ;;			has variable names, not keywords, the keywords are
-  ;;			derived from the variable names). An arg can also
+  ;;			derived from the variable names).  An arg can also
   ;;			be a (keyword var) form, as for keyword args in a
   ;;			lambda list.
   ;;
   ;; The matching TEST-FORM for each queued event is executed until a
-  ;; clause's test-form returns non-nil. Then the BODY-FORMS are
+  ;; clause's test-form returns non-nil.  Then the BODY-FORMS are
   ;; evaluated, returning the (possibly multiple) values of the last
-  ;; form from event-cond. If there are no body-forms then, if the
+  ;; form from event-cond.  If there are no body-forms then, if the
   ;; test-form is non-nil, the value of the test-form is returned as a
   ;; single value.
   ;;
@@ -1277,7 +1268,7 @@ that returns nil."
 (defun get-event-code (event)
   ;; Returns the event code given an event-key
   (declare (type event-key event))
-  (declare (clx-values card8))
+  (declare (values card8))
   (or (get event 'event-code)
       (x-type-error event 'event-key)))
 
@@ -1452,7 +1443,7 @@ that returns nil."
   (declare (type display display)
 	   (dynamic-extent params))
   ;; All errors (synchronous and asynchronous) are processed by calling
-  ;; an error handler in the display. The handler is called with the display
+  ;; an error handler in the display.  The handler is called with the display
   ;; as the first argument and the error-key as its second argument. If handler is
   ;; an array it is expected to contain handler functions specific to
   ;; each error; the error code is used to index the array, fetching the
@@ -1746,7 +1737,7 @@ that returns nil."
   ;; Associate a function with ERROR-KEY which will be called with
   ;; parameters DISPLAY and REPLY-BUFFER and
   ;; returns a plist of keyword/value pairs which will be passed on
-  ;; to the error handler. A compiler warning is printed when
+  ;; to the error handler.  A compiler warning is printed when
   ;; ERROR-KEY is not defined in a preceding DEFINE-EXTENSION.
   ;; Note: REPLY-BUFFER may used with the READING-EVENT and READ-type
   ;;       macros for getting error fields. See DECODE-CORE-ERROR for
@@ -1768,14 +1759,13 @@ that returns nil."
   ;;    :minor integer
   ;;    :sequence integer
   ;; In addition, many have an additional argument that comes from the
-  ;; same place in the event, but is named differently. When the ARG
+  ;; same place in the event, but is named differently.  When the ARG
   ;; argument is specified, the keyword ARG with card32 value starting
   ;; at byte 4 of the event is returned with the other keyword/argument
   ;; pairs.
   (declare (type display display)
 	   (type reply-buffer event)
 	   (type (or null keyword) arg))
-  (declare (clx-values keyword/arg-plist))
   display
   (reading-event (event)
     (let* ((sequence (read-card16 2))

@@ -145,7 +145,7 @@
                                         ;  ;; The value will be nil if the last value stored is unknown (e.g., the cache was
                                         ;  ;; off, or the component was copied from a gcontext with unknown state).
                                         ;  (declare (type gcontext gcontext)
-                                        ;          (clx-values <type>)))
+                                        ;          (values <type>)))
 
 ;; For each argument to create-gcontext (except clip-mask and clip-ordering) declared
 ;; as (type (or null <type>) <name>), there is a setf for the corresponding accessor:
@@ -179,7 +179,7 @@
 
        (defun ,gcontext-name (gcontext)
          (declare (type gcontext gcontext))
-         (declare (clx-values (or null ,type)))
+         (declare (values (or null ,type)))
          (let ((value (,internal-accessor (gcontext-local-state gcontext))))
            (declare (type (or null card32) value))
            (when value ;; Don't do anything when value isn't known
@@ -241,7 +241,7 @@
 
 (defun gcontext-clip-mask (gcontext)
   (declare (type gcontext gcontext))
-  (declare (clx-values (or null (member :none) pixmap rect-seq)
+  (declare (values (or null (member :none) pixmap rect-seq)
                        (or null (member :unsorted :y-sorted :yx-sorted :yx-banded))))
   (access-gcontext (gcontext local-state)
     (multiple-value-bind (clip clip-mask)
@@ -297,7 +297,7 @@
 
 (defun gcontext-dashes (gcontext)
   (declare (type gcontext gcontext))
-  (declare (clx-values (or null card8 sequence)))
+  (declare (values (or null card8 sequence)))
   (access-gcontext (gcontext local-state)
     (multiple-value-bind (dash dashes)
         (without-interrupts
@@ -338,7 +338,7 @@
   ;; result in an invalid-font error.
   (declare (type gcontext gcontext)
            (type generalized-boolean metrics-p))
-  (declare (clx-values (or null font)))
+  (declare (values (or null font)))
   (access-gcontext (gcontext local-state)
     (let ((font (gcontext-internal-font-obj local-state)))
       (or font
@@ -693,7 +693,7 @@
            (type (or null card8 sequence) dashes)
            (dynamic-extent options)
            (type generalized-boolean cache-p))
-  (declare (clx-values gcontext))
+  (declare (values gcontext))
   (let* ((display (drawable-display drawable))
          (gcontext (make-gcontext :display display :drawable drawable :cache-p cache-p))
          (local-state (gcontext-local-state gcontext))

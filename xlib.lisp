@@ -112,22 +112,22 @@
 ;  ;; cache-p true.
 ;  (declare (type display display)
 ;	   (type integer resource-id)
-;	   (clx-values <mumble>)))
+;	   (values <mumble>)))
 
 ;(defun <mumble>-display (<mumble>)
 ;  (declare (type <mumble> <mumble>)
-;	   (clx-values display)))
+;	   (values display)))
 
 ;(defun <mumble>-id (<mumble>)
 ;  (declare (type <mumble> <mumble>)
-;	   (clx-values integer)))
+;	   (values integer)))
 
 ;(defun <mumble>-equal (<mumble>-1 <mumble>-2)
 ;  (declare (type <mumble> <mumble>-1 <mumble>-2)))
 
 ;(defun <mumble>-p (<mumble>-1 <mumble>-2)
 ;  (declare (type <mumble> <mumble>-1 <mumble>-2)
-;	   (clx-values boolean)))
+;	   (values boolean)))
 
 (deftype generalized-boolean () 't)	; (or null (not null))
 
@@ -191,12 +191,12 @@
 
 (defun make-color (&key (red 1.0) (green 1.0) (blue 1.0) &allow-other-keys)
   (declare (type rgb-val red green blue))
-  (declare (clx-values color))
+  (declare (values color))
   (make-color-internal red green blue))
 
 (defun color-rgb (color)
   (declare (type color color))
-  (declare (clx-values red green blue))
+  (declare (values red green blue))
   (values (color-red color) (color-green color) (color-blue color)))
 
 ;; TODO 2026-01-01: OBJ/COLOR (as-rgb, etc)
@@ -676,7 +676,7 @@
 
 (defun screen-root-visual (screen)
   (declare (type screen screen)
-	   (clx-values resource-id))
+	   (values resource-id))
   (visual-info-id (screen-root-visual-info screen)))
 
 ;; The list contains alternating keywords and integers.
@@ -755,7 +755,7 @@
 
 ;; (defun font-<name> (font)
 ;;  (declare (type font font)
-;;	   (clx-values <type>)))
+;;	   (values <type>)))
 (macrolet ((make-font-info-accessors (useless-name &body fields)
 	     `(within-definition (,useless-name make-font-info-accessors)
 		,@(mapcar
@@ -766,7 +766,7 @@
 			       (accessor (xintern 'font-info- n)))
 			  `(defun ,name (font)
 			     (declare (type font font))
-			     (declare (clx-values ,type))
+			     (declare (values ,type))
 			     (,accessor (font-font-info font)))))
 		    fields))))
   (make-font-info-accessors ignore
@@ -788,7 +788,7 @@
 (defun font-property (font name)
   (declare (type font font)
 	   (type keyword name))
-  (declare (clx-values (or null int32)))
+  (declare (values (or null int32)))
   (getf (font-properties font) name))
 
 (macrolet ((make-mumble-equal (type)
@@ -821,7 +821,7 @@
   ;; KEY-TYPE Returns NIL when KEY-LIST is not a list or mask.
   (declare (type (simple-array keyword (*)) key-vector)
 	   (type (or mask32 list) key-list))
-  (declare (clx-values (or mask32 null)))
+  (declare (values (or mask32 null)))
   (typecase key-list
     (mask32 key-list)
     (list (let ((mask 0))
@@ -834,7 +834,7 @@
 (defun decode-mask (key-vector mask)
   (declare (type (simple-array keyword (*)) key-vector)
 	   (type mask32 mask))
-  (declare (clx-values list))
+  (declare (values list))
   (do ((m mask (ash m -1))
        (bit 0 (1+ bit))
        (len (length key-vector))
@@ -848,7 +848,7 @@
 
 (defun encode-event-mask (event-mask)
   (declare (type event-mask event-mask))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (or (encode-mask +event-mask-vector+ event-mask 'event-mask-class)
       (x-type-error event-mask 'event-mask)))
 
@@ -856,49 +856,49 @@
   ;; This is only defined for core events.
   ;; Useful for constructing event-mask, pointer-event-mask, device-event-mask.
   (declare (type (clx-list event-mask-class) keys))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (encode-mask +event-mask-vector+ keys 'event-mask-class))
 
 (defun make-event-keys (event-mask)
   ;; This is only defined for core events.
   (declare (type mask32 event-mask))
-  (declare (clx-values (clx-list event-mask-class)))
+  (declare (values (clx-list event-mask-class)))
   (decode-mask +event-mask-vector+ event-mask))
 
 (defun encode-device-event-mask (device-event-mask)
   (declare (type device-event-mask device-event-mask))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (or (encode-mask +device-event-mask-vector+ device-event-mask
 		   'device-event-mask-class)
       (x-type-error device-event-mask 'device-event-mask)))
 
 (defun encode-modifier-mask (modifier-mask)
   (declare (type modifier-mask modifier-mask))
-  (declare (clx-values mask16))
+  (declare (values mask16))
   (or (and (eq modifier-mask :any) #x8000)
       (encode-mask +state-mask-vector+ modifier-mask 'modifier-key)
       (x-type-error modifier-mask 'modifier-mask)))
 
 (defun encode-state-mask (state-mask)
   (declare (type (or mask16 (clx-list state-mask-key)) state-mask))
-  (declare (clx-values mask16))
+  (declare (values mask16))
   (or (encode-mask +state-mask-vector+ state-mask 'state-mask-key)
       (x-type-error state-mask '(or mask16 (clx-list state-mask-key)))))
 
 (defun make-state-mask (&rest keys)
   ;; Useful for constructing modifier-mask, state-mask.
   (declare (type (clx-list state-mask-key) keys))
-  (declare (clx-values mask16))
+  (declare (values mask16))
   (encode-mask +state-mask-vector+ keys 'state-mask-key))
 
 (defun make-state-keys (state-mask)
   (declare (type mask16 state-mask))
-  (declare (clx-values (clx-list state-mask-key)))
+  (declare (values (clx-list state-mask-key)))
   (decode-mask +state-mask-vector+ state-mask))
 
 (defun encode-pointer-event-mask (pointer-event-mask)
   (declare (type pointer-event-mask pointer-event-mask))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (or (encode-mask +pointer-event-mask-vector+ pointer-event-mask
 		   'pointer-event-mask-class)
       (x-type-error pointer-event-mask 'pointer-event-mask)))

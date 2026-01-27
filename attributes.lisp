@@ -296,19 +296,19 @@ window-priority"
 ;;; Group A: (for GetWindowAttributes)
 (defun window-visual (window)
   (declare (type window window))
-  (declare (clx-values resource-id))
+  (declare (values resource-id))
   (with-attributes (window :sizes 32)
     (resource-id-get 8)))
 
 (defun window-visual-info (window)
   (declare (type window window))
-  (declare (clx-values visual-info))
+  (declare (values visual-info))
   (with-attributes (window :sizes 32)
     (visual-info (window-display window) (resource-id-get 8))))
 
 (defun window-class (window)
   (declare (type window window))
-  (declare (clx-values (member :input-output :input-only)))
+  (declare (values (member :input-output :input-only)))
   (with-attributes (window :sizes 16)
     (member16-get 12 :copy :input-output :input-only)))
 
@@ -354,7 +354,7 @@ window-priority"
 (defun window-bit-gravity (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values bit-gravity))
+  (declare (values bit-gravity))
   (with-attributes (window :sizes 8)
     (member8-vector-get 14 +bit-gravity-vector+)))
 
@@ -368,7 +368,7 @@ window-priority"
 (defun window-gravity (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values win-gravity))
+  (declare (values win-gravity))
   (with-attributes (window :sizes 8)
     (member8-vector-get 15 +win-gravity-vector+)))
 
@@ -382,7 +382,7 @@ window-priority"
 (defun window-backing-store (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values (member :not-useful :when-mapped :always)))
+  (declare (values (member :not-useful :when-mapped :always)))
   (with-attributes (window :sizes 8)
     (member8-get 1 :not-useful :when-mapped :always)))
 
@@ -396,7 +396,7 @@ window-priority"
 (defun window-backing-planes (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values pixel))
+  (declare (values pixel))
   (with-attributes (window :sizes 32)
     (card32-get 16)))
 
@@ -409,7 +409,7 @@ window-priority"
 (defun window-backing-pixel (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values pixel))
+  (declare (values pixel))
   (with-attributes (window :sizes 32)
     (card32-get 20)))
 
@@ -422,7 +422,7 @@ window-priority"
 (defun window-save-under (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values (member :off :on)))
+  (declare (values (member :off :on)))
   (with-attributes (window :sizes 8)
     (member8-get 24 :off :on)))
 
@@ -435,7 +435,7 @@ window-priority"
 (defun window-override-redirect (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values (member :off :on)))
+  (declare (values (member :off :on)))
   (with-attributes (window :sizes 8)
     (member8-get 27 :off :on)))
 
@@ -448,7 +448,7 @@ window-priority"
 (defun window-event-mask (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (with-attributes (window :sizes 32)
     (card32-get 36)))
 
@@ -462,7 +462,7 @@ window-priority"
 (defun window-do-not-propagate-mask (window)
   ;; setf'able
   (declare (type window window))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (with-attributes (window :sizes 32)
     (card32-get 40)))
 
@@ -475,7 +475,7 @@ window-priority"
 
 (defun window-colormap (window)
   (declare (type window window))
-  (declare (clx-values (or null colormap)))
+  (declare (values (or null colormap)))
   (with-attributes (window :sizes 32)
     (let ((id (resource-id-get 28)))
       (if (zerop id)
@@ -495,7 +495,7 @@ window-priority"
 
 (defun window-cursor (window)
   (declare (type window window))
-  (declare (clx-values cursor))
+  (declare (values cursor))
   window
   (error "~S can only be set" 'window-cursor))
 
@@ -506,33 +506,33 @@ window-priority"
 
 (defun window-colormap-installed-p (window)
   (declare (type window window))
-  (declare (clx-values generalized-boolean))
+  (declare (values generalized-boolean))
   (with-attributes (window :sizes 8)
     (boolean-get 25)))
 
 (defun window-all-event-masks (window)
   (declare (type window window))
-  (declare (clx-values mask32))
+  (declare (values mask32))
   (with-attributes (window :sizes 32)
     (card32-get 32)))
 
 (defun window-map-state (window)
   (declare (type window window))
-  (declare (clx-values (member :unmapped :unviewable :viewable)))
+  (declare (values (member :unmapped :unviewable :viewable)))
   (with-attributes (window :sizes 8)
     (member8-get 26 :unmapped :unviewable :viewable)))
 
 ;;; Group G: (for GetGeometry)
 (defun drawable-root (drawable)
   (declare (type drawable drawable))
-  (declare (clx-values window))
+  (declare (values window))
   (with-geometry (drawable :sizes 32)
     (window-get 8 (drawable-display drawable))))
 
 (defun drawable-x (drawable)
   ;; setf'able
   (declare (type drawable drawable))
-  (declare (clx-values int16))
+  (declare (values int16))
   (with-geometry (drawable :sizes 16)
     (int16-get 12)))
 
@@ -545,7 +545,7 @@ window-priority"
 (defun drawable-y (drawable)
   ;; setf'able
   (declare (type drawable drawable))
-  (declare (clx-values int16))
+  (declare (values int16))
   (with-geometry (drawable :sizes 16)
     (int16-get 14)))
 
@@ -559,7 +559,7 @@ window-priority"
   ;; setf'able
   ;; Inside width, excluding border.
   (declare (type drawable drawable))
-  (declare (clx-values card16))
+  (declare (values card16))
   (with-geometry (drawable :sizes 16)
     (card16-get 16)))
 
@@ -573,7 +573,7 @@ window-priority"
   ;; setf'able
   ;; Inside height, excluding border.
   (declare (type drawable drawable))
-  (declare (clx-values card16))
+  (declare (values card16))
   (with-geometry (drawable :sizes 16)
     (card16-get 18)))
 
@@ -585,14 +585,14 @@ window-priority"
 
 (defun drawable-depth (drawable)
   (declare (type drawable drawable))
-  (declare (clx-values card8))
+  (declare (values card8))
   (with-geometry (drawable :sizes 8)
     (card8-get 1)))
 
 (defun drawable-border-width (drawable)
   ;; setf'able
   (declare (type drawable drawable))
-  (declare (clx-values integer))
+  (declare (values integer))
   (with-geometry (drawable :sizes 16)
     (card16-get 20)))
 

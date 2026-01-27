@@ -25,6 +25,8 @@
           shape-get-rectangles)
         :xlib)
 
+(allocate-extension-event-code :shape-notify)
+
 (define-extension "SHAPE"
     :events (:shape-notify))
 
