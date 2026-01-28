@@ -762,12 +762,6 @@ nil if a network socket should be opened."
 (defun getenv (name)
   (sb-ext:posix-getenv name))
 
-(defun get-host-name ()
-  "Return the same hostname as gethostname(3) would"
-  ;; machine-instance probably works on a lot of lisps, but clisp is not
-  ;; one of them
-  (machine-instance))
-
 (defun homedir-file-pathname (name)
   (merge-pathnames (user-homedir-pathname) (pathname name)))
 
