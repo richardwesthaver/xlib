@@ -8,6 +8,8 @@
 
 ;; Eric Wolf <eric at boese-wolf.eu>
 
+;; TODO 2026-01-27: refactor to wrap io/kbd
+
 ;;; Code:
 (defpackage #:xlib/xkb
   (:use :cl :xlib)
@@ -17,7 +19,7 @@
    :write-card16 :write-card8 :with-buffer :holding-lock :without-aborts :with-buffer-request-internal
    :with-buffer-output :check-put :card8-get :card32-get :write-card32 :read-card32
    :int16-get :read-card8 :read-card16 :index 
-   :index-incf :lround)
+   :index-incf :lround :xintern)
   (:export :enable-xkeyboard
    :+use-core-kbd+ :+use-core-ptr+
    :+xkb-table+ :xkeyboard-error
@@ -32,13 +34,13 @@
    :device-state-compat-lookup-mods :device-state-ptr-btn-state
    :get-state :latch-lock-state
    :lock-group :get-map
-   :transform-xkb-keymap-to-client-mapping :keyevent->keysym
-   :xkb/keysym->character :client-mapping
+   :transform-xkb-keymap-to-client-mapping :keysym-from-keyevent
+   :character-from-xkb-keysym :client-mapping
    :process-leftover-modifiers :client-mapping-symmaps
-   :effective-group :corestate->group
+   :effective-group :group-from-corestate
    :client-keysymmap-num-groups :client-keysymmap-groups-wrap
    :client-keysymmap-redirect-group :client-keysymmap-keytypes
-   :shiftlevel/leftover-modifiers :corestate->mask))
+   :shiftlevel/leftover-modifiers :mask-from-corestate))
 
 (in-package :xlib/xkb)
 
@@ -2063,10 +2065,8 @@
   (define-card8-abrev %devicespec)
   (define-card8-abrev keycode)
   (define-card8-abrev keymask)
-
   (define-card16-abrev butmask)
   (define-card16-abrev vmodmask)
-
   (define-card16-abrev gbndetailmask)
   (define-card16-abrev devfeature)
   (define-card16-abrev feature)
@@ -2089,9 +2089,7 @@
   (define-card32-abrev control)
   (define-card8-abrev cmdetail)
   (define-card16-abrev xidetail) 
-
   (define-card8-abrev group)
-
   (define-card8-abrev groups)
   (define-card8-abrev immodswhich)
   (define-card8-abrev imgroupswhich)
@@ -2105,10 +2103,6 @@
   (define-card16-abrev axndetail)
   (define-card32-abrev namedetail)
   (define-card32-abrev perclientflag))
-
-(shadowing-import
- '(xlib::keycode-get xlib::keymask-get 
-   xlib::explicit-get xlib::behavior-get xlib::group-get xlib::butmask-get xlib::vmodmask-get))
 
 (deftype %devicespec () 'card8)
 (deftype keycode () 'card8)
@@ -2204,8 +2198,7 @@
 (defconstant +AXN_BKAccept+ #x10)
 (defconstant +AXN_BKReject+ #x20)
 (defconstant +AXN_AXKWarning+ #x40)
-
-                                        ;SETofKB_MAPPART
+;; SETofKB_MAPPART
 (defconstant +KeyTypes+ #x0001)
 (defconstant +KeySyms+ #x0002)
 (defconstant +ModifierMap+ #x0004)
@@ -2214,8 +2207,7 @@
 (defconstant +KeyBehaviors+ #x0020)
 (defconstant +VirtualMods+ #x0040)
 (defconstant +VirtualModMap+ #x0080)
-
-                                        ;SETofKEYMASK clx never explicitly defines them
+;; SETofKEYMASK clx never explicitly defines them
 (defconstant +shift+ #x0001)
 (defconstant +lock+ #x0002)
 (defconstant +control+ #x0004)
@@ -2224,7 +2216,6 @@
 (defconstant +mod3+ #x0020)
 (defconstant +mod4+ #x0040)
 (defconstant +mod5+ #x0080)
-
 (defconstant +ModifierState+ #x0001)
 (defconstant +ModifierBase+ #x0002)
 (defconstant +ModifierLatch+ #x0004)
@@ -2294,12 +2285,10 @@
 (defconstant +AX_SKRejectFB+ #x0200)
 (defconstant +AX_BKRejectFB+ #x0400)
 (defconstant +AX_DumbBell+ #x0800)
-
 (defconstant +kbd-feedback-class+ 0)
 (defconstant +led-feedback-class+ 4)
 (defconstant +kbd-feedback-class+ 0)
 (defconstant +led-feedback-class+ 4)
-
 (defconstant +DfltXIClass+ #x0300)
 (defconstant +AllXIClasses+ #x0500)
 (defconstant +KbdFeedbackClass+ 0)
@@ -2312,7 +2301,6 @@
 (defconstant +XINone+ #xff00)
 (defconstant +DfltXIId+ #x0400)
 (defconstant +AllXIIds+ #x0500)
-
 (defconstant +group1+ 0)
 (defconstant +group2+ 1)
 (defconstant +group3+ 2)
@@ -2321,7 +2309,6 @@
 (defconstant +group2+ 1)
 (defconstant +group3+ 2)
 (defconstant +group4+ 3)
-
 (defconstant +any-group+ 254)
 (defconstant +all-groups+ 255)
 (defconstant +wrap-into-range+ #x00)
@@ -2367,7 +2354,6 @@
 (defconstant +explicit-key-type3+ #x04)
 (defconstant +explicit-key-type2+ #x02)
 (defconstant +explicit-key-type1+ #x01)
-
 (defconstant +IM_NoExplicit+ #x80)
 (defconstant +IM_NoAutomatic+ #x40)
 (defconstant +IM_LEDDrivesKB+ #x20)
@@ -2398,7 +2384,6 @@
 (defconstant +virtual-mod-names+ #x0800)
 (defconstant +group-names+ #x1000)
 (defconstant +rgnames+ #x2000)
-
 (defconstant +GBN_Types+ #x01)
 (defconstant +GBN_CompatMap+ #x02)
 (defconstant +GBN_ClientSymbols+ #x04)
@@ -2434,16 +2419,13 @@
 (defconstant +TextDoodad+ 3)
 (defconstant +IndicatorDoodad+ 4)
 (defconstant +LogoDoodad+ 5)
-
  ;;; The version we implement
 (defconstant +major-version+ 1)
 (defconstant +minor-version+ 0)
-
  ;;; KB_DEVICESPEC card8
  ;;; 0..255     input extension device id
 (defconstant +use-core-kbd+ #x100)
 (defconstant +use-core-ptr+ #x200)
-
  ;;; KB_BELLCLASSRESULT card8
 ;;KbdFeedbackClass , BellFeedbackClass , DfltXIClass ,
 ;;                  AllXIClasses
@@ -2467,9 +2449,9 @@
 (defun enable-xkeyboard (display &optional (major +major-version+) (minor +minor-version+))
   (declare (type display display))
   (with-buffer-request-and-reply (display (xkeyboard-opcode display) nil)
-                                 ((data +use-extension+)
-                                  (card16 major)
-                                  (card16 minor))
+      ((data +use-extension+)
+       (card16 major)
+       (card16 minor))
     (values (boolean-get 1)
             (card16-get 8))))
 
@@ -2515,23 +2497,23 @@
 (defun get-state (display &optional (device +use-core-kbd+))
   (declare (type display display))
   (with-buffer-request-and-reply (display (xkeyboard-opcode display) nil)
-                                 ((data +get-state+)
-                                  (devicespec device)
-                                  (pad16 0))
+      ((data +get-state+)
+       (devicespec device)
+       (pad16 0))
     (make-device-state
      :device-id (card8-get 1)
-     :mods (keymask-get 8)
-     :base-mods (keymask-get 9)
-     :latched-mods (keymask-get 10)
-     :locked-mods (keymask-get 11)
-     :group (group-get 12)
-     :locked-group (group-get 13)
+     :mods (xlib::keymask-get 8)
+     :base-mods (xlib::keymask-get 9)
+     :latched-mods (xlib::keymask-get 10)
+     :locked-mods (xlib::keymask-get 11)
+     :group (xlib::group-get 12)
+     :locked-group (xlib::group-get 13)
      :base-group (int16-get 14)
      :latched-group (int16-get 16)
-     :compat-state (keymask-get 18)
-     :lookup-mods (keymask-get 19)
-     :compat-lookup-mods (keymask-get 20)
-     :ptr-btn-state (butmask-get 22))))
+     :compat-state (xlib::keymask-get 18)
+     :lookup-mods (xlib::keymask-get 19)
+     :compat-lookup-mods (xlib::keymask-get 20)
+     :ptr-btn-state (xlib::butmask-get 22))))
 
 (defun latch-lock-state (display &key (device +use-core-kbd+)
                                       affect-mod-locks
@@ -2638,42 +2620,42 @@
 
 (defmacro moddef-get (indexsym)
   `(prog1 (make-moddef
-           :mask (keymask-get ,indexsym)
-           :real-mods (keymask-get (index-incf ,indexsym 1))
-           :vmods (vmodmask-get (index-incf ,indexsym 1)))
+           :mask (xlib::keymask-get ,indexsym)
+           :real-mods (xlib::keymask-get (index-incf ,indexsym 1))
+           :vmods (xlib::vmodmask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 2)))
 
 (defmacro modmap-get (indexsym)
   `(prog1 (make-modmap
-           :keycode (keycode-get ,indexsym)
-           :mods (keymask-get (index-incf ,indexsym 1)))
+           :keycode (xlib::keycode-get ,indexsym)
+           :mods (xlib::keymask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 1)))
 
 (defmacro vmodmap-get (indexsym)
   `(prog1 (make-vmodmap
-           :keycode (keycode-get ,indexsym)
-           :vmods   (vmodmask-get (index-incf ,indexsym 2)))
+           :keycode (xlib::keycode-get ,indexsym)
+           :vmods   (xlib::vmodmask-get (index-incf ,indexsym 2)))
      (index-incf ,indexsym 2)))
 
 (defmacro behaviormap-get (indexsym)
   `(prog1 (make-behaviormap
-           :keycode (keycode-get ,indexsym)
-           :behavior (behavior-get (index-incf ,indexsym 1)))
+           :keycode (xlib::keycode-get ,indexsym)
+           :behavior (xlib::behavior-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 3)))
 
 (defmacro explicitmap-get (indexsym)
   `(prog1 (make-explicitmap
-           :keycode (keycode-get ,indexsym)
-           :explicit (explicit-get (index-incf ,indexsym 1)))
+           :keycode (xlib::keycode-get ,indexsym)
+           :explicit (xlib::explicit-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 1)))
 
 (defmacro keytype-mapentry-get (indexsym)
   `(prog1 (make-keytype-mapentry
            :active (boolean-get ,indexsym)
-           :mask (keymask-get (index-incf ,indexsym 1))
+           :mask (xlib::keymask-get (index-incf ,indexsym 1))
            :level (card8-get (index-incf ,indexsym 1))
-           :mods (keymask-get (index-incf ,indexsym 1))
-           :vmods (vmodmask-get (index-incf ,indexsym 1)))
+           :mods (xlib::keymask-get (index-incf ,indexsym 1))
+           :vmods (xlib::vmodmask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 4)))
 
 (defmacro keytype-get (indexsym)
@@ -2681,9 +2663,9 @@
         (preserve-p-sym (gensym "preserve-p")))
     `(let (,n-map-entries-sym ,preserve-p-sym)
        (make-keytype
-        :mask (keymask-get ,indexsym)
-        :mods (keymask-get (index-incf ,indexsym 1))
-        :vmods (vmodmask-get (index-incf ,indexsym 1))
+        :mask (xlib::keymask-get ,indexsym)
+        :mods (xlib::keymask-get (index-incf ,indexsym 1))
+        :vmods (xlib::vmodmask-get (index-incf ,indexsym 1))
         :levels (card8-get (index-incf ,indexsym 2))
         :map-entries (setf ,n-map-entries-sym (card8-get (index-incf ,indexsym 1)))
         :preserve-p (setf ,preserve-p-sym (boolean-get (index-incf ,indexsym 1)))
@@ -2813,7 +2795,7 @@
                         :virtual-modifiers ,virtualModsSym
                         :real-modifiers-per-virtual-modifier
                         (loop for i from 0 upto 15 when (= (ldb (byte 1 i) ,virtualModsSym) 1)
-                              collect (prog1 (keymask-get ,indexsym)
+                              collect (prog1 (xlib::keymask-get ,indexsym)
                                         (index-incf ,indexsym 1)))))
         :explicits (when (contained-in-mask +EXPLICITCOMPONENTS+ ,mappartMaskSYm)
                      (prog1 (make-xkb-keymap-part
@@ -2948,10 +2930,10 @@
     (make-client-mapping
      :symmaps symmaps-array)))
 
-(defun corestate->group (corestate)
+(defun group-from-corestate (corestate)
   (ldb (byte 2 13) corestate))
 
-(defun corestate->mask (corestate)
+(defun mask-from-corestate (corestate)
   (ldb (byte 8 0) corestate))
 
 (defun sanitize-redirect-group (num-groups redirect-group)
@@ -2981,9 +2963,9 @@
                          (calculate-leftover-modifiers mask entry keytype-mask))
           finally (return (values 0 (logand mask (lognot keytype-mask)))))))
 
-(defun keyevent->keysym (mapping keycode corestate)
-  (let* ((group (corestate->group corestate))
-         (mask (corestate->mask corestate))
+(defun keysym-from-keyvent (mapping keycode corestate)
+  (let* ((group (group-from-corestate corestate))
+         (mask (mask-from-corestate corestate))
          (symmap (svref (client-mapping-symmaps mapping) keycode))
          (effective-group (effective-group group
                                            (client-keysymmap-num-groups symmap)
@@ -3000,7 +2982,7 @@
                   (+ (* effective-group (client-keysymmap-width symmap)) shiftlevel))
            leftover-modifiers)))))
 
-(defun xkb/keysym->character (keysym keysymdb) ;keysymdb would be normally +xkb-table+
+(defun character-from-xkb-keysym (keysym keysymdb) ;keysymdb would be normally +xkb-table+
   (cond
     ((or (<= #x0020 keysym #x007E) (<= #x00A0 keysym #x00FF))
      (code-char keysym))
@@ -3025,7 +3007,7 @@
   (cond
     ((<= #x0040 keysym #x005F) (code-char (- keysym #x0040))) ;@A-Z[\]^_
     ((<= #x0061 keysym #x007A) (code-char (- keysym #x0060))) ;a-z
-    (t (xkb/keysym->character keysym keysymdb))))
+    (t (character-from-xkb-keysym keysym keysymdb))))
 
 (defun process-leftover-modifiers (keysym leftover-modifiers keysymdb)
   (cond
@@ -3033,7 +3015,7 @@
      (values keysym (string (control-character keysym keysymdb))))
     ((contained-in-mask +lock+ leftover-modifiers)
      (values (upcase-keysym keysym)
-             (string (xkb/keysym->character (upcase-keysym keysym) keysymdb))))
+             (string (character-from-xkb-keysym (upcase-keysym keysym) keysymdb))))
     (t
      (values keysym
-             (string (xkb/keysym->character keysym keysymdb))))))
+             (string (character-from-xkb-keysym keysym keysymdb))))))

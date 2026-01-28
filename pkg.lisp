@@ -23,10 +23,10 @@
     bell bit-gravity bitmap bitmap-format bitmap-format-lsb-first-p
     bitmap-format-p bitmap-format-pad bitmap-format-unit bitmap-image
     boole-constant boolean card16 card29 card32 card8
-    card8->char change-active-pointer-grab change-keyboard-control
+    char-from-card8 change-active-pointer-grab change-keyboard-control
     change-keyboard-mapping change-pointer-control change-property
-    char->card8 char-ascent char-attributes char-descent
-    char-left-bearing char-right-bearing char-width character->keysyms
+    card8-from-char char-ascent char-attributes char-descent
+    char-left-bearing char-right-bearing char-width keysyms-from-character
     character-in-map-p circulate-window-down circulate-window-up clear-area
     close-display with-default-display close-down-mode close-font closed-display color
     color-blue color-green color-p color-red color-rgb colormap
@@ -90,8 +90,8 @@
     image-xy-p image-y-hot image-z image-z-bits-per-pixel image-z-p
     image-z-pixarray implementation-error input-focus install-colormap
     installed-colormaps int16 int32 int8 intern-atom invalid-font
-    keyboard-control keyboard-mapping keycode->character keycode->keysym
-    keysym->character keysym->keycodes keysym-in-map-p
+    keyboard-control keyboard-mapping character-from-keycode keysym-from-keycode
+    character-from-keysym keycodes-from-keysym keysym-in-map-p
     kill-client kill-temporary-clients length-error
     list-extensions list-font-names list-fonts list-properties
     lookup-color lookup-error make-color make-event-handlers

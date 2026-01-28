@@ -7,13 +7,33 @@
   (the (or (member :modifiers) mask16 (clx-list (or keysym state-mask-key)))
        (logand #xff (lognot (make-state-mask :lock)))))
 
+(defun keysyms-from-character (character &optional display)
+  ;; Given a character, return a list of all matching keysyms.
+  ;; If DISPLAY is given, translations specific to DISPLAY are used,
+  ;; otherwise only global translations are used.
+  ;; Implementation dependent function.
+  ;; May be slow [i.e. do a linear search over all known keysyms]
+  (declare (type t character)
+	   (type (or null display) display))
+  (let ((result nil))
+    (when display
+      (dolist (mapping (display-keysym-translation display))
+	(when (eql character (second mapping))
+	  (push (first mapping) result))))
+    (maphash #'(lambda (keysym mappings)
+		 (dolist (mapping mappings)
+		   (when (eql (char-map-char mapping) character)
+		     (pushnew keysym result))))
+	     *keysym-character-table*)
+    result))
+
 ;; Keysym mapping functions
 (defun display-keyboard-mapping (display)
   (declare (type display display))
   (or (display-keysym-mapping display)
       (setf (display-keysym-mapping display) (keyboard-mapping display))))
 
-(defun keycode->keysym (display keycode keysym-index)
+(defun keysym-from-keycode (display keycode keysym-index)
   (declare (type display display)
 	   (type card8 keycode)
 	   (type card8 keysym-index)
@@ -33,7 +53,7 @@
 	   (aref mapping keycode 0))
 	  (t keysym))))
 
-(defun keysym->character (display keysym &optional (state 0))
+(defun character-from-keysym (display keysym &optional (state 0))
   ;; Find the character associated with a keysym.
   ;; STATE can be used to set character attributes.
   ;; Implementation dependent function.
@@ -47,7 +67,7 @@
 		     (when (mapping-matches-p display state mapping)
 		       (return mapping)))
 		   ;; Find the matching static mapping
-		   (dolist (mapping (gethash keysym io/kbd::*character-keysym-table*))
+		   (dolist (mapping (gethash keysym *keysym-character-table*))
 		     (when (mapping-matches-p display state mapping)
 		       (return mapping))))))
     (when mapping
@@ -62,7 +82,7 @@
 	   (type list mapping))
   (declare (values generalized-boolean))
   (flet
-      ((modifiers->mask (display-mapping modifiers errorp &aux (mask 0))
+      ((mask-from-modifiers (display-mapping modifiers errorp &aux (mask 0))
          ;; Convert MODIFIERS, which is a modifier mask, or a list of state-mask-keys into a mask.
          ;; If ERRORP is non-nil, return NIL when an unknown modifier is specified,
          ;; otherwise ignore unknown modifiers.
@@ -82,25 +102,25 @@
 			           (or (cdr (assoc modifier display-mapping))
 				       ;; bad modifier
 				       (if errorp
-				           (return-from modifiers->mask nil)
+				           (return-from mask-from-modifiers nil)
 				           0))))))))))
 
     (let* ((display-mapping (get-display-modifier-mapping display))
-	   (mapping-modifiers (keysym-mapping-modifiers mapping))
-	   (modifiers (or (modifiers->mask display-mapping (or mapping-modifiers 0) t)
+	   (mapping-modifiers (third mapping))
+	   (modifiers (or (mask-from-modifiers display-mapping (or mapping-modifiers 0) t)
 			  (return-from mapping-matches-p nil)))
-	   (mapping-mask (or (keysym-mapping-mask mapping)	; If no mask, use the default.
+	   (mapping-mask (or (fourth mapping)	; If no mask, use the default.
 			     (if mapping-modifiers	        ; If no modifiers, match anything.
 				 *default-keysym-translate-mask*
 			         0)))
 	   (mask (if (eq mapping-mask :modifiers)
 		     modifiers
-		     (modifiers->mask display-mapping mapping-mask nil))))
+		     (mask-from-modifiers display-mapping mapping-mask nil))))
       (declare (type mask16 modifiers mask))
       (= (logand state mask) modifiers))))
 
 (defun default-keysym-index (display keycode state)
-  ;; Returns a keysym-index for use with keycode->character
+  ;; Returns a keysym-index for use with character-from-keycode
   (declare (values card8))
   (macrolet ((keystate-p (state keyword)
 	       `(logbitp ,(position keyword +state-mask-vector+) ,state)))
@@ -170,7 +190,7 @@
 ;;;   1       0       1       #\control-A              #\control-*
 ;;;   1       1       0       #\control-shift-a        #\control-*
 ;;;   1       1       1       #\control-shift-a        #\control-8
-(defun keycode->character (display keycode state &key keysym-index
+(defun character-from-keycode (display keycode state &key keysym-index
 	                                              (keysym-index-function #'default-keysym-index))
   ;; keysym-index defaults to the result of keysym-index-function which
   ;; is called with the following parameters:
@@ -189,16 +209,16 @@
   (declare (values (or null character)))
   (let* ((index (or keysym-index
 		    (funcall keysym-index-function display keycode state)))
-	 (keysym (if index (keycode->keysym display keycode index) 0)))
+	 (keysym (if index (keysym-from-keycode display keycode index) 0)))
     (declare (type (or null card8) index)
 	     (type keysym keysym))
     (when (plusp keysym)
-      (keysym->character display keysym state))))
+      (character-from-keysym display keysym state))))
 
 (defun get-display-modifier-mapping (display)
   (labels ((keysym-replace (display modifiers mask &aux result)
 	     (dolist (modifier modifiers result)
-	       (push (cons (keycode->keysym display modifier 0) mask) result))))
+	       (push (cons (keysym-from-keycode display modifier 0) mask) result))))
     (or (display-modifier-mapping display)
 	(multiple-value-bind (shift lock control mod1 mod2 mod3 mod4 mod5)
 	    (modifier-mapping display)
@@ -274,11 +294,11 @@
     (when (and (plusp (aref keymap i))
 	       ;; Match when character is in mapping for this keycode
 	       (dotimes (j jmax)
-		 (when (eql character (keycode->character display i 0 :keysym-index j))
+		 (when (eql character (character-from-keycode display i 0 :keysym-index j))
 		   (return t))))
       (return t))))
 
-(defun keysym->keycodes (display keysym)
+(defun keycodes-from-keysym (display keysym)
   ;; Return keycodes for keysym, as multiple values
   (declare (type display display)
 	   (type keysym keysym))

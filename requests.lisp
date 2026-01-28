@@ -1258,7 +1258,7 @@
   (declare (type display display)
 	   (type int8 percent-from-normal))
   (with-buffer-request (display +x-bell+)
-    (data (int8->card8 percent-from-normal))))
+    (data (card8-from-int8 percent-from-normal))))
 
 (defun pointer-mapping (display &key (result-type 'list))
   (declare (type display display)

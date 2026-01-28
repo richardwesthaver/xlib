@@ -80,11 +80,11 @@ nil if a network socket should be opened."
                (safety ,+buffer-safety+)
                (debug ,+buffer-debug+)))))
 
-(declaim (inline card8->int8 int8->card8
-                 card16->int16 int16->card16
-                 card32->int32 int32->card32))
+(declaim (inline int8-from-card8 card8-from-int8
+                 int16-from-card16 card16-from-int16
+                 int32-from-card32 card32-from-int32))
 
-(defun card8->int8 (x)
+(defun int8-from-card8 (x)
   (declare (type card8 x))
   (declare (values int8))
   #.(declare-buffun)
@@ -92,13 +92,13 @@ nil if a network socket should be opened."
                 (the int8 (- x #x100))
                 x)))
 
-(defun int8->card8 (x)
+(defun card8-from-int8 (x)
   (declare (type int8 x))
   (declare (values card8))
   #.(declare-buffun)
   (the card8 (ldb (byte 8 0) x)))
 
-(defun card16->int16 (x)
+(defun int16-from-card16 (x)
   (declare (type card16 x))
   (declare (values int16))
   #.(declare-buffun)
@@ -106,13 +106,13 @@ nil if a network socket should be opened."
                  (the int16 (- x #x10000))
                  x)))
 
-(defun int16->card16 (x)
+(defun card16-from-int16 (x)
   (declare (type int16 x))
   (declare (values card16))
   #.(declare-buffun)
   (the card16 (ldb (byte 16 0) x)))
 
-(defun card32->int32 (x)
+(defun int32-from-card32 (x)
   (declare (type card32 x))
   (declare (values int32))
   #.(declare-buffun)
@@ -120,7 +120,7 @@ nil if a network socket should be opened."
                  (the int32 (- x #x100000000))
                  x)))
 
-(defun int32->card32 (x)
+(defun card32-from-int32 (x)
   (declare (type int32 x))
   (declare (values card32))
   #.(declare-buffun)
@@ -147,14 +147,14 @@ nil if a network socket should be opened."
            (type array-index i))
   (declare (values int8))
   #.(declare-buffun)
-  (card8->int8 (aref a i)))
+  (int8-from-card8 (aref a i)))
 
 (defun aset-int8 (v a i)
   (declare (type int8 v)
            (type buffer-bytes a)
            (type array-index i))
   #.(declare-buffun)
-  (setf (aref a i) (int8->card8 v)))
+  (setf (aref a i) (card8-from-int8 v)))
 
 (progn
   (defun aref-card16 (a i)
@@ -297,7 +297,7 @@ nil if a network socket should be opened."
   `(aset-card29 ,v ,a ,i))
 
 ;;; Other random conversions
-(defun rgb-val->card16 (value)
+(defun card16-from-rgb-val (value)
   ;; Short floats are good enough
   (declare (type rgb-val value))
   (declare (values card16))
@@ -305,7 +305,7 @@ nil if a network socket should be opened."
   ;; Convert VALUE from float to card16
   (the card16 (values (round (the rgb-val value) #.(/ 1.0s0 #xffff)))))
 
-(defun card16->rgb-val (value)
+(defun rgb-val-from-card16 (value)
   ;; Short floats are good enough
   (declare (type card16 value))
   (declare (values short-float))
@@ -313,14 +313,14 @@ nil if a network socket should be opened."
   ;; Convert VALUE from card16 to float
   (the short-float (* (the card16 value) #.(/ 1.0s0 #xffff))))
 
-(defun radians->int16 (value)
+(defun int16-from-radians (value)
   ;; Short floats are good enough
   (declare (type angle value))
   (declare (values int16))
   #.(declare-buffun)
   (the int16 (values (round (the angle value) #.(float (/ pi 180.0s0 64.0s0) 0.0s0)))))
 
-(defun int16->radians (value)
+(defun radians-from-int16 (value)
   ;; Short floats are good enough
   (declare (type int16 value))
   (declare (values short-float))
@@ -348,7 +348,7 @@ nil if a network socket should be opened."
 
 ;;; This stuff transforms chars to ascii codes in card8's and back.
 ;;; You might have to hack it a little to get it to work for your machine.
-(declaim (inline char->card8 card8->char))
+(declaim (inline card8-from-char char-from-card8))
 
 (macrolet ((char-translators ()
              (let ((alist
@@ -414,13 +414,13 @@ nil if a network socket should be opened."
                                (dolist (pair alist)
                                  (setf (aref array (cdr pair)) (car pair)))
                                array))
-                         (defun char->card8 (char)
+                         (defun card8-from-char (char)
                            (declare (type base-char char))
                            #.(declare-buffun)
                            (the card8 (aref (the (simple-array card8 (*))
                                                  *char-to-card8-translation-table*)
                                             (the array-index (char-code char)))))
-                         (defun card8->char (card8)
+                         (defun char-from-card8 (card8)
                            (declare (type card8 card8))
                            #.(declare-buffun)
                            (the base-char
@@ -428,27 +428,27 @@ nil if a network socket should be opened."
                                           card8)
                                     (error "Invalid CHAR code ~D." card8))))
                          (dotimes (i 256)
-                           (unless (= i (char->card8 (card8->char i)))
-                             (warn "The card8->char mapping is not invertible through char->card8. Info:~%~S"
+                           (unless (= i (card8-from-char (char-from-card8 i)))
+                             (warn "The char-from-card8 mapping is not invertible through card8-from-char. Info:~%~S"
                                    (list i
-                                         (card8->char i)
-                                         (char->card8 (card8->char i))))
+                                         (char-from-card8 i)
+                                         (card8-from-char (char-from-card8 i))))
                              (return nil)))
                          (dotimes (i (length *char-to-card8-translation-table*))
                            (let ((char (code-char i)))
-                             (unless (eql char (card8->char (char->card8 char)))
-                               (warn "The char->card8 mapping is not invertible through card8->char. Info:~%~S"
+                             (unless (eql char (char-from-card8 (card8-from-char char)))
+                               (warn "The card8-from-char mapping is not invertible through char-from-card8. Info:~%~S"
                                      (list char
-                                           (char->card8 char)
-                                           (card8->char (char->card8 char))))
+                                           (card8-from-char char)
+                                           (char-from-card8 (card8-from-char char))))
                                (return nil))))))
                      (t
                       `(progn
-                         (defun char->card8 (char)
+                         (defun card8-from-char (char)
                            (declare (type base-char char))
                            #.(declare-buffun)
                            (the card8 (char-code char)))
-                         (defun card8->char (card8)
+                         (defun char-from-card8 (card8)
                            (declare (type card8 card8))
                            #.(declare-buffun)
                            (the base-char (code-char card8)))))))))

@@ -196,7 +196,6 @@
 
 (defun color-rgb (color)
   (declare (type color color))
-  (declare (values red green blue))
   (values (color-red color) (color-green color) (color-blue color)))
 
 ;; TODO 2026-01-01: OBJ/COLOR (as-rgb, etc)
@@ -848,7 +847,6 @@
 
 (defun encode-event-mask (event-mask)
   (declare (type event-mask event-mask))
-  (declare (values mask32))
   (or (encode-mask +event-mask-vector+ event-mask 'event-mask-class)
       (x-type-error event-mask 'event-mask)))
 
@@ -867,21 +865,18 @@
 
 (defun encode-device-event-mask (device-event-mask)
   (declare (type device-event-mask device-event-mask))
-  (declare (values mask32))
   (or (encode-mask +device-event-mask-vector+ device-event-mask
 		   'device-event-mask-class)
       (x-type-error device-event-mask 'device-event-mask)))
 
 (defun encode-modifier-mask (modifier-mask)
   (declare (type modifier-mask modifier-mask))
-  (declare (values mask16))
   (or (and (eq modifier-mask :any) #x8000)
       (encode-mask +state-mask-vector+ modifier-mask 'modifier-key)
       (x-type-error modifier-mask 'modifier-mask)))
 
 (defun encode-state-mask (state-mask)
   (declare (type (or mask16 (clx-list state-mask-key)) state-mask))
-  (declare (values mask16))
   (or (encode-mask +state-mask-vector+ state-mask 'state-mask-key)
       (x-type-error state-mask '(or mask16 (clx-list state-mask-key)))))
 
@@ -898,7 +893,6 @@
 
 (defun encode-pointer-event-mask (pointer-event-mask)
   (declare (type pointer-event-mask pointer-event-mask))
-  (declare (values mask32))
   (or (encode-mask +pointer-event-mask-vector+ pointer-event-mask
 		   'pointer-event-mask-class)
       (x-type-error pointer-event-mask 'pointer-event-mask)))

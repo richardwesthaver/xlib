@@ -58,7 +58,7 @@
 	    ((index>= i src-end)
 	     i)
 	  (declare (type array-index i j))
-	  (setf char (char->card8 (char src i)))
+	  (setf char (card8-from-char (char src i)))
 	  (if (and font (or (< char min-char-index) (> char max-char-index)))
 	      (return i)
 	      (setf (aref dst j) char)))
@@ -69,7 +69,7 @@
 	     i)
 	  (declare (type array-index i j))
 	  (setq elt (elt src i))
-	  (when (characterp elt) (setq elt (char->card8 elt)))
+	  (when (characterp elt) (setq elt (card8-from-char elt)))
 	  (if (or (not (integerp elt))
                   (and font
                        (< elt min-char-index)

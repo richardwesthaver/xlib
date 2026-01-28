@@ -26,4 +26,4 @@
                  (draw-text *window* *gcontext* *font* "Press space to exit. Нажмите пробел для выхода." 100 (+ 100 (* 3 (baseline-to-baseline *window* *font*))) :draw-background-p t)
                  nil)
       (:button-press () t)
-      (:key-press (code state) (char= #\Space (xlib:keycode->character *display* code state))))))
+      (:key-press (code state) (char= #\Space (xlib:character-from-keycode *display* code state))))))

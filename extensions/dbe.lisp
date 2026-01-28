@@ -124,7 +124,7 @@
   "takes a list of (window swap-action) pairs and swaps their back-buffers"
   (let ((display (window-display (caar window-list)))
 	 (num (length window-list))
-	 (seq (lst->array window-list)))
+	 (seq (array-from-list window-list)))
     (declare (type display display)
 	     (type fixnum num)
 	     (type simple-array seq))
@@ -178,7 +178,7 @@
        (or-get 8 null window)))))
 
 ;;  utility functions
-(defun lst->array (lst)
+(defun array-from-list (lst)
   (make-array (* 2 (length lst)) :initial-contents 
 	      (loop :for x :in lst
 		    :collect (drawable-id (car x))

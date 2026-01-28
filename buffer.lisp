@@ -363,7 +363,7 @@
 	    ((index>= j string-length)
 	     (setf (elt result count) string))
 	  (declare (type array-index i j))
-	  (setf (aref string j) (card8->char (read-card8 i))))))))
+	  (setf (aref string j) (char-from-card8 (read-card8 i))))))))
 
 ;;; Reading sequences of chars
 
@@ -384,7 +384,7 @@
 	   (,reader reply-buffer result-type nitems #',transformer data start index)))))
 
 (define-transformed-sequence-reader read-sequence-char character 
-  card8->char read-sequence-card8)
+  char-from-card8 read-sequence-card8)
 
 ;;; Reading sequences of card8's
 (defmacro define-list-readers ((name tname) type size step reader)
@@ -503,7 +503,7 @@
   (read-vector-card8 read-vector-card8-with-transform))
 
 (define-transformed-sequence-reader read-sequence-int8 int8
-  card8->int8 read-sequence-card8)
+  int8-from-card8 read-sequence-card8)
 
 ;;; Reading sequences of card16's
 (define-list-readers (read-list-card16 read-list-card16-with-transform) card16
@@ -573,7 +573,7 @@
   (read-vector-card16 read-vector-card16-with-transform))
 
 (define-transformed-sequence-reader read-sequence-int16 int16
-  card16->int16 read-sequence-card16)
+  int16-from-card16 read-sequence-card16)
 
 ;;; Reading sequences of card32's
 
@@ -643,7 +643,7 @@
   (read-vector-card32 read-vector-card32-with-transform))
 
 (define-transformed-sequence-reader read-sequence-int32 int32 
-  card32->int32 read-sequence-card32)
+  int32-from-card32 read-sequence-card32)
 
 ;;; Writing sequences of chars
 (defmacro define-transformed-sequence-writer (name fromtype transformer writer)
@@ -662,7 +662,7 @@
 	   (,writer buffer boffset data start end #',transformer)))))
 
 (define-transformed-sequence-writer write-sequence-char character 
-  char->card8 write-sequence-card8)
+  card8-from-char write-sequence-card8)
 
 ;;; Writing sequences of card8's
 (defmacro define-list-writers ((name tname) type step writer)
@@ -788,7 +788,7 @@
   (write-vector-card8 write-vector-card8-with-transform))
 
 (define-transformed-sequence-writer write-sequence-int8 int8 
-  int8->card8 write-sequence-card8)
+  card8-from-int8 write-sequence-card8)
 
 ;;; Writing sequences of card16's
 (define-list-writers (write-list-card16 write-list-card16-with-transform) card16
@@ -1068,7 +1068,7 @@
   (write-vector-card32 write-vector-card32-with-transform))
 
 (define-transformed-sequence-writer write-sequence-int32 int32 
-  int32->card32 write-sequence-card32)
+  card32-from-int32 write-sequence-card32)
 
 (defun read-bitvector256 (buffer-bbuf boffset data)
   (declare (type buffer-bytes buffer-bbuf)

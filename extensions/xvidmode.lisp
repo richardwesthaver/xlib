@@ -158,7 +158,6 @@
 (defun screen-position (screen display)
   (declare (type display display)
 	   (type screen screen))
-  (declare (values position))
   (let ((position (position screen (xlib:display-roots display))))
     (if (not (numberp position))
 	(error "screen ~A not found in display ~A" screen display)

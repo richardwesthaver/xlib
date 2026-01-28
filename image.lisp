@@ -2074,7 +2074,7 @@
 		  )))))))))
 
 ;;; COPY-IMAGE
-(defun xy-format-image-x->image-x (image x y width height)
+(defun image-x-from-xy-format-image-x (image x y width height)
   (declare (type image-x image)
 	   (type card16 x y width height)
 	   (values image-x))
@@ -2119,7 +2119,7 @@
      :unit unit :pad pad :left-pad left-pad
      :byte-lsb-first-p byte-lsb-first-p :bit-lsb-first-p bit-lsb-first-p)))
 
-(defun z-format-image-x->image-x (image x y width height)
+(defun image-x-from-z-format-image-x (image x y width height)
   (declare (type image-x image)
 	   (type card16 x y width height)
 	   (values image-x))
@@ -2160,17 +2160,17 @@
      :unit unit :pad pad :left-pad left-pad
      :byte-lsb-first-p byte-lsb-first-p :bit-lsb-first-p bit-lsb-first-p)))
 
-(defun image-x->image-x  (image x y width height)
+(defun image-x-from-image-x  (image x y width height)
   (declare (type image-x image)
 	   (type card16 x y width height)
 	   (values image-x))
   (ecase (image-x-format image)
     ((:bitmap :xy-pixmap)
-     (xy-format-image-x->image-x image x y width height))
+     (image-x-from-xy-format-image-x image x y width height))
     (:z-pixmap
-     (z-format-image-x->image-x image x y width height))))
+     (image-x-from-z-format-image-x image x y width height))))
 
-(defun image-x->image-xy (image x y width height)
+(defun image-xy-from-image-x (image x y width height)
   (declare (type image-x image)
 	   (type card16 x y width height)
 	   (values image-xy))
@@ -2188,7 +2188,7 @@
    (image-x-unit image) (image-x-byte-lsb-first-p image)
    (image-x-bit-lsb-first-p image)))
 
-(defun image-x->image-z  (image x y width height)
+(defun image-z-from-image-x  (image x y width height)
   (declare (type image-x image)
 	   (type card16 x y width height)
 	   (values image-z))
@@ -2245,7 +2245,7 @@
 	  (32 (copy pixarray-32 pixarray-32-element-type)))))
     copy))
 
-(defun image-xy->image-x (image x y width height)
+(defun image-x-from-image-xy (image x y width height)
   (declare (type image-xy image)
 	   (type card16 x y width height)
 	   (values image-x))
@@ -2274,7 +2274,7 @@
      :byte-lsb-first-p +image-byte-lsb-first-p+
      :bit-lsb-first-p +image-bit-lsb-first-p+)))
 
-(defun image-xy->image-xy (image x y width height)
+(defun image-xy-from-image-xy (image x y width height)
   (declare (type image-xy image)
 	   (type card16 x y width height)
 	   (values image-xy))
@@ -2286,14 +2286,14 @@
 	      (copy-pixarray array x y width height 1))
 	  (image-xy-bitmap-list image))))
 
-(defun image-xy->image-z (image x y width height)
+(defun image-z-from-image-xy (image x y width height)
   (declare (type image-xy image)
 	   (type card16 x y width height)
 	   (ignore image x y width height))
   (error "Format conversion from ~S to ~S not supported"
 	 :xy-pixmap :z-pixmap))
 
-(defun image-z->image-x (image x y width height)
+(defun image-x-from-image-z (image x y width height)
   (declare (type image-z image)
 	   (type card16 x y width height)
 	   (values image-x))
@@ -2322,14 +2322,14 @@
      :byte-lsb-first-p +image-byte-lsb-first-p+
      :bit-lsb-first-p +image-bit-lsb-first-p+)))
 
-(defun image-z->image-xy (image x y width height)
+(defun image-xy-from-image-z (image x y width height)
   (declare (type image-z image)
 	   (type card16 x y width height)
 	   (ignore image x y width height))
   (error "Format conversion from ~S to ~S not supported"
 	 :z-pixmap :xy-pixmap))
 
-(defun image-z->image-z (image x y width height)
+(defun image-z-from-image-z (image x y width height)
   (declare (type image-z image)
 	   (type card16 x y width height)
 	   (values image-z))
@@ -2362,19 +2362,19 @@
 	    (etypecase image
 	      (image-x
 	       (ecase result-type
-		 ((nil image-x) (image-x->image-x image x y width height))
-		 (image-xy (image-x->image-xy image x y width height))
-		 (image-z  (image-x->image-z  image x y width height))))
+		 ((nil image-x) (image-x-from-image-x image x y width height))
+		 (image-xy (image-xy-from-image-x image x y width height))
+		 (image-z  (image-z-from-image-x  image x y width height))))
 	      (image-xy
 	       (ecase result-type
-		 (image-x (image-xy->image-x image x y width height))
-		 ((nil image-xy) (image-xy->image-xy image x y width height))
-		 (image-z  (image-xy->image-z image x y width height))))
+		 (image-x (image-x-from-image-xy image x y width height))
+		 ((nil image-xy) (image-xy-from-image-xy image x y width height))
+		 (image-z  (image-z-from-image-xy image x y width height))))
 	      (image-z 
 	       (ecase result-type
-		 (image-x (image-z->image-x image x y width height))
-		 (image-xy  (image-z->image-xy image x y width height))
-		 ((nil image-z) (image-z->image-z image x y width height)))))))
+		 (image-x (image-x-from-image-z image x y width height))
+		 (image-xy  (image-xy-from-image-z image x y width height))
+		 ((nil image-z) (image-z-from-image-z image x y width height)))))))
       (declare (type image copy))
       (setf (image-plist copy) (copy-list (image-plist image)))
       (when (and (image-x-hot image) (not (index-zerop x)))

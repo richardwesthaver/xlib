@@ -127,13 +127,13 @@
 
 (define-accessor rgb-val (16)
   ;; Used for color's
-  ((index) `(card16->rgb-val (read-card16 ,index)))
-  ((index thing) `(write-card16 ,index (rgb-val->card16 ,thing))))
+  ((index) `(rgb-val-from-card16 (read-card16 ,index)))
+  ((index thing) `(write-card16 ,index (card16-from-rgb-val ,thing))))
 
 (define-accessor angle (16)
   ;; Used for drawing arcs
-  ((index) `(int16->radians (read-int16 ,index)))
-  ((index thing) `(write-int16 ,index (radians->int16 ,thing))))
+  ((index) `(radians-from-int16 (read-int16 ,index)))
+  ((index thing) `(write-int16 ,index (int16-from-radians ,thing))))
 
 (define-accessor bit (0)
   ;; Like BOOLEAN, but tests bits
@@ -778,11 +778,11 @@
             type (car type)))
     `(macrolet ((read-card29 (value) value)
                 (read-card32 (value) value)
-                (read-int32 (value) `(card32->int32 ,value))
+                (read-int32 (value) `(int32-from-card32 ,value))
                 (read-card16 (value) value)
-                (read-int16 (value) `(card16->int16 ,value))
+                (read-int16 (value) `(int16-from-card16 ,value))
                 (read-card8 (value) value)
-                (read-int8 (value) `(int8->card8 ,value)))
+                (read-int8 (value) `(card8-from-int8 ,value)))
        (,(getify type) ,value ,@args))))
 
 (defmacro encode-type (type value)
@@ -794,11 +794,11 @@
             type (car type)))
     `(macrolet ((write-card29 (index value) index value)
                 (write-card32 (index value) index value)
-                (write-int32 (index value) index `(int32->card32 ,value))
+                (write-int32 (index value) index `(card32-from-int32 ,value))
                 (write-card16 (index value) index value)
-                (write-int16 (index value) index `(int16->card16 ,value))
+                (write-int16 (index value) index `(card16-from-int16 ,value))
                 (write-card8 (index value) index value)
-                (write-int8 (index value) index `(int8->card8 ,value)))
+                (write-int8 (index value) index `(card8-from-int8 ,value)))
        (check-put 0 ,value ,type ,@args))))
 
 (defmacro set-decode-type (type accessor value)

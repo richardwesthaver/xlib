@@ -155,7 +155,7 @@
 
 ;; Generate all the accessors and defsetf's for GContext
 
-(defmacro xgcmask->gcmask (mask)
+(defmacro gcmask-from-xgcmask (mask)
   `(the gcmask (logand ,mask #.(1- (ash 1 +gcontext-fast-change-length+)))))
 
 (defmacro access-gcontext ((gcontext local-state) &body body)
@@ -605,7 +605,7 @@
               (with-buffer-request (display +x-copygc+)
                 (gcontext gcontext)
                 (gcontext temp-gc)
-                (card29 (xgcmask->gcmask temp-mask))))
+                (card29 (gcmask-from-xgcmask temp-mask))))
             ;; Copy extension fields to the new gcontext
             (when (plusp extension-mask)
               ;; Copy extension fields from temp back to gcontext
@@ -628,7 +628,7 @@
       (with-buffer-request (display +x-copygc+)
         (gcontext temp-gc)
         (gcontext gcontext)
-        (card29 (xgcmask->gcmask temp-mask)))
+        (card29 (gcmask-from-xgcmask temp-mask)))
       ;; Copy extension fields from temp back to gcontext
       (do ((bit (ash temp-mask (- *gcontext-data-length*)) (ash bit -1))
            (extensions *gcontext-extensions* (cdr extensions))
@@ -644,7 +644,7 @@
       (deallocate-temp-gcontext temp-gc)
       ;; Copy saved state back to server state
       (do ((server-state (gcontext-server-state gcontext))
-           (bit (xgcmask->gcmask temp-mask) (the gcmask (ash bit -1)))
+           (bit (gcmask-from-xgcmask temp-mask) (the gcmask (ash bit -1)))
            (i 0 (index+ i 1)))
           ((zerop bit)
            (incf-internal-timestamp server-state))
@@ -859,7 +859,7 @@
                     (setf (svref dst-server-state i) (svref src-server-state i)))))
           (with-buffer-request (display +x-copygc+)
             (gcontext src dst)
-            (card29 (xgcmask->gcmask mask))))))))
+            (card29 (gcmask-from-xgcmask mask))))))))
 
 (defun copy-gcontext (src dst)
   (declare (type gcontext src dst))

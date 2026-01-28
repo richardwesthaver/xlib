@@ -183,8 +183,7 @@
 		(setf (resource-database-tight node)
 		      (delete entry (resource-database-tight node)
 			      :test #'eq :count 1))))
-	    (return-from delete-resource-internal t)))
-	(setq loose-p nil)))))
+	    (return-from delete-resource-internal t)))))))
 
 ;;; Get Resource
 (defun get-resource (database value-name value-class full-name full-class)
@@ -194,7 +193,6 @@
   (declare (type resource-database database)
 	   (type stringable value-name value-class)
 	   (type (clx-list stringable) full-name full-class))
-  (declare (values value))
   (let ((names (append full-name (list value-name)))
 	(classes (append full-class (list value-class))))
     (let* ((result (get-entry (resource-database-tight database)
@@ -278,7 +276,6 @@
   ;; Return a search table for use with get-search-resource.
   (declare (type resource-database database)
 	   (type (clx-list stringable) full-name full-class))
-  (declare (values value))
   (let* ((tight (resource-database-tight database))
 	 (loose (resource-database-loose database))
 	 (result (cons nil nil))
@@ -444,7 +441,7 @@
 	  (when i ;; else blank line
 	    (case (char string i)
 	      (#\! nil)  ;; Comment - skip
-	      ;;(#.(card8->char 0) nil) ;; terminator for C strings - skip
+	      ;;(#.(char-from-card8 0) nil) ;; terminator for C strings - skip
 	      (#\#       ;; Include
 	       (setq term (position '(#\tab #\space) string :test #'char-memq
 				    :start i :end end))
@@ -472,7 +469,6 @@
   (declare (type string string)
 	   (type array-index start)
 	   (type (or null array-index) end))
-  (declare (values name-list value))
   (do ((i start)
        (end (or end (length string)))
        (term)
@@ -551,7 +547,7 @@
   (declare (values resource-database))
   (let ((string (get-property window :RESOURCE_MANAGER :type :STRING
 			      :result-type 'string
-			      :transform #'xlib::card8->char)))
+			      :transform #'xlib::char-from-card8)))
     (when string
       (with-input-from-string (stream string)
 	(read-resources database stream

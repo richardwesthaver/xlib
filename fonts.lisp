@@ -3,7 +3,7 @@
 ;;; Code:
 (in-package :xlib)
 
-;; The char-info stuff is here instead of CLX because of uses of int16->card16.
+;; The char-info stuff is here instead of CLX because of uses of card16-from-int16.
 
 ; To allow efficient storage representations, the type char-info is not
 ; required to be a structure.
@@ -43,7 +43,7 @@
 		   (flet ((from (form)
 			    (if (eq type 'int16)
 				form
-				`(,(xintern 'int16-> type) ,form))))
+				`(,(xintern type '-from-int16) ,form))))
 		     (push
 		       `(defun ,name (font index)
 			  (declare (type font font)
@@ -113,7 +113,7 @@
 		       (push `(setf (aref result ,n)
 				    ,(if (eq type 'int16)
 					 var
-					 `(,(xintern type '->int16) ,var)))
+					 `(,(xintern 'int16-from- type) ,var)))
 			     result))
 		   result)))))
   (def-char-info-accessors ignore

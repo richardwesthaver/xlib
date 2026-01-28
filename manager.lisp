@@ -22,7 +22,7 @@
 (defun wm-name (window)
   (declare (window window))
   (declare (values string))
-  (get-property window :WM_NAME :type :STRING :result-type 'string :transform #'card8->char))
+  (get-property window :WM_NAME :type :STRING :result-type 'string :transform #'char-from-card8))
 
 (defsetf wm-name (window) (name)
   `(set-string-property ,window :WM_NAME ,name))
@@ -31,14 +31,14 @@
   (declare (type window window)
            (type keyword property)
            (type stringable string))
-  (change-property window property (string string) :STRING 8 :transform #'char->card8)
+  (change-property window property (string string) :STRING 8 :transform #'card8-from-char)
   string)
 
 (defun wm-icon-name (window)
   (declare (type window window))
   (declare (values string))
   (get-property window :WM_ICON_NAME :type :STRING
-                                     :result-type 'string :transform #'card8->char))
+                                     :result-type 'string :transform #'char-from-card8))
 
 (defsetf wm-icon-name (window) (name)
   `(set-string-property ,window :WM_ICON_NAME ,name))
@@ -47,14 +47,13 @@
   (declare (type window window))
   (declare (values string))
   (get-property window :WM_CLIENT_MACHINE :type :STRING
-                                          :result-type 'string :transform #'card8->char))
+                                          :result-type 'string :transform #'char-from-card8))
 
 (defsetf wm-client-machine (window) (name)
   `(set-string-property ,window :WM_CLIENT_MACHINE ,name))
 
 (defun get-wm-class (window)
   (declare (type window window))
-  (declare (values (or null name-string) (or null class-string)))
   (let ((value (get-property window :WM_CLASS :type :STRING :result-type '(vector card8))))
     (declare (type (or null (vector card8)) value))
     (when value
@@ -64,18 +63,18 @@
                (when name-len
                  (subseq (the (vector card8) value) (1+ name-len)
                          (position 0 (the (vector card8) value) :start (1+ name-len))))))
-        (values (and (plusp (length name)) (map 'string #'card8->char name))
-                (and (plusp (length class)) (map 'string #'card8->char class)))))))
+        (values (and (plusp (length name)) (map 'string #'char-from-card8 name))
+                (and (plusp (length class)) (map 'string #'char-from-card8 class)))))))
 
 (defun set-wm-class (window resource-name resource-class)
   (declare (type window window)
            (type (or null stringable) resource-name resource-class))
   (change-property window :WM_CLASS
                    (concatenate '(vector card8)
-                                (map '(vector card8) #'char->card8
+                                (map '(vector card8) #'card8-from-char
                                      (string (or resource-name "")))
                                 #(0)
-                                (map '(vector card8) #'char->card8
+                                (map '(vector card8) #'card8-from-char
                                      (string (or resource-class "")))
                                 #(0))
                    :string 8)
@@ -94,7 +93,7 @@
         (len (length command-string)))
        ((>= start len) (nreverse command))
     (setq end (position 0 command-string :start start))
-    (push (map 'string #'card8->char (subseq command-string start end))
+    (push (map 'string #'char-from-card8 (subseq command-string start end))
           command)))
 
 (defsetf wm-command set-wm-command)
@@ -110,7 +109,7 @@
   (change-property window :WM_COMMAND
                    (apply #'concatenate '(vector card8)
                           (mapcan #'(lambda (c)
-                                      (list (map '(vector card8) #'char->card8
+                                      (list (map '(vector card8) #'card8-from-char
                                                  (with-output-to-string (stream)
                                                    (with-standard-io-syntax
                                                      (prin1 c stream))))
@@ -330,8 +329,8 @@
                       :north-west)))))
       ;; Obsolete fields
       (when (or (logbitp 0 flags) (logbitp 2 flags))
-        (setf (wm-size-hints-x hints) (card32->int32 (aref vector 1))
-              (wm-size-hints-y hints) (card32->int32 (aref vector 2))))
+        (setf (wm-size-hints-x hints) (int32-from-card32 (aref vector 1))
+              (wm-size-hints-y hints) (int32-from-card32 (aref vector 2))))
       (when (or (logbitp 1 flags) (logbitp 3 flags))
         (setf (wm-size-hints-width hints) (aref vector 3)
               (wm-size-hints-height hints) (aref vector 4)))
@@ -388,8 +387,8 @@
     (when (and (wm-size-hints-x hints) (wm-size-hints-y hints))
       (unless (wm-size-hints-user-specified-position-p hints)
         (setf (ldb (byte 1 2) flags) 1))
-      (setf (aref vector 1) (int32->card32 (wm-size-hints-x hints))
-            (aref vector 2) (int32->card32 (wm-size-hints-y hints))))
+      (setf (aref vector 1) (card32-from-int32 (wm-size-hints-x hints))
+            (aref vector 2) (card32-from-int32 (wm-size-hints-y hints))))
     (when (and (wm-size-hints-width hints) (wm-size-hints-height hints))
       (unless (wm-size-hints-user-specified-size-p hints)
         (setf (ldb (byte 1 3) flags) 1))
@@ -603,19 +602,20 @@
 (defun rgb-colormaps (window property)
   (declare (type window window)
            (type (member :RGB_DEFAULT_MAP :RGB_BEST_MAP :RGB_RED_MAP
-                                          :RGB_GREEN_MAP :RGB_BLUE_MAP) property))
+                                          :RGB_GREEN_MAP :RGB_BLUE_MAP) 
+                 property))
   (let ((prop (get-property window property :type :RGB_COLOR_MAP :result-type 'vector)))
     (declare (type (or null simple-vector) prop))
     (when prop
       (list (make-standard-colormap
              :colormap (lookup-colormap (window-display window) (aref prop 0))
              :base-pixel (aref prop 7)
-             :max-color (make-color :red   (card16->rgb-val (aref prop 1))
-                                    :green (card16->rgb-val (aref prop 3))
-                                    :blue  (card16->rgb-val (aref prop 5)))
-             :mult-color (make-color :red   (card16->rgb-val (aref prop 2))
-                                     :green (card16->rgb-val (aref prop 4))
-                                     :blue  (card16->rgb-val (aref prop 6)))
+             :max-color (make-color :red   (rgb-val-from-card16 (aref prop 1))
+                                    :green (rgb-val-from-card16 (aref prop 3))
+                                    :blue  (rgb-val-from-card16 (aref prop 5)))
+             :mult-color (make-color :red   (rgb-val-from-card16 (aref prop 2))
+                                     :green (rgb-val-from-card16 (aref prop 4))
+                                     :blue  (rgb-val-from-card16 (aref prop 6)))
              :visual (and (<= 9 (length prop))
                           (visual-info (window-display window) (aref prop 8)))
              :kill (and (<= 10 (length prop))
@@ -672,18 +672,17 @@
            (type (member :RGB_DEFAULT_MAP :RGB_BEST_MAP :RGB_RED_MAP
                                           :RGB_GREEN_MAP :RGB_BLUE_MAP)
                  property))
-  (declare (values colormap base-pixel max-color mult-color))
   (let ((prop (get-property window property :type :RGB_COLOR_MAP :result-type 'vector)))
     (declare (type (or null simple-vector) prop))
     (when prop
       (values (lookup-colormap (window-display window) (aref prop 0))
               (aref prop 7)			;Base Pixel
-              (make-color :red   (card16->rgb-val (aref prop 1))	;Max Color
-                          :green (card16->rgb-val (aref prop 3))
-                          :blue  (card16->rgb-val (aref prop 5)))
-              (make-color :red   (card16->rgb-val (aref prop 2))	;Mult color
-                          :green (card16->rgb-val (aref prop 4))
-                          :blue  (card16->rgb-val (aref prop 6)))))))
+              (make-color :red   (rgb-val-from-card16 (aref prop 1))	;Max Color
+                          :green (rgb-val-from-card16 (aref prop 3))
+                          :blue  (rgb-val-from-card16 (aref prop 5)))
+              (make-color :red   (rgb-val-from-card16 (aref prop 2))	;Mult color
+                          :green (rgb-val-from-card16 (aref prop 4))
+                          :blue  (rgb-val-from-card16 (aref prop 6)))))))
 
 ;;; OBSOLETE
 (defun set-standard-colormap (window property colormap base-pixel max-color mult-color)
@@ -706,7 +705,7 @@
 
 ;; Cut-Buffers
 (defun cut-buffer (display &key (buffer 0) (type :STRING) (result-type 'string)
-                                (transform #'card8->char) (start 0) end)
+                                (transform #'char-from-card8) (start 0) end)
   ;; Return the contents of cut-buffer BUFFER
   (declare (type display display)
            (type (integer 0 7) buffer)
@@ -715,7 +714,6 @@
            (type (or null array-index) end)
            (type t result-type)			;a sequence type
            (type (or null (function (integer) t)) transform))
-  (declare (values sequence type format bytes-after))
   (let* ((root (screen-root (first (display-roots display))))
          (property (aref '#(:CUT_BUFFER0 :CUT_BUFFER1 :CUT_BUFFER2 :CUT_BUFFER3
                             :CUT_BUFFER4 :CUT_BUFFER5 :CUT_BUFFER6 :CUT_BUFFER7)
@@ -725,7 +723,7 @@
 
 (defun (setf cut-buffer)
     (data display &key (buffer 0) (type :STRING) (format 8)
-                       (start 0) end (transform #'char->card8))
+                       (start 0) end (transform #'card8-from-char))
   (declare (type sequence data)
            (type display display)
            (type (integer 0 7) buffer)

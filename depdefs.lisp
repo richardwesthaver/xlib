@@ -72,7 +72,7 @@
 (defmacro atom-cache-map-test ()
   '#'eq)
 
-(defmacro keysym->character-map-test ()
+(defmacro character-map-test-from-keysym ()
   '#'eql)
 
 (deftype buffer-bytes () `(simple-array (unsigned-byte 8) (*)))

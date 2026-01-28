@@ -34,7 +34,7 @@
              (let ((length (read-short stream)))
                (let ((string (make-string length)))
                  (dotimes (k length)
-                   (setf (schar string k) (card8->char (read-byte stream))))
+                   (setf (schar string k) (char-from-card8 (read-byte stream))))
                  string)))
            (read-short-length-vector (stream)
              (let ((length (read-short stream)))

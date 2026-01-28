@@ -97,7 +97,7 @@ VEC (VEC/AA).")
         (getf (xlib:screen-plist screen) :dpi-y) value))
 
 ;;; Font metrics
-(defun font-units->pixels-x (dpi-x font)
+(defun pixels-x-from-font-units (dpi-x font)
   "px = funits*coeff. Function returns coeff."
   (with-font (loader font)
     (with-slots (size) font
@@ -105,7 +105,7 @@ VEC (VEC/AA).")
              (pixel-size-x (* size (/ dpi-x 72))))
         (* pixel-size-x (/ units/em))))))
 
-(defun font-units->pixels-y (dpi-y font)
+(defun font-pixels-y-from-units (dpi-y font)
   "px = funits*coeff. Function returns coeff."
   (with-font (loader font)
     (with-slots (size) font
@@ -115,11 +115,11 @@ VEC (VEC/AA).")
 
 (defun font-ascent-for-dpi (dpi-y font)
   (with-font (loader font)
-    (ceiling (* (font-units->pixels-y dpi-y font) (ttf:ascender loader)))))
+    (ceiling (* (font-pixels-y-from-units dpi-y font) (ttf:ascender loader)))))
 
 (defun font-descent-for-dpi (dpi-y font)
   (with-font (loader font)
-    (floor (* (font-units->pixels-y dpi-y font) (ttf:descender loader)))))
+    (floor (* (font-pixels-y-from-units dpi-y font) (ttf:descender loader)))))
 
 (defun font-ascent (drawable font)
   "Return ascent of FONT. DRAWABLE must be window, pixmap or screen."
@@ -132,7 +132,7 @@ VEC (VEC/AA).")
 (defun font-line-gap (drawable font)
   "Return line gap of FONT. DRAWABLE must be window, pixmap or screen."
   (with-font (loader font)
-    (ceiling (* (font-units->pixels-y drawable font) (ttf:line-gap loader)))))
+    (ceiling (* (font-pixels-y-from-units drawable font) (ttf:line-gap loader)))))
 
 ;;; baseline-to-baseline = ascent - descent + line gap
 (defun baseline-to-baseline (drawable font)
@@ -144,8 +144,8 @@ window, pixmap or screen. ascent - descent + line gap"
 (defun text-bounding-box-provider (dpi-x dpi-y font string)
   (with-font (loader font)
     (let* ((bbox (ttf:string-bounding-box string loader))
-           (units->pixels-x (font-units->pixels-x dpi-x font))
-           (units->pixels-y (font-units->pixels-y dpi-y font))
+           (pixels-x-from-units (pixels-x-from-font-units dpi-x font))
+           (pixels-y-from-units (font-pixels-y-from-units dpi-y font))
            (xmin (ttf:bbox-xmin bbox))
            (ymin (ttf:bbox-ymin bbox))
            (xmax (ttf:bbox-xmax bbox))
@@ -158,13 +158,13 @@ window, pixmap or screen. ascent - descent + line gap"
                                 (ttf:underline-position loader)
                                 (+ (ttf:underline-thickness loader))))))
       (vector (floor (* xmin
-                        units->pixels-x))
+                        pixels-x-from-units))
               (floor (* ymin
-                        units->pixels-y))
+                        pixels-y-from-units))
               (ceiling (* xmax
-                          units->pixels-x))
+                          pixels-x-from-units))
               (ceiling (* ymax
-                          units->pixels-y))))))
+                          pixels-y-from-units))))))
 
 (defun text-bounding-box (drawable font string &key start end)
   "Return text bounding box. DRAWABLE must be window, pixmap or screen. Text
@@ -196,7 +196,7 @@ in fixed-pitch fonts.")
 
 (defun text-line-bounding-box-provider (dpi-x dpi-y font string)
   (with-font (loader font)
-    (let* ((units->pixels-x (font-units->pixels-x dpi-x font))
+    (let* ((pixels-x-from-units (pixels-x-from-font-units dpi-x font))
            (xmin 0)
            (ymin (font-descent-for-dpi dpi-y font))
            (ymax (font-ascent-for-dpi dpi-y font))
@@ -211,10 +211,10 @@ in fixed-pitch fonts.")
             (incf xmax
               (+ (ttf:advance-width (ttf:find-glyph (elt string i) loader))
                  (ttf:kerning-offset (elt string (1- i)) (elt string i) loader)))))
-      (vector (floor (* xmin units->pixels-x))
+      (vector (floor (* xmin pixels-x-from-units))
               ymin
               (ceiling (* xmax
-                          units->pixels-x))
+                          pixels-x-from-units))
               ymax))))
 
 (defun text-line-bounding-box (drawable font string &key start end)
@@ -318,8 +318,8 @@ in fixed-pitch fonts.")
            (height (- max-y min-y)))
       (if (or (= 0 width) (= 0 height))
           (list nil 0 0 0 0)
-          (let* ((units->pixels-x (font-units->pixels-x dpi-x font))
-                 (units->pixels-y (font-units->pixels-y dpi-y font))
+          (let* ((pixels-x-from-units (pixels-x-from-font-units dpi-x font))
+                 (pixels-y-from-units (font-pixels-y-from-units dpi-y font))
                  (array (make-array (list height width)
                                     :initial-element 0
                                     :element-type '(unsigned-byte 8)))
@@ -327,24 +327,24 @@ in fixed-pitch fonts.")
                  (paths (paths/ttf:paths-from-string font-loader string
                                                      :offset (paths:make-point (- min-x)
                                                                                max-y)
-                                                     :scale-x units->pixels-x
-                                                     :scale-y (- units->pixels-y))))
+                                                     :scale-x pixels-x-from-units
+                                                     :scale-y (- pixels-y-from-units))))
 
             (when (font-underline font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* units->pixels-y (ttf:underline-position font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* pixels-y-from-units (ttf:underline-position font-loader)))
                      (underline-path (paths:make-rectangle-path 0 (+ max-y (- underline-offset))
                                                                 max-x (+ max-y (- underline-offset) thickness))))
                 (push underline-path paths)))
             (when (font-strikethrough font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* 2 units->pixels-y (ttf:underline-position font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* 2 pixels-y-from-units (ttf:underline-position font-loader)))
                      (line-path (paths:make-rectangle-path 0 (+ max-y underline-offset) max-x (+ max-y underline-offset thickness))))
                 (push line-path paths)))
             (when (font-overline font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* units->pixels-y (ttf:underline-position font-loader)))
-                     (ascend (* units->pixels-y (ttf:ascender font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* pixels-y-from-units (ttf:underline-position font-loader)))
+                     (ascend (* pixels-y-from-units (ttf:ascender font-loader)))
                      (overline-path (paths:make-rectangle-path 0 (- max-y ascend underline-offset)
                                                                max-x
                                                                (- max-y ascend underline-offset thickness))))
@@ -389,8 +389,8 @@ DRAWABLE must be window or pixmap."
            (height (- max-y min-y)))
       (if (or (= 0 width) (= 0 height))
           (list nil 0 0 0 0)
-          (let* ((units->pixels-x (font-units->pixels-x dpi-x font))
-                 (units->pixels-y (font-units->pixels-y dpi-y font))
+          (let* ((pixels-x-from-units (pixels-x-from-font-units dpi-x font))
+                 (pixels-y-from-units (font-pixels-y-from-units dpi-y font))
                  (array (make-array (list height width)
                                     :initial-element 0
                                     :element-type '(unsigned-byte 8)))
@@ -398,23 +398,23 @@ DRAWABLE must be window or pixmap."
                  (paths (paths/ttf:paths-from-string font-loader string
                                                      :offset (paths:make-point (- min-x)
                                                                                max-y)
-                                                     :scale-x units->pixels-x
-                                                     :scale-y (- units->pixels-y))))
+                                                     :scale-x pixels-x-from-units
+                                                     :scale-y (- pixels-y-from-units))))
             (when (font-underline font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* units->pixels-y (ttf:underline-position font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* pixels-y-from-units (ttf:underline-position font-loader)))
                      (underline-path (paths:make-rectangle-path 0 (+ max-y (- underline-offset))
                                                                 max-x (+ max-y (- underline-offset) thickness))))
                 (push underline-path paths)))
             (when (font-strikethrough font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* 2 units->pixels-y (ttf:underline-position font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* 2 pixels-y-from-units (ttf:underline-position font-loader)))
                      (line-path (paths:make-rectangle-path 0 (+ max-y underline-offset) max-x (+ max-y underline-offset thickness))))
                 (push line-path paths)))
             (when (font-overline font)
-              (let* ((thickness (* units->pixels-y (ttf:underline-thickness font-loader)))
-                     (underline-offset (* units->pixels-y (ttf:underline-position font-loader)))
-                     (ascend (* units->pixels-y (ttf:ascender font-loader)))
+              (let* ((thickness (* pixels-y-from-units (ttf:underline-thickness font-loader)))
+                     (underline-offset (* pixels-y-from-units (ttf:underline-position font-loader)))
+                     (ascend (* pixels-y-from-units (ttf:ascender font-loader)))
                      (overline-path (paths:make-rectangle-path 0 (- max-y ascend underline-offset)
                                                                max-x
                                                                (- max-y ascend underline-offset thickness))))
