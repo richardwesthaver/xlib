@@ -473,7 +473,7 @@
 		   (return (setq aborted nil)))))
 	;; If we get aborted out of this, deallocate all outstanding asynchronous
 	;; errors.
-	(when aborted 
+	(when aborted
 	  (with-event-queue-internal (display)
 	    (loop
 	      (let ((reply-buffer

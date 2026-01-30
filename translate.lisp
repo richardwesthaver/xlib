@@ -4,10 +4,10 @@
 (in-package :xlib)
 
 (setq *default-keysym-translate-mask*
-  (the (or (member :modifiers) mask16 (clx-list (or keysym state-mask-key)))
+  (the (or (member :modifiers) mask16 list)
        (logand #xff (lognot (make-state-mask :lock)))))
 
-(defun keysyms-from-character (character &optional display)
+(defun xkeysyms-from-character (character &optional display)
   ;; Given a character, return a list of all matching keysyms.
   ;; If DISPLAY is given, translations specific to DISPLAY are used,
   ;; otherwise only global translations are used.
@@ -15,16 +15,11 @@
   ;; May be slow [i.e. do a linear search over all known keysyms]
   (declare (type t character)
 	   (type (or null display) display))
-  (let ((result nil))
+  (let ((result (keysyms-from-character character)))
     (when display
       (dolist (mapping (display-keysym-translation display))
 	(when (eql character (second mapping))
 	  (push (first mapping) result))))
-    (maphash #'(lambda (keysym mappings)
-		 (dolist (mapping mappings)
-		   (when (eql (char-map-char mapping) character)
-		     (pushnew keysym result))))
-	     *keysym-character-table*)
     result))
 
 ;; Keysym mapping functions
@@ -36,8 +31,7 @@
 (defun keysym-from-keycode (display keycode keysym-index)
   (declare (type display display)
 	   (type card8 keycode)
-	   (type card8 keysym-index)
-	   (values keysym))
+	   (type card8 keysym-index))
   (let* ((mapping (display-keyboard-mapping display))
 	 (keysym (aref mapping keycode keysym-index)))
     (declare (type (simple-array keysym (* *)) mapping)

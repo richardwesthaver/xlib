@@ -593,9 +593,7 @@ gethostname(3) - is used instead."
   ;; Forces output, then causes a round-trip to ensure that all possible
   ;; errors and events have been received.
   (declare (type display display))
-  (with-buffer-request-and-reply (display +x-getinputfocus+ 16 :sizes (8 32))
-                                 ()
-    )
+  (with-buffer-request-and-reply (display +x-getinputfocus+ 16 :sizes (8 32)) ())
   ;; Report asynchronous errors here if the user wants us to.
   (report-asynchronous-errors display :after-finish-output))
 

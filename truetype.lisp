@@ -260,10 +260,6 @@ in fixed-pitch fonts.")
     (vector (elt bounding-box 3))))
 
 ;;; Font rendering 
-(defun clamp (value min max)
-  "Clamps the value 'value' into the range [min,max]."
-  (max min (min max value)))
-
 (defun make-state (font)
   "Wrapper around antialising and not antialiasing renderers."
   (if (font-antialias font)

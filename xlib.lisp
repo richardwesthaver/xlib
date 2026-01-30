@@ -166,7 +166,7 @@
 
 (deftype resource-id () 'card29)
 
-(deftype keysym () 'card32)
+(deftype xkeysym () 'card32)
 
 ; The following functions are provided by color objects:
 
@@ -652,8 +652,7 @@
   (backing-stores :never :type (member :never :when-mapped :always))
   (save-unders-p nil :type generalized-boolean)
   (event-mask-at-open 0 :type mask32)
-  (plist nil :type list)			; Extension hook
-  )
+  (plist nil :type list))			; Extension hook
 
 (defun print-screen (screen stream depth)
   (declare (type screen screen)
@@ -888,7 +887,7 @@
 
 (defun make-state-keys (state-mask)
   (declare (type mask16 state-mask))
-  (declare (values (clx-list state-mask-key)))
+  (declare (values list))
   (decode-mask +state-mask-vector+ state-mask))
 
 (defun encode-pointer-event-mask (pointer-event-mask)

@@ -26,7 +26,7 @@
     char-from-card8 change-active-pointer-grab change-keyboard-control
     change-keyboard-mapping change-pointer-control change-property
     card8-from-char char-ascent char-attributes char-descent
-    char-left-bearing char-right-bearing char-width keysyms-from-character
+    char-left-bearing char-right-bearing char-width xkeysyms-from-character
     character-in-map-p circulate-window-down circulate-window-up clear-area
     close-display with-default-display close-down-mode close-font closed-display color
     color-blue color-green color-p color-red color-rgb colormap

@@ -25,8 +25,6 @@
           shape-get-rectangles)
         :xlib)
 
-(allocate-extension-event-code :shape-notify)
-
 (define-extension "SHAPE"
     :events (:shape-notify))
 
@@ -40,6 +38,8 @@
                (card16 height)
                ((or null card32) time)  ;timestamp
                (boolean shaped-p))
+
+(allocate-extension-event-code :shape-notify)
 
 (defun encode-shape-kind (kind)
   (ecase kind
