@@ -15,9 +15,9 @@ This is a fork of CLX built for the Cursed Linux environment.
 | id          | 3818250095842153598                         |
 | root        | ~/comp/shed/xlib/                           |
 | tags        | x                                           |
-| updated     | Thu Jan 29 21:28:19 2026 -0500              |
+| updated     | Tue Feb 03 21:00:34 2026 -0500              |
 | langs       | lisp org                                    |
-| lines       | 30087 :code 24549 :comment 3096 :blank 2442 |
+| lines       | 29995 :code 24456 :comment 3098 :blank 2441 |
 |-------------+---------------------------------------------|
 
 #+CALL: hg-churn() :dir ~/comp/shed/xlib/
@@ -25,7 +25,8 @@ This is a fork of CLX built for the Cursed Linux environment.
 #+RESULTS:
 : 2025-11  37657 *************************************************************
 : 2025-12      9 
-: 2026-01  11847 *******************
+: 2026-01  11853 *******************
+: 2026-02    136 
 
 #+END:
 
