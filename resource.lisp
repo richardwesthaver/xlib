@@ -82,7 +82,6 @@
   ;; Compare two stringables.
   ;; Ignore case when comparing to a symbol.
   (declare (type stringable a b))
-  (declare (values generalized-boolean))
   (etypecase a
     (string
       (etypecase b
@@ -356,7 +355,6 @@
 	   (type (function (list t &rest t) t) function)
 	   (dynamic-extent function)
 	   (dynamic-extent args))
-  (declare (values nil))
   (labels ((map-resource-internal (database function args name)
 	     (declare (type resource-database database)
 		      (type (function (list t &rest t) t) function)
@@ -387,7 +385,6 @@
 
 (defun merge-resources (database with-database)
   (declare (type resource-database database with-database))
-  (declare (values resource-database))
   (map-resource
     database
     #'(lambda (name value database)
@@ -426,7 +423,6 @@
 	   (type (or null (function (string) t)) key)
 	   (type (or null (function (list t) generalized-boolean))
                  test test-not))
-  (declare (values resource-database))
   (resource-with-open-file (stream pathname)
     (loop
       (let ((string (read-line stream nil :eof)))
@@ -544,7 +540,6 @@
 	   (type (or null (function (string) t)) key)
 	   (type (or null (function (list t) generalized-boolean))
                  test test-not))
-  (declare (values resource-database))
   (let ((string (get-property window :RESOURCE_MANAGER :type :STRING
 			      :result-type 'string
 			      :transform #'xlib::char-from-card8)))

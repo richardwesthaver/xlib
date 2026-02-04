@@ -191,7 +191,6 @@
 
 (defun make-color (&key (red 1.0) (green 1.0) (blue 1.0) &allow-other-keys)
   (declare (type rgb-val red green blue))
-  (declare (values color))
   (make-color-internal red green blue))
 
 (defun color-rgb (color)
@@ -832,7 +831,6 @@
 (defun decode-mask (key-vector mask)
   (declare (type (simple-array keyword (*)) key-vector)
 	   (type mask32 mask))
-  (declare (values list))
   (do ((m mask (ash m -1))
        (bit 0 (1+ bit))
        (len (length key-vector))
@@ -853,13 +851,11 @@
   ;; This is only defined for core events.
   ;; Useful for constructing event-mask, pointer-event-mask, device-event-mask.
   (declare (type (clx-list event-mask-class) keys))
-  (declare (values mask32))
   (encode-mask +event-mask-vector+ keys 'event-mask-class))
 
 (defun make-event-keys (event-mask)
   ;; This is only defined for core events.
   (declare (type mask32 event-mask))
-  (declare (values (clx-list event-mask-class)))
   (decode-mask +event-mask-vector+ event-mask))
 
 (defun encode-device-event-mask (device-event-mask)
@@ -882,12 +878,10 @@
 (defun make-state-mask (&rest keys)
   ;; Useful for constructing modifier-mask, state-mask.
   (declare (type (clx-list state-mask-key) keys))
-  (declare (values mask16))
   (encode-mask +state-mask-vector+ keys 'state-mask-key))
 
 (defun make-state-keys (state-mask)
   (declare (type mask16 state-mask))
-  (declare (values list))
   (decode-mask +state-mask-vector+ state-mask))
 
 (defun encode-pointer-event-mask (pointer-event-mask)

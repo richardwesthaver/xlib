@@ -265,7 +265,6 @@
   (declare (type (or font gcontext) font)
 	   (type sequence sequence)
 	   (type array-index start end))
-  (declare (values integer))
   (let ((display (font-display font))
 	(length (index- end start))
 	(font-id (font-id font)))

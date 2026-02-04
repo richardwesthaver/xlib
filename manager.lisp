@@ -21,7 +21,6 @@
 
 (defun wm-name (window)
   (declare (window window))
-  (declare (values string))
   (get-property window :WM_NAME :type :STRING :result-type 'string :transform #'char-from-card8))
 
 (defsetf wm-name (window) (name)
@@ -36,7 +35,6 @@
 
 (defun wm-icon-name (window)
   (declare (type window window))
-  (declare (values string))
   (get-property window :WM_ICON_NAME :type :STRING
                                      :result-type 'string :transform #'char-from-card8))
 
@@ -45,7 +43,6 @@
 
 (defun wm-client-machine (window)
   (declare (type window window))
-  (declare (values string))
   (get-property window :WM_CLIENT_MACHINE :type :STRING
                                           :result-type 'string :transform #'char-from-card8))
 
@@ -84,7 +81,6 @@
   ;; Returns a list whose car is the command and
   ;; whose cdr is the list of arguments
   (declare (type window window))
-  (declare (values list))
   (do* ((command-string (get-property window :WM_COMMAND :type :STRING
                                                          :result-type '(vector card8)))
         (command nil)
@@ -134,7 +130,6 @@
 
 (defun wm-hints (window)
   (declare (type window window))
-  (declare (values wm-hints))
   (let ((prop (get-property window :WM_HINTS :type :WM_HINTS :result-type 'vector)))
     (when prop
       (decode-wm-hints prop (window-display window)))))
@@ -143,14 +138,12 @@
 (defun set-wm-hints (window wm-hints)
   (declare (type window window)
            (type wm-hints wm-hints))
-  (declare (values wm-hints))
   (change-property window :WM_HINTS (encode-wm-hints wm-hints) :WM_HINTS 32)
   wm-hints)
 
 (defun decode-wm-hints (vector display)
   (declare (type (simple-vector *) vector)
            (type display display))
-  (declare (values wm-hints))
   (let ((hint-mask (1- (ash 1 29)))
         (input-hint 0)
         (state-hint 1)
@@ -188,7 +181,6 @@
 
 (defun encode-wm-hints (wm-hints)
   (declare (type wm-hints wm-hints))
-  (declare (values simple-vector))
   (let ((input-hint         #b1)
         (state-hint         #b10)
         (icon-pixmap-hint   #b100)
@@ -257,21 +249,18 @@
 
 (defun wm-normal-hints (window)
   (declare (type window window))
-  (declare (values wm-size-hints))
   (decode-wm-size-hints (get-property window :WM_NORMAL_HINTS :type :WM_SIZE_HINTS :result-type 'vector)))
 
 (defsetf wm-normal-hints set-wm-normal-hints)
 (defun set-wm-normal-hints (window hints)
   (declare (type window window)
            (type wm-size-hints hints))
-  (declare (values wm-size-hints))
   (change-property window :WM_NORMAL_HINTS (encode-wm-size-hints hints) :WM_SIZE_HINTS 32)
   hints)
 
 ;;; OBSOLETE
 (defun wm-zoom-hints (window)
   (declare (type window window))
-  (declare (values wm-size-hints))
   (decode-wm-size-hints (get-property window :WM_ZOOM_HINTS :type :WM_SIZE_HINTS :result-type 'vector)))
 
 ;;; OBSOLETE
@@ -280,7 +269,6 @@
 (defun set-wm-zoom-hints (window hints)
   (declare (type window window)
            (type wm-size-hints hints))
-  (declare (values wm-size-hints))
   (change-property window :WM_ZOOM_HINTS (encode-wm-size-hints hints) :WM_SIZE_HINTS 32)
   hints)
 
@@ -402,7 +390,6 @@
 ;; Use the same intermediate structure as WM_SIZE_HINTS
 (defun icon-sizes (window)
   (declare (type window window))
-  (declare (values wm-size-hints))
   (let ((vector (get-property window :WM_ICON_SIZE :type :WM_ICON_SIZE :result-type 'vector)))
     (declare (type (or null (simple-vector 6)) vector))
     (when vector

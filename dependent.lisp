@@ -86,7 +86,6 @@ nil if a network socket should be opened."
 
 (defun int8-from-card8 (x)
   (declare (type card8 x))
-  (declare (values int8))
   #.(declare-buffun)
   (the int8 (if (logbitp 7 x)
                 (the int8 (- x #x100))
@@ -94,13 +93,11 @@ nil if a network socket should be opened."
 
 (defun card8-from-int8 (x)
   (declare (type int8 x))
-  (declare (values card8))
   #.(declare-buffun)
   (the card8 (ldb (byte 8 0) x)))
 
 (defun int16-from-card16 (x)
   (declare (type card16 x))
-  (declare (values int16))
   #.(declare-buffun)
   (the int16 (if (logbitp 15 x)
                  (the int16 (- x #x10000))
@@ -108,13 +105,11 @@ nil if a network socket should be opened."
 
 (defun card16-from-int16 (x)
   (declare (type int16 x))
-  (declare (values card16))
   #.(declare-buffun)
   (the card16 (ldb (byte 16 0) x)))
 
 (defun int32-from-card32 (x)
   (declare (type card32 x))
-  (declare (values int32))
   #.(declare-buffun)
   (the int32 (if (logbitp 31 x)
                  (the int32 (- x #x100000000))
@@ -122,7 +117,6 @@ nil if a network socket should be opened."
 
 (defun card32-from-int32 (x)
   (declare (type int32 x))
-  (declare (values card32))
   #.(declare-buffun)
   (the card32 (ldb (byte 32 0) x)))
 
@@ -131,7 +125,6 @@ nil if a network socket should be opened."
 (defun aref-card8 (a i)
   (declare (type buffer-bytes a)
            (type array-index i))
-  (declare (values card8))
   #.(declare-buffun)
   (the card8 (aref a i)))
 
@@ -145,7 +138,6 @@ nil if a network socket should be opened."
 (defun aref-int8 (a i)
   (declare (type buffer-bytes a)
            (type array-index i))
-  (declare (values int8))
   #.(declare-buffun)
   (int8-from-card8 (aref a i)))
 
@@ -160,7 +152,6 @@ nil if a network socket should be opened."
   (defun aref-card16 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (values card16))
     #.(declare-buffun)
     (the card16
          (logior (the card16
@@ -180,7 +171,6 @@ nil if a network socket should be opened."
   (defun aref-int16 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (values int16))
     #.(declare-buffun)
     (the int16
          (logior (the int16
@@ -200,7 +190,6 @@ nil if a network socket should be opened."
   (defun aref-card32 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (values card32))
     #.(declare-buffun)
     (the card32
          (logior (the card32
@@ -226,7 +215,6 @@ nil if a network socket should be opened."
   (defun aref-int32 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (values int32))
     #.(declare-buffun)
     (the int32
          (logior (the int32
@@ -252,7 +240,6 @@ nil if a network socket should be opened."
   (defun aref-card29 (a i)
     (declare (type buffer-bytes a)
              (type array-index i))
-    (declare (values card29))
     #.(declare-buffun)
     (the card29
          (logior (the card29
@@ -740,7 +727,6 @@ nil if a network socket should be opened."
   ;; and cdr is a list of network address bytes.
   (declare (type stringable host)
            (type (or null (member :internet :decnet :chaos) card8) family))
-  (declare (values list))
   (let ((hostent (get-host-by-name (string host))))
     (ecase family
       ((:internet nil 0)

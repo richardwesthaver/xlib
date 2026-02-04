@@ -53,7 +53,6 @@
 	   (type (or null (member :on :off)) save-under override-redirect)
 	   (type (or null (member :copy) colormap) colormap)
 	   (type (or null (member :none) cursor) cursor))
-  (declare (values window))
   (let* ((display (window-display parent))
 	 (window (or window (make-window :display display)))
 	 (wid (allocate-resource-id display window 'window))
@@ -200,7 +199,6 @@
 (defun intern-atom (display name)
   (declare (type display display)
 	   (type xatom name))
-  (declare (values resource-id))
   (let ((name (if (or (null name) (keywordp name))
 		  name
 		(kintern (string name)))))
@@ -248,7 +246,6 @@
 (defun atom-name (display atom-id)
   (declare (type display display)
 	   (type resource-id atom-id))
-  (declare (values keyword))
   (if (zerop atom-id)
       nil
   (or (id-atom atom-id display)
@@ -390,7 +387,6 @@
 (defun list-properties (window &key (result-type 'list))
   (declare (type window window)
 	   (type t result-type)) ;; a sequence type
-  (declare (values (clx-sequence keyword)))
   (let ((display (window-display window)))
     (multiple-value-bind (seq)
 	(with-buffer-request-and-reply (display +x-listproperties+ nil :sizes 16)
@@ -499,7 +495,6 @@
 	   (type (or null window) confine-to)
 	   (type (or null cursor) cursor)
 	   (type timestamp time))
-  (declare (values grab-status))
   (let ((display (window-display window)))
     (with-buffer-request-and-reply (display +x-grabpointer+ nil :sizes 8)
 	 (((data boolean) owner-p)
@@ -561,7 +556,6 @@
   (declare (type window window)
 	   (type generalized-boolean owner-p sync-pointer-p sync-keyboard-p)
 	   (type timestamp time))
-  (declare (values grab-status))
   (let ((display (window-display window)))
     (with-buffer-request-and-reply (display +x-grabkeyboard+ nil :sizes 8)
 	 (((data boolean) owner-p)
@@ -668,7 +662,6 @@
   (declare (type window window)
 	   (type timestamp start stop)
 	   (type t result-type)) ;; a type specifier
-  (declare (values (repeat-seq (integer x) (integer y) (timestamp time))))
   (let ((display (window-display window)))
     (with-buffer-request-and-reply (display +x-getmotionevents+ nil :sizes 32)
 	 ((window window)
@@ -762,7 +755,6 @@
 (defun query-keymap (display &optional bit-vector)
   (declare (type display display)
 	   (type (or null (bit-vector 256)) bit-vector))
-  (declare (values (bit-vector 256)))
   (with-buffer-request-and-reply (display +x-querykeymap+ 40 :sizes 8)
        ()
     (values
@@ -778,7 +770,6 @@
 	   (type card8 depth) ;; required
 	   (type card16 width height) ;; required
 	   (type drawable drawable)) ;; required
-  (declare (values pixmap))
   (let* ((display (drawable-display drawable))
 	 (pixmap (or pixmap (make-pixmap :display display)))
 	 (pid (allocate-resource-id display pixmap 'pixmap)))
@@ -839,7 +830,6 @@
   (declare (type (or visual-info resource-id) visual-info)
 	   (type window window)
 	   (type generalized-boolean alloc-p))
-  (declare (values colormap))
   (let ((display (window-display window)))
     (when (typep visual-info 'resource-id)
       (setf visual-info (visual-info display visual-info)))
@@ -862,7 +852,6 @@
 
 (defun copy-colormap-and-free (colormap)
   (declare (type colormap colormap))
-  (declare (values colormap))
   (let* ((display (colormap-display colormap))
 	 (new-colormap (make-colormap :display display
 				      :visual-info (colormap-visual-info colormap)))
@@ -886,7 +875,6 @@
 (defun installed-colormaps (window &key (result-type 'list))
   (declare (type window window)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence colormap)))
   (let ((display (window-display window)))
     (flet ((get-colormap (id)
 	     (lookup-colormap display id)))
@@ -936,7 +924,6 @@
 	   (type card16 colors planes)
 	   (type generalized-boolean contiguous-p)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence pixel) (clx-sequence mask)))
   (let ((display (colormap-display colormap)))
     (with-buffer-request-and-reply (display +x-alloccolorcells+ nil :sizes 16)
 	 (((data boolean) contiguous-p)
@@ -1032,7 +1019,6 @@
   (declare (type colormap colormap)
 	   (type sequence pixels) ;; sequence of integer
 	   (type t result-type))   ;; a type specifier
-  (declare (values (clx-sequence color)))
   (let ((display (colormap-display colormap)))
     (with-buffer-request-and-reply (display +x-querycolors+ nil :sizes (8 16))
 	 ((colormap colormap)
@@ -1076,7 +1062,6 @@
 	   (type (or null pixmap) mask)
 	   (type card16 x y) ;; required
 	   (type (or null color) foreground background)) ;; required
-  (declare (values cursor))
   (let* ((display (pixmap-display source))
 	 (cursor (make-cursor :display display))
 	 (cid (allocate-resource-id display cursor 'cursor)))
@@ -1106,7 +1091,6 @@
 	   (type (or null font) mask-font)
 	   (type (or null card16) mask-char)
 	   (type color foreground background)) ;; required
-  (declare (values cursor))
   (let* ((display (font-display source-font))
 	 (cursor (make-cursor :display display))
 	 (cid (allocate-resource-id display cursor 'cursor))
@@ -1203,7 +1187,6 @@
 (defun list-extensions (display &key (result-type 'list))
   (declare (type display display)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence string)))
   (with-buffer-request-and-reply (display +x-listextensions+ size :sizes 8)
        ()
     (values
@@ -1263,7 +1246,6 @@
 (defun pointer-mapping (display &key (result-type 'list))
   (declare (type display display)
 	   (type t result-type)) ;; CL type
-  (declare (values sequence)) ;; Sequence of card
   (with-buffer-request-and-reply (display +x-getpointermapping+ nil :sizes 8)
        ()
     (values
@@ -1423,7 +1405,6 @@
 
 (defun access-control (display)
   (declare (type display display))
-  (declare (values generalized-boolean)) ;; True when access-control is ENABLED
   (with-buffer-request-and-reply (display +x-listhosts+ 2 :sizes 8)
        ()
     (boolean-get 1)))
@@ -1441,7 +1422,6 @@
   ;; setf'able
   ;; Cached locally in display object.
   (declare (type display display))
-  (declare (values (member :destroy :retain-permanent :retain-temporary nil)))
   (display-close-down-mode display))
 
 (defun set-close-down-mode (display mode)

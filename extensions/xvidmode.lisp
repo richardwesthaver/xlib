@@ -225,8 +225,7 @@ return a mode-info structure fields with the server answer.
 If there are any server  private  values (currently  only
 applicable  to  the S3 server) the function will store it
 into the returned structure."
-  (declare (values mode-info)
-	   (type display display)
+  (declare (type display display)
 	   (type screen screen))
   (let ((major (xfree86-vidmode-query-version display))
 	(offset 8))

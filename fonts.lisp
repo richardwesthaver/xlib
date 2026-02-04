@@ -130,7 +130,6 @@
   ;; The protocol QueryFont request happens on-demand under the covers.
   (declare (type display display)
 	   (type stringable name))
-  (declare (values font))
   (let* ((name-string (string-downcase (string name)))
 	 (font (car (member name-string (display-font-cache display)
 			    :key 'font-name
@@ -154,7 +153,6 @@
 (defun open-font-internal (font)
   ;; Called "under the covers" to open a font object
   (declare (type font font))
-  (declare (values resource-id))
   (let* ((name-string (font-name font))
 	 (display (font-display font))
 	 (id (allocate-resource-id display font 'font)))
@@ -178,7 +176,6 @@
 (defun query-font (font)
   ;; Internal function called by font and char info accessors
   (declare (type font font))
-  (declare (values font-info))
   (let ((display (font-display font))
 	font-id
 	font-info
@@ -244,7 +241,6 @@
 	   (type string pattern)
 	   (type card16 max-fonts)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence string)))
   (let ((string (string pattern)))
     (with-buffer-request-and-reply (display +x-listfonts+ size :sizes (8 16))
 	 ((card16 max-fonts (length string))
@@ -264,7 +260,6 @@
 	   (type string pattern)
 	   (type card16 max-fonts)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence font)))
   (let ((string (string pattern))
 	(result nil))
     (with-buffer-request-and-reply (display +x-listfontswithinfo+ 60
@@ -317,7 +312,6 @@
 (defun font-path (display &key (result-type 'list))
   (declare (type display display)
 	   (type t result-type)) ;; CL type
-  (declare (values (clx-sequence (or string pathname))))
   (with-buffer-request-and-reply (display +x-getfontpath+ size :sizes (8 16))
        ()
     (values

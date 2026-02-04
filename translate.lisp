@@ -61,20 +61,19 @@
 		     (when (mapping-matches-p display state mapping)
 		       (return mapping)))
 		   ;; Find the matching static mapping
-		   (dolist (mapping (gethash keysym *keysym-character-table*))
+		   (when-let ((mapping (gethash keysym *keysym-character-table*)))
 		     (when (mapping-matches-p display state mapping)
-		       (return mapping))))))
+		       mapping)))))
     (when mapping
       ;; (or (keysym-mapping-translate mapping) 'default-keysym-translate)
       (funcall 'default-keysym-translate
-	       display state (car mapping)))))
+	       display state (char-map-char mapping)))))
 
 (defun mapping-matches-p (display state mapping)
   ;; Returns T when the modifiers and mask in MAPPING satisfies STATE for DISPLAY
   (declare (type display display)
 	   (type mask16 state)
 	   (type list mapping))
-  (declare (values generalized-boolean))
   (flet
       ((mask-from-modifiers (display-mapping modifiers errorp &aux (mask 0))
          ;; Convert MODIFIERS, which is a modifier mask, or a list of state-mask-keys into a mask.
@@ -141,7 +140,6 @@
 	   (type generalized-boolean uppercase-alphabetic-p)
 	   (type generalized-boolean shift-lock-xors));;; If T, both SHIFT-LOCK and SHIFT is the same
 	                                  ;;; as neither if the character is alphabetic.
-  (declare (values generalized-boolean))
   (macrolet ((keystate-p (state keyword)
 	       `(logbitp ,(position keyword +state-mask-vector+) ,state)))
     (let* ((controlp (or (keystate-p state :control)
@@ -231,7 +229,6 @@
   (declare (type display display)
 	   (type card16 state)
 	   (type keysym keysym))
-  (declare (values generalized-boolean))
   (let* ((mapping (get-display-modifier-mapping display))
 	 (mask (assoc keysym mapping)))
     (and mask (plusp (logand state (cdr mask))))))
@@ -255,7 +252,6 @@
   (declare (type display display)
 	   (type keysym keysym)
 	   (type (bit-vector 256) keymap))
-  (declare (values generalized-boolean))
   ;; The keysym may appear in the keymap more than once,
   ;; So we have to search the entire keysym map.
   (do* ((min (display-min-keycode display))
@@ -277,7 +273,6 @@
   (declare (type display display)
 	   (type character character)
 	   (type (bit-vector 256) keymap))
-  (declare (values generalized-boolean))
   ;; Check all one bits in keymap
   (do* ((min (display-min-keycode display))
 	(max (display-max-keycode display))

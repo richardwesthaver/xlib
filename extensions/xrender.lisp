@@ -1280,7 +1280,6 @@ by every function, which attempts to generate RENDER requests."
     (close-display dpy)))
 ||#
 
-
 ;;;; Cursors
 (defun render-create-cursor (picture &optional (x 0) (y 0))
   (let ((display (picture-display picture)))

@@ -1268,7 +1268,6 @@ that returns nil."
 (defun get-event-code (event)
   ;; Returns the event code given an event-key
   (declare (type event-key event))
-  (declare (values card8))
   (or (get event 'event-code)
       (x-type-error event 'event-key)))
 

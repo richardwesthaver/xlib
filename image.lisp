@@ -121,7 +121,6 @@
    (type generalized-boolean byte-lsb-first-p bit-lsb-first-p)
    (type (or null (member 8 16 32)) unit pad)
    (type (or null card8) left-pad))
-  (declare (values image))
   (let ((image
 	  (etypecase data
 	    (buffer-bytes			; image-x
@@ -2346,7 +2345,6 @@
 	   (type card16 x y)
 	   (type (or null card16) width height) ;; Default from image
 	   (type (or null (member image-x image-xy image-z)) result-type))
-  (declare (values image))
   (let* ((image-width (image-width image))
 	 (image-height (image-height image))
 	 (width (or width image-width))
@@ -2387,7 +2385,6 @@
 (defun read-bitmap-file (pathname)
   ;; Creates an image from a C include file in standard X11 format
   (declare (type (or pathname string stream) pathname))
-  (declare (values image))
   (with-open-file (fstream pathname :direction :input)
     (let ((line "")
 	  (properties nil)
@@ -2577,7 +2574,6 @@
   ;; If the first parameter is a list, its used as the image property-list.
   (declare (type (or list bit-vector) plist)
 	   (type list patterns)) ;; list of bitvector
-  (declare (values image))
   (unless (listp plist)
     (push plist patterns)
     (setq plist nil))
@@ -2605,7 +2601,6 @@
 	   (type (or null gcontext) gcontext)
 	   (type (or null card16) width height)
 	   (type (or null card8) depth))
-  (declare (values pixmap))
   (let* ((image-width (image-width image))
 	 (image-height (image-height image))
 	 (image-depth (image-depth image))

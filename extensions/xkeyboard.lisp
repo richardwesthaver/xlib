@@ -2866,7 +2866,6 @@
 (defstruct client-mapping
   (symmaps (make-array 0) :type vector))
 
-
 (defun construct-keytype-map-entry (entry preserve)
   (make-client-keytype-mapentry
    :preserve preserve

@@ -158,7 +158,7 @@
       		(declare (type fixnum num next))
       		(dotimes (i num (nreverse result-list))
       		  (push 
-      		   (loop :for i :from 1 :to (card32-get next)  
+      		   (loop :for i of-type fixnum :from 1 :to (card32-get next)  
       			 :for off := (+ next 4) :then (+ off 8)
       			 :collect (make-visinfo :visual-id (card32-get off)
       						:depth (card8-get (+ off 4))

@@ -149,7 +149,6 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 (defun resourcealloc (display)
   ;; Allocate a resource-id for use in DISPLAY
   (declare (type display display))
-  (declare (values resource-id))
   (loop for next-count upfrom (1+ (display-resource-id-count display))
         repeat (1+ (display-resource-id-mask display))
         as id = (dpb next-count
@@ -268,7 +267,6 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   (declare (type xatom atom)
 	   (type display display)
 	   (type resource-id id))
-  (declare (values resource-id))
   (let ((atom (if (or (null atom) (keywordp atom)) atom (kintern atom))))
     (setf (gethash id (display-atom-id-map display)) atom)
     (setf (gethash atom (display-atom-cache display)) id)
@@ -283,8 +281,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
 
 (defun visual-info (display visual-id)
   (declare (type display display)
-	   (type resource-id visual-id)
-	   (values visual-info))
+	   (type resource-id visual-id))
   (when (zerop visual-id)
     (return-from visual-info nil))
   (dolist (screen (display-roots display))
@@ -365,7 +362,6 @@ gethostname(3) - is used instead."
   ;; system dependent. The default protocol is system specific.  Authorization,
   ;; if any, is assumed to come from the environment somehow.
   (declare (type integer display))
-  (declare (values display))
   ;; Get the authorization mechanism from the environment. Handle the
   ;; special case of a host name of "" and "unix" which means the
   ;; protocol is :local
