@@ -71,12 +71,12 @@
     (symbol
       (if (keywordp (the symbol stringable))
 	  stringable
-	  (kintern (symbol-name (the symbol stringable)))))
+	  (keywordicate (symbol-name (the symbol stringable)))))
     (string
       (if *uppercase-resource-symbols*
 	  (setq stringable (string-upcase
 			    (the string stringable))))
-      (kintern (the string stringable)))))
+      (keywordicate (the string stringable)))))
 
 (defun stringable-equal (a b)
   ;; Compare two stringables.

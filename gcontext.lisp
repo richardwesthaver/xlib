@@ -903,7 +903,7 @@
   (let* ((gc-name (intern (concatenate 'string
                                        (string 'gcontext-)
                                        (string name)))) ;; in current package
-         (key-name (kintern name))
+         (key-name (keywordicate name))
          (setfer (xintern "Set-" gc-name))
          (internal-set-function (xintern "Internal-Set-" gc-name))
          (internal-copy-function (xintern "Internal-Copy-" gc-name))

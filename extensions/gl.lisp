@@ -10,39 +10,29 @@
                 "CONTEXT-DISPLAY"
                 "CONTEXT-TAG"
                 "CONTEXT-RBUF"
-                "CONTEXT-INDEX"
-                )
+                "CONTEXT-INDEX")
   (:import-from :xlib
                 "DATA"
                 "WITH-BUFFER-REQUEST"
                 "WITH-BUFFER-REQUEST-AND-REPLY"
                 "CARD32-GET"
                 "SEQUENCE-GET"
-
                 "WITH-DISPLAY"
                 "DISPLAY-FORCE-OUTPUT"
-
                 "INT8" "INT16" "INT32" "INTEGER"
                 "CARD8" "CARD16" "CARD32"
-
                 "ASET-CARD8"
                 "ASET-CARD16"
                 "ASET-CARD32"
                 "ASET-INT8"
                 "ASET-INT16"
                 "ASET-INT32"
-
                 "DECLARE-BUFFUN"
-
                 ;; Types
                 "ARRAY-INDEX"
-                "BUFFER-BYTES"
-                )
-
+                "BUFFER-BYTES")
   (:export "GET-STRING"
-
            ;; Rendering commands (alphabetical order)
-
            "ACCUM"
            "ACTIVE-TEXTURE-ARB"
            "ALPHA-FUNC"
@@ -224,10 +214,6 @@
            "VERTEX-4I"
            "VERTEX-4S"
            "VIEWPORT"
-
-           ;; * Where did this come from?
-           ;;"NO-FLOATS"
-
            ;; Non-rendering commands
            "NEW-LIST"
            "END-LIST"
@@ -236,16 +222,11 @@
            "DISABLE"
            "FLUSH"
            "FINISH"
-
            ;; Constants
-
            ;; Boolean
-
            "+FALSE+"
            "+TRUE+"
-
            ;; Types
-
            "+BYTE+"
            "+UNSIGNED-BYTE+"
            "+SHORT+"
@@ -257,9 +238,7 @@
            "+2-BYTES+"
            "+3-BYTES+"
            "+4-BYTES+"
-
            ;; Primitives
-
            "+POINTS+"
            "+LINES+"
            "+LINE-LOOP+"
@@ -270,9 +249,7 @@
            "+QUADS+"
            "+QUAD-STRIP+"
            "+POLYGON+"
-
            ;; Arrays
-
            "+VERTEX-ARRAY+"
            "+NORMAL-ARRAY+"
            "+COLOR-ARRAY+"
@@ -299,9 +276,7 @@
            "+INDEX-ARRAY-POINTER+"
            "+TEXTURE-COORD-ARRAY-POINTER+"
            "+EDGE-FLAG-ARRAY-POINTER+"
-
            ;; Array formats
-
            "+V2F+"
            "+V3F+"
            "+C4UB-V2F+"
@@ -316,23 +291,17 @@
            "+T2F-N3F-V3F+"
            "+T2F-C4F-N3F-V3F+"
            "+T4F-C4F-N3F-V4F+"
-
            ;; Matrices
-
            "+MATRIX-MODE+"
            "+MODELVIEW+"
            "+PROJECTION+"
            "+TEXTURE+"
-
            ;; Points
-
            "+POINT-SMOOTH+"
            "+POINT-SIZE+"
            "+POINT-SIZE-GRANULARITY+"
            "+POINT-SIZE-RANGE+"
-
            ;; Lines
-
            "+LINE-SMOOTH+"
            "+LINE-STIPPLE+"
            "+LINE-STIPPLE-PATTERN+"
@@ -340,9 +309,7 @@
            "+LINE-WIDTH+"
            "+LINE-WIDTH-GRANULARITY+"
            "+LINE-WIDTH-RANGE+"
-
            ;; Polygons
-
            "+POINT+"
            "+LINE+"
            "+FILL+"
@@ -362,17 +329,13 @@
            "+POLYGON-OFFSET-POINT+"
            "+POLYGON-OFFSET-LINE+"
            "+POLYGON-OFFSET-FILL+"
-
            ;; Display Lists
-
            "+COMPILE+"
            "+COMPILE-AND-EXECUTE+"
            "+LIST-BASE+"
            "+LIST-INDEX+"
            "+LIST-MODE+"
-
            ;; Depth Buffer
-
            "+NEVER+"
            "+LESS+"
            "+EQUAL+"
@@ -388,9 +351,7 @@
            "+DEPTH-RANGE+"
            "+DEPTH-WRITEMASK+"
            "+DEPTH-COMPONENT+"
-
            ;; Lighting
-
            "+LIGHTING+"
            "+LIGHT0+"
            "+LIGHT1+"
@@ -425,18 +386,14 @@
            "+COLOR-MATERIAL-FACE+"
            "+COLOR-MATERIAL-PARAMETER+"
            "+NORMALIZE+"
-
            ;; Clipping planes
-
            "+CLIP-PLANE0+"
            "+CLIP-PLANE1+"
            "+CLIP-PLANE2+"
            "+CLIP-PLANE3+"
            "+CLIP-PLANE4+"
            "+CLIP-PLANE5+"
-
            ;; Accumulation buffer
-
            "+ACCUM-RED-BITS+"
            "+ACCUM-GREEN-BITS+"
            "+ACCUM-BLUE-BITS+"
@@ -447,15 +404,11 @@
            "+LOAD+"
            "+MULT+"
            "+RETURN+"
-
            ;; Alpha Testing
-
            "+ALPHA-TEST+"
            "+ALPHA-TEST-REF+"
            "+ALPHA-TEST-FUNC+"
-
            ;; Blending
-
            "+BLEND+"
            "+BLEND-SRC+"
            "+BLEND-DST+"
@@ -474,15 +427,11 @@
            "+ONE-MINUS-CONSTANT-COLOR+"
            "+CONSTANT-ALPHA+"
            "+ONE-MINUS-CONSTANT-ALPHA+"
-
            ;; Render mode
-
            "+FEEDBACK+"
            "+RENDER+"
            "+SELECT+"
-
            ;; Feedback
-
            "+2D+"
            "+3D+"
            "+3D-COLOR+"
@@ -499,14 +448,10 @@
            "+FEEDBACK-BUFFER-POINTER+"
            "+FEEDBACK-BUFFER-SIZE+"
            "+FEEDBACK-BUFFER-TYPE+"
-
            ;; Selection
-
            "+SELECTION-BUFFER-POINTER+"
            "+SELECTION-BUFFER-SIZE+"
-
            ;; Fog
-
            "+FOG+"
            "+FOG-MODE+"
            "+FOG-DENSITY+"
@@ -517,9 +462,7 @@
            "+LINEAR+"
            "+EXP+"
            "+EXP2+"
-
            ;; Logic operations
-
            "+LOGIC-OP+"
            "+INDEX-LOGIC-OP+"
            "+COLOR-LOGIC-OP+"
@@ -540,9 +483,7 @@
            "+AND-INVERTED+"
            "+OR-REVERSE+"
            "+OR-INVERTED+"
-
            ;; Stencil
-
            "+STENCIL-TEST+"
            "+STENCIL-WRITEMASK+"
            "+STENCIL-BITS+"
@@ -558,9 +499,7 @@
            "+REPLACE+"
            "+INCR+"
            "+DECR+"
-
            ;; Buffers, Pixel Drawing/Reading
-
            "+NONE+"
            "+LEFT+"
            "+RIGHT+"
@@ -597,9 +536,7 @@
            "+DITHER+"
            "+RGB+"
            "+RGBA+"
-
            ;; Implementation Limits
-
            "+MAX-LIST-NESTING+"
            "+MAX-ATTRIB-STACK-DEPTH+"
            "+MAX-MODELVIEW-STACK-DEPTH+"
@@ -613,9 +550,7 @@
            "+MAX-PIXEL-MAP-TABLE+"
            "+MAX-VIEWPORT-DIMS+"
            "+MAX-CLIENT-ATTRIB-STACK-DEPTH+"
-
            ;; Gets
-
            "+ATTRIB-STACK-DEPTH+"
            "+CLIENT-ATTRIB-STACK-DEPTH+"
            "+COLOR-CLEAR-VALUE+"
@@ -643,9 +578,7 @@
            "+TEXTURE-MATRIX+"
            "+TEXTURE-STACK-DEPTH+"
            "+VIEWPORT+"
-
            ;; GL Evaluators
-
            "+AUTO-NORMAL+"
            "+MAP1-COLOR-4+"
            "+MAP1-GRID-DOMAIN+"
@@ -672,9 +605,7 @@
            "+COEFF+"
            "+DOMAIN+"
            "+ORDER+"
-
            ;; Hints
-
            "+FOG-HINT+"
            "+LINE-SMOOTH-HINT+"
            "+PERSPECTIVE-CORRECTION-HINT+"
@@ -683,14 +614,10 @@
            "+DONT-CARE+"
            "+FASTEST+"
            "+NICEST+"
-
            ;; Scissor box
-
            "+SCISSOR-TEST+"
            "+SCISSOR-BOX+"
-
            ;; Pixel Mode / Transfer
-
            "+MAP-COLOR+"
            "+MAP-STENCIL+"
            "+INDEX-SHIFT+"
@@ -739,9 +666,7 @@
            "+UNPACK-SWAP-BYTES+"
            "+ZOOM-X+"
            "+ZOOM-Y+"
-
            ;; Texture Mapping
-
            "+TEXTURE-ENV+"
            "+TEXTURE-ENV-MODE+"
            "+TEXTURE-1D+"
@@ -785,9 +710,7 @@
            "+Q+"
            "+TEXTURE-GEN-R+"
            "+TEXTURE-GEN-Q+"
-
            ;; GL 1.1 Texturing
-
            "+PROXY-TEXTURE-1D+"
            "+PROXY-TEXTURE-2D+"
            "+TEXTURE-PRIORITY+"
@@ -805,7 +728,6 @@
            "+TEXTURE-WRAP-R+"
            "+MAX-3D-TEXTURE-SIZE+"
            "+TEXTURE-BINDING-3D+"
-
            ;; Internal texture formats (GL 1.1)
            "+ALPHA4+"
            "+ALPHA8+"
@@ -840,16 +762,12 @@
            "+rgb10-a2+"
            "+RGBA12+"
            "+RGBA16+"
-
            ;; Utility
-
            "+VENDOR+"
            "+RENDERER+"
            "+VERSION+"
            "+EXTENSIONS+"
-
            ;; Errors
-
            "+NO-ERROR+"
            "+INVALID-VALUE+"
            "+INVALID-ENUM+"
@@ -857,9 +775,7 @@
            "+STACK-OVERFLOW+"
            "+STACK-UNDERFLOW+"
            "+OUT-OF-MEMORY+"
-
            ;; OpenGL 1.2
-
            "+RESCALE-NORMAL+"
            "+CLAMP-TO-EDGE+"
            "+MAX-ELEMENTS-VERTICES+"
@@ -891,7 +807,6 @@
            "+SMOOTH-LINE-WIDTH-GRANULARITY+"
            "+ALIASED-POINT-SIZE-RANGE+"
            "+ALIASED-LINE-WIDTH-RANGE+"
-
            ;; OpenGL 1.2 Imaging subset
            ;; GL_EXT_color_table
            "+COLOR-TABLE+"
@@ -968,9 +883,7 @@
            "+FUNC-ADD+"
            "+FUNC-SUBTRACT+"
            "+FUNC-REVERSE-SUBTRACT+"
-
            ;; glPush/PopAttrib bits
-
            "+CURRENT-BIT+"
            "+POINT-BIT+"
            "+LINE-BIT+"
@@ -995,9 +908,7 @@
            "+CLIENT-PIXEL-STORE-BIT+"
            "+CLIENT-VERTEX-ARRAY-BIT+"
            "+CLIENT-ALL-ATTRIB-BITS+"
-
            ;; ARB Multitexturing extension
-
            "+ARB-MULTITEXTURE+"
            "+TEXTURE0-ARB+"
            "+TEXTURE1-ARB+"
@@ -1034,9 +945,7 @@
            "+ACTIVE-TEXTURE-ARB+"
            "+CLIENT-ACTIVE-TEXTURE-ARB+"
            "+MAX-TEXTURE-UNITS-ARB+"
-
-;;; Misc extensions
-
+           ;; Misc extensions
            "+EXT-ABGR+"
            "+ABGR-EXT+"
            "+EXT-BLEND-COLOR+"
@@ -1151,10 +1060,7 @@
            "+REFLECTION-MAP-NV+"
            "+EXT-TEXTURE-ENV-ADD+"
            "+MESA-WINDOW-POS+"
-           "+MESA-RESIZE-BUFFERS+"
-           
-           ))
-
+           "+MESA-RESIZE-BUFFERS+"))
 
 (in-package #:xlib/gl)
 

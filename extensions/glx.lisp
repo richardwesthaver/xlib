@@ -20,11 +20,9 @@
    "SEQUENCE-GET"
    "SEQUENCE-PUT"
    "DATA"
-
    ;; Types
    "ARRAY-INDEX"
    "BUFFER-BYTES"
-
    "WITH-DISPLAY"
    "BUFFER-FLUSH"
    "BUFFER-WRITE"
@@ -36,7 +34,6 @@
    "+VENDOR+"
    "+VERSION+"
    "+EXTENSIONS+"
-
    ;; Conditions
    "BAD-CONTEXT"
    "BAD-CONTEXT-STATE"
@@ -51,7 +48,6 @@
    "BAD-PBUFFER"
    "BAD-CURRENT-DRAWABLE"
    "BAD-WINDOW"
-
    ;; Requests
    "QUERY-VERSION"
    "QUERY-SERVER-STRING"
@@ -507,7 +503,6 @@ Example: '(:glx-rgba (:glx-alpha-size 4) :glx-double-buffer (:glx-class 4 =)."
                          when (visual-matches-p visual attributes)
                          collect visual))
            (result (first candidates)))
-      
       (dolist (candidate (rest candidates))
         ;; Visuals with glx-class 3 (pseudo-color) and 4 (true-color)
         ;; are preferred over glx-class 2 (static-color) and 5 (direct-color).

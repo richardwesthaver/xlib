@@ -53,10 +53,6 @@
           render-create-glyph-set
           render-reference-glyph-set
           render-free-glyph-set
-
-          render-add-glyph
-          render-add-glyph-from-picture
-          render-free-glyph
           render-fill-rectangle
 
           picture-format-display

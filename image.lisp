@@ -2398,7 +2398,7 @@
 	(setq line (read-line fstream))
 	(unless (char= (aref line 0) #\#) (return))
 	(flet ((read-keyword (line start end)
-		 (kintern
+		 (keywordicate
 		  (substitute
 		   #\- #\_
 		   (string-upcase

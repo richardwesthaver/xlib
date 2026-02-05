@@ -89,7 +89,7 @@
   ;; To define error handlers, use declare-error and define-condition.
   (declare (type stringable name)
 	   (type list events errors))
-  (let ((name-symbol (kintern name)) ;; Intern name in the keyword package
+  (let ((name-symbol (keywordicate name)) ;; Intern name in the keyword package
 	(event-list (mapcar #'canonicalize-event-name events)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (setq *extensions* (cons (list ',name-symbol ',event-list ',errors)
@@ -99,7 +99,7 @@
   (defun canonicalize-event-name (event)
     ;; Returns the event name keyword given an event name stringable
     (declare (type stringable event))
-    (kintern event)))
+    (keywordicate event)))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun extension-event-key-p (key)
@@ -164,7 +164,7 @@
   ;; This is a macro to enable NAME to be interned for fast run-time
   ;; retrieval. 
   ;; Note: The case of NAME is important.
-  (let ((name-symbol (kintern name))) ;; Intern name in the keyword package
+  (let ((name-symbol (keywordicate name))) ;; Intern name in the keyword package
     `(or (second (assoc ',name-symbol (display-extension-alist ,display)))
 	 (x-error 'absent-extension :name ',name-symbol :display ,display))))
 
@@ -697,7 +697,7 @@
 	 #'(lambda (type index item args)
 	     (flet ((event-get (type index item args)
 		      (unless (member type '(pad8 pad16))
-			`(,(kintern item)
+			`(,(keywordicate item)
 			  (,(getify type) ,index ,@args)))))
 	       (if (atom item)
 		   (event-get type index item args)
@@ -714,7 +714,7 @@
 		     (progn
 		       (push item keywords)
 		       `((,(putify type) ,index ,item ,@args)))
-		     (let ((names (mapcar #'(lambda (name) (kintern name))
+		     (let ((names (mapcar #'(lambda (name) (keywordicate name))
 					  item)))
 		       (setq keywords (append item keywords))
 		       `((,(putify type) ,index
@@ -1339,7 +1339,7 @@ that returns nil."
   ;; Execute BODY with the variables in VALUE-LIST bound to components of the
   ;; EVENT-KEYS events.
   (unless (consp event-keys) (setq event-keys (list event-keys)))
-  (flet ((var-key (var) (kintern (if (consp var) (first var) var)))
+  (flet ((var-key (var) (keywordicate (if (consp var) (first var) var)))
 	 (var-symbol (var) (if (consp var) (second var) var)))
     ;; VARS is an alist of:
     ;;  (component-key ((event-key event-key ...) . extraction-code)

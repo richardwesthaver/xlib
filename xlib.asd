@@ -32,7 +32,7 @@ Independent FOSS developers"
   :in-order-to ((test-op (test-op "xlib/tests")))
   :components
   ((:file "pkg")
-   (:file "depdefs")
+   (:file "prim")
    (:file "xlib")
    (:file "dependent")
    (:file "common")

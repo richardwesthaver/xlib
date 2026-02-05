@@ -5,7 +5,7 @@
  :require (:std :log)
  :components 
  ((:file "pkg")
-  (:file "depdefs")
+  (:file "prim")
   (:file "xlib")
   (:file "dependent")
   (:file "common")

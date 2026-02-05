@@ -201,7 +201,7 @@
 	   (type xatom name))
   (let ((name (if (or (null name) (keywordp name))
 		  name
-		(kintern (string name)))))
+		(keywordicate (string name)))))
     (declare (type symbol name))
     (or (atom-id name display)
 	(let ((string (symbol-name name)))
@@ -225,7 +225,7 @@
   (declare (values (or null resource-id)))
   (let ((name (if (or (null name) (keywordp name))
 		  name
-		(kintern (string name)))))
+		(keywordicate (string name)))))
     (declare (type symbol name))
     (or (atom-id name display)
 	(let ((string (symbol-name name)))
@@ -250,7 +250,7 @@
       nil
   (or (id-atom atom-id display)
       (let ((keyword
-	      (kintern
+	      (keywordicate
 		  (with-buffer-request-and-reply
 		       (display +x-getatomname+ nil :sizes (16))
 		     ((resource-id atom-id))

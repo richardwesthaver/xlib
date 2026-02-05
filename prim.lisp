@@ -1,4 +1,4 @@
-;;; depdefs.lisp --- Dependency Definitions
+;;; prim.lisp --- Primitive Definitions
 
 ;; This file contains some of the system dependent code for CLX
 
@@ -175,11 +175,6 @@
 (defun xintern (&rest parts)
   (intern (apply #'concatenate 'string (mapcar #'string parts)) *xlib-package*))
 
-(defparameter *keyword-package* (find-package :keyword))
-
-(defun kintern (name)
-  (intern (string name) *keyword-package*))
-
 ;;; Pseudo-class mechanism.
 (eval-when (:compile-toplevel :load-toplevel :execute)
   ;; FIXME: maybe we should reevaluate this?
@@ -193,8 +188,7 @@ used, since NIL is the empty list."))
 (defmacro def-clx-class ((name &rest options) &body slots)
   (if (or (not (listp *def-clx-class-use-defclass*))
 	  (member name *def-clx-class-use-defclass*))
-      (let ((clos-package (find-package :common-lisp))
-	    (constructor t)
+      (let ((constructor t)
 	    (constructor-args t)
 	    (include nil)
 	    (print-function nil)
@@ -213,20 +207,12 @@ used, since NIL is the empty list."))
 	     (setf copier (pop option)))
 	    (:predicate
 	     (setf predicate (pop option)))))
-	(flet ((cintern (&rest symbols)
-		 (intern (apply #'concatenate 'simple-string
-				(mapcar #'symbol-name symbols))
-			 *package*))
-	       (kintern (symbol)
-		 (intern (symbol-name symbol) (find-package :keyword)))
-	       (closintern (symbol)
-		 (intern (symbol-name symbol) clos-package)))
 	  (when (eq constructor t)
-	    (setf constructor (cintern 'make- name)))
+	    (setf constructor (symbolicate 'make- name)))
 	  (when (eq copier t)
-	    (setf copier (cintern 'copy- name)))
+	    (setf copier (symbolicate 'copy- name)))
 	  (when (eq predicate t)
-	    (setf predicate (cintern name '-p)))
+	    (setf predicate (symbolicate name '-p)))
 	  (when include
 	    (setf slots (append (get include 'def-clx-class) slots)))
 	  (let* ((n-slots (length slots))
@@ -244,46 +230,44 @@ used, since NIL is the empty list."))
 		 (setf (get ',name 'def-clx-class) ',slots))
 	       ;; From here down are the system-specific expansions:
 	       (within-definition (,name def-clx-class)
-		 (,(closintern 'defclass)
+		 (defclass
 		  ,name ,(and include `(,include))
 		  (,@(map 'list
 			  #'(lambda (slot-name slot-initform slot-type)
 			      `(,slot-name
 				:initform ,slot-initform :type ,slot-type
-				:accessor ,(cintern name '- slot-name)
+				:accessor ,(symbolicate name '- slot-name)
 				,@(when (and constructor
 					     (or (eq constructor-args t)
 						 (member slot-name
 							 constructor-args)))
-				    `(:initarg ,(kintern slot-name)))
+				    `(:initarg ,(keywordicate slot-name)))
 				))
 			  slot-names slot-initforms slot-types)))
 		 ,(when constructor
 		    (if (eq constructor-args t)
 			`(defun ,constructor (&rest args)
-			   (apply #',(closintern 'make-instance)
+			   (apply #'make-instance
 				  ',name args))
 			`(defun ,constructor ,constructor-args
-			   (,(closintern 'make-instance) ',name
+			   (make-instance ',name
 			    ,@(mapcan #'(lambda (slot-name)
 					  (and (member slot-name slot-names)
-					       `(,(kintern slot-name) ,slot-name)))
+					       `(,(keywordicate slot-name) ,slot-name)))
 				      constructor-args)))))
 		 ,(when predicate
 		    `(defun ,predicate (object)
 		       (typep object ',name)))
 		 ,(when copier
-		    `(,(closintern 'defmethod) ,copier ((.object. ,name))
-		      (,(closintern 'with-slots) ,slot-names .object.
-		       (,(closintern 'make-instance) ',name
+		    `(defmethod ,copier ((.object. ,name))
+		      (with-slots ,slot-names .object.
+		       (make-instance ',name
 			,@(mapcan #'(lambda (slot-name)
-				      `(,(kintern slot-name) ,slot-name))
+				      `(,(keywordicate slot-name) ,slot-name))
 				  slot-names)))))
 		 ,(when print-function
-		    `(,(closintern 'defmethod)
-		      ,(closintern 'print-object)
-		      ((object ,name) stream)
-		      (,print-function object stream 0))))))))
+		    `(defmethod print-object ((object ,name) stream)
+		       (,print-function object stream 0)))))))
       (flet ((assert-valid-option (option)
                (unless (typep option
                               '(cons (member :constructor :include

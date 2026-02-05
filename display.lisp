@@ -259,7 +259,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   (declare (type xatom atom)
 	   (type display display))
   (declare (values (or null resource-id)))
-  (gethash (if (or (null atom) (keywordp atom)) atom (kintern atom))
+  (gethash (if (or (null atom) (keywordp atom)) atom (keywordicate atom))
 	   (display-atom-cache display)))
 
 (defun set-atom-id (atom display id)
@@ -267,7 +267,7 @@ not prevent concurrent event processing; see WITH-EVENT-QUEUE."
   (declare (type xatom atom)
 	   (type display display)
 	   (type resource-id id))
-  (let ((atom (if (or (null atom) (keywordp atom)) atom (kintern atom))))
+  (let ((atom (if (or (null atom) (keywordp atom)) atom (keywordicate atom))))
     (setf (gethash id (display-atom-id-map display)) atom)
     (setf (gethash atom (display-atom-cache display)) id)
     id))
