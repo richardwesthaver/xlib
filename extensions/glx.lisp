@@ -117,42 +117,29 @@
 ;; FIXME:
 ;; - Are all the 32-bit values unsigned?  Do we care?
 ;; - These are not used much, yet.
-(progn
-  (deftype attribute-pair ())
-  (deftype bitfield () 'mask32)
-  (deftype bool32 () 'card32)           ; 1 for true and 0 for false 
-  (deftype enum () 'card32)
-  (deftype fbconfigid () 'card32)
-  ;; FIXME: How to define these two?
-  (deftype float32 () 'single-float)
-  (deftype float64 () 'double-float)
-  ;;(deftype glx-context () 'card32)
-  (deftype context-tag () 'card32)
-  ;;(deftype glx-drawable () 'card32)
-  (deftype glx-pixmap () 'card32)
-  (deftype glx-pbuffer () 'card32)
-  (deftype glx-render-command () #|TODO|#)
-  (deftype glx-window () 'card32)
-  #-(and)
-  (deftype visual-property ()
-    "An ordered list of 32-bit property values followed by unordered pairs of
-property types and property values."
-    ;; FIXME: maybe CLX-LIST or even just LIST?
-    'clx-sequence))
+(deftype attribute-pair ())
+(deftype bitfield () 'mask32)
+(deftype bool32 () 'card32)           ; 1 for true and 0 for false 
+(deftype enum () 'card32)
+(deftype fbconfigid () 'card32)
+;; FIXME: How to define these two?
+(deftype float32 () 'single-float)
+(deftype float64 () 'double-float)
+;;(deftype glx-context () 'card32)
+(deftype context-tag () 'card32)
+;;(deftype glx-drawable () 'card32)
+(deftype glx-pixmap () 'card32)
+(deftype glx-pbuffer () 'card32)
+(deftype glx-render-command () #|TODO|#)
+(deftype glx-window () 'card32)
+(deftype visual-property ()
+  "An ordered list of 32-bit property values followed by unordered pairs of
+property types and property values." 'list)
 
-
-;;; FIXME: DEFINE-ACCESSOR interns getter and setter in XLIB package
-;;; (using XINTERN). Therefore the accessors defined below can only
-;;; be accessed using double-colon, which is a bad style. Or these
-;;; forms must be taken to another file so the accessors exist before
-;;; we get to this file.
-
-#-(and)
 (define-accessor glx-context-tag (32)
   ((index) `(read-card32 ,index))
   ((index thing) `(write-card32 ,index ,thing)))
 
-#-(and)
 (define-accessor glx-enum (32)
   ((index) `(read-card32 ,index))
   ((index thing) `(write-card32 ,index ,thing)))
