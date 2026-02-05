@@ -52,9 +52,8 @@
 
 ;;; Data-type accessor functions
 
-;;   These functions translate between lisp data-types and the byte,
-;;   half-word or word that gets transmitted across the client/server
-;;   connection
+;; These functions translate between lisp data-types and the byte, half-word
+;; or word that gets transmitted across the client/server connection
 (defun index-increment (type)
   ;; Given a type, return its field width in bytes
   (let* ((name (if (consp type) (car type) type))
@@ -70,11 +69,9 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun getify (name)
-    (xintern name '-get))
-
+    (symbolicate name '-get))
   (defun putify (name &optional predicate-p)
-    (xintern name '-put (if predicate-p '-predicating "")))
-
+    (symbolicate name '-put (if predicate-p '-predicating "")))
   ;; Use &body so zmacs indents properly
   (defmacro define-accessor (name (width) &body get-put-macros)
     ;; The first body form defines the get macro
@@ -99,7 +96,7 @@
              (when predicating-put
                `((setf (get ',name 'predicating-put) t)
                  (defmacro ,(putify name t) ,(car predicating-put)
-                   ,@(cdr predicating-put))))))))) ;; End eval-when
+                   ,@(cdr predicating-put)))))))))
 
 (define-accessor card32 (32)
   ((index) `(read-card32 ,index))
