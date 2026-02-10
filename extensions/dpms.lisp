@@ -29,8 +29,10 @@
    "CARD8-GET"
    "CARD16-GET"
    "BOOLEAN-GET"
+   "DATA-PUT"
    "CARD8"
    "CARD16"
+   "CARD16-PUT"
    "DATA")
   (:export 
    "DPMS-GET-VERSION"

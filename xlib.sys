@@ -1,6 +1,6 @@
 ;;; ~/comp/shed/xlib/xlib.sys --- XLIB Sytem Definitions
 (defsys :xlib
- :description "An implementation of the X Window System protocol in Lisp."
+ "An implementation of the X Window System protocol in Lisp."
  :version "0.7.7"
  :require (:std :log)
  :components 
@@ -21,7 +21,6 @@
   (:file "text")
   (:file "attributes")
   (:file "translate")
-  (:file "keysyms")
   (:file "manager")
   (:file "image")
   (:file "resource")
@@ -46,8 +45,10 @@
     (:file "xembed"))))
  :provide
  ((:sys :xlib/truetype
-   :description "xlib/truetype is pure common lisp solution for antialiased TrueType font
+   #|
+   "xlib/truetype is pure common lisp solution for antialiased TrueType font
 rendering using XLIB and XRender extension."
+   |#
    :require
    (#:xlib 
     #:obj

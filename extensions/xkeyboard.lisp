@@ -13,7 +13,8 @@
 ;;; Code:
 (defpackage #:xlib/xkb
   (:use :cl :xlib)
-  (:import-from :xlib :boolean-get :card16-get
+  (:import-from :xlib :boolean-get :card16-get :boolean-put :window-put :pad8-put :pad16-put :data-put :card8-put
+                :int16-put :keyword-put :card16-put
    :define-accessor :with-buffer-request-and-reply :display :with-buffer-request 
    :card8 :pad8 :int16 :window 
    :write-card16 :write-card8 :with-buffer :holding-lock :without-aborts :with-buffer-request-internal
@@ -2502,18 +2503,18 @@
        (pad16 0))
     (make-device-state
      :device-id (card8-get 1)
-     :mods (xlib::keymask-get 8)
-     :base-mods (xlib::keymask-get 9)
-     :latched-mods (xlib::keymask-get 10)
-     :locked-mods (xlib::keymask-get 11)
-     :group (xlib::group-get 12)
-     :locked-group (xlib::group-get 13)
+     :mods (keymask-get 8)
+     :base-mods (keymask-get 9)
+     :latched-mods (keymask-get 10)
+     :locked-mods (keymask-get 11)
+     :group (group-get 12)
+     :locked-group (group-get 13)
      :base-group (int16-get 14)
      :latched-group (int16-get 16)
-     :compat-state (xlib::keymask-get 18)
-     :lookup-mods (xlib::keymask-get 19)
-     :compat-lookup-mods (xlib::keymask-get 20)
-     :ptr-btn-state (xlib::butmask-get 22))))
+     :compat-state (keymask-get 18)
+     :lookup-mods (keymask-get 19)
+     :compat-lookup-mods (keymask-get 20)
+     :ptr-btn-state (butmask-get 22))))
 
 (defun latch-lock-state (display &key (device +use-core-kbd+)
                                       affect-mod-locks
@@ -2620,42 +2621,42 @@
 
 (defmacro moddef-get (indexsym)
   `(prog1 (make-moddef
-           :mask (xlib::keymask-get ,indexsym)
-           :real-mods (xlib::keymask-get (index-incf ,indexsym 1))
-           :vmods (xlib::vmodmask-get (index-incf ,indexsym 1)))
+           :mask (keymask-get ,indexsym)
+           :real-mods (keymask-get (index-incf ,indexsym 1))
+           :vmods (vmodmask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 2)))
 
 (defmacro modmap-get (indexsym)
   `(prog1 (make-modmap
-           :keycode (xlib::keycode-get ,indexsym)
-           :mods (xlib::keymask-get (index-incf ,indexsym 1)))
+           :keycode (keycode-get ,indexsym)
+           :mods (keymask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 1)))
 
 (defmacro vmodmap-get (indexsym)
   `(prog1 (make-vmodmap
-           :keycode (xlib::keycode-get ,indexsym)
-           :vmods   (xlib::vmodmask-get (index-incf ,indexsym 2)))
+           :keycode (keycode-get ,indexsym)
+           :vmods   (vmodmask-get (index-incf ,indexsym 2)))
      (index-incf ,indexsym 2)))
 
 (defmacro behaviormap-get (indexsym)
   `(prog1 (make-behaviormap
-           :keycode (xlib::keycode-get ,indexsym)
-           :behavior (xlib::behavior-get (index-incf ,indexsym 1)))
+           :keycode (keycode-get ,indexsym)
+           :behavior (behavior-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 3)))
 
 (defmacro explicitmap-get (indexsym)
   `(prog1 (make-explicitmap
-           :keycode (xlib::keycode-get ,indexsym)
-           :explicit (xlib::explicit-get (index-incf ,indexsym 1)))
+           :keycode (keycode-get ,indexsym)
+           :explicit (explicit-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 1)))
 
 (defmacro keytype-mapentry-get (indexsym)
   `(prog1 (make-keytype-mapentry
            :active (boolean-get ,indexsym)
-           :mask (xlib::keymask-get (index-incf ,indexsym 1))
+           :mask (keymask-get (index-incf ,indexsym 1))
            :level (card8-get (index-incf ,indexsym 1))
-           :mods (xlib::keymask-get (index-incf ,indexsym 1))
-           :vmods (xlib::vmodmask-get (index-incf ,indexsym 1)))
+           :mods (keymask-get (index-incf ,indexsym 1))
+           :vmods (vmodmask-get (index-incf ,indexsym 1)))
      (index-incf ,indexsym 4)))
 
 (defmacro keytype-get (indexsym)
@@ -2663,9 +2664,9 @@
         (preserve-p-sym (gensym "preserve-p")))
     `(let (,n-map-entries-sym ,preserve-p-sym)
        (make-keytype
-        :mask (xlib::keymask-get ,indexsym)
-        :mods (xlib::keymask-get (index-incf ,indexsym 1))
-        :vmods (xlib::vmodmask-get (index-incf ,indexsym 1))
+        :mask (keymask-get ,indexsym)
+        :mods (keymask-get (index-incf ,indexsym 1))
+        :vmods (vmodmask-get (index-incf ,indexsym 1))
         :levels (card8-get (index-incf ,indexsym 2))
         :map-entries (setf ,n-map-entries-sym (card8-get (index-incf ,indexsym 1)))
         :preserve-p (setf ,preserve-p-sym (boolean-get (index-incf ,indexsym 1)))
@@ -2795,7 +2796,7 @@
                         :virtual-modifiers ,virtualModsSym
                         :real-modifiers-per-virtual-modifier
                         (loop for i from 0 upto 15 when (= (ldb (byte 1 i) ,virtualModsSym) 1)
-                              collect (prog1 (xlib::keymask-get ,indexsym)
+                              collect (prog1 (keymask-get ,indexsym)
                                         (index-incf ,indexsym 1)))))
         :explicits (when (contained-in-mask +EXPLICITCOMPONENTS+ ,mappartMaskSYm)
                      (prog1 (make-xkb-keymap-part

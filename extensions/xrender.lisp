@@ -49,12 +49,10 @@
 ;; Beginning to collect the external interface for documentation.
 (export '(render-create-picture
           render-free-picture
-
           render-create-glyph-set
           render-reference-glyph-set
           render-free-glyph-set
           render-fill-rectangle
-
           picture-format-display
           picture-format-id
           picture-format-type
@@ -64,7 +62,6 @@
           picture-format-blue-byte
           picture-format-alpha-byte
           picture-format-colormap
-
           ;; picture object
           picture-repeat
           picture-alpha-map
@@ -80,11 +77,9 @@
           picture-dither
           picture-component-alpha
           picture-drawable
-
           find-matching-picture-formats
           find-window-picture-format
           find-standard-picture-format
-
           render-free-picture
           render-free-glyph-set
           render-query-version
