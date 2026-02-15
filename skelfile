@@ -8,3 +8,8 @@
 :vc (:hg "https://vc.compiler.company/shed/xlib"
      (upstream (:git "https://github.com/sharplispers/clx"))
      (gh (:git "ssh://github.com/richardwesthaver/xlib")))
+:rules
+((clean ()
+  #$rm -f **.fasl
+  rm -f *.log *.fns *.fn *.aux *.cp *.ky *.log *.toc *.pg *.tp *.vr *.vrs
+  rm -rf .stash$#))
