@@ -168,13 +168,6 @@
 (defconstant +buffer-text16-size+ 256)
 (deftype buffer-text16 () `(simple-array (unsigned-byte 16) (,+buffer-text16-size+)))
 
-;; FIX 2025-06-24: 
-;; These are here because.
-(defparameter *xlib-package* (find-package :xlib))
-
-(defun xintern (&rest parts)
-  (intern (apply #'concatenate 'string (mapcar #'string parts)) *xlib-package*))
-
 ;;; Pseudo-class mechanism.
 (eval-when (:compile-toplevel :load-toplevel :execute)
   ;; FIXME: maybe we should reevaluate this?

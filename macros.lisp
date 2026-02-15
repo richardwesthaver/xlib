@@ -54,20 +54,19 @@
 
 ;; These functions translate between lisp data-types and the byte, half-word
 ;; or word that gets transmitted across the client/server connection
-(defun index-increment (type)
-  ;; Given a type, return its field width in bytes
-  (let* ((name (if (consp type) (car type) type))
-         (increment (get name 'byte-width :not-found)))
-    (when (eq increment :not-found)
-      ;; Check for TYPE in a different package
-      (when (not (eq (symbol-package name) *xlib-package*))
-        (setq name (xintern name))
-        (setq increment (get name 'byte-width :not-found)))
+(eval-always
+  (defun index-increment (type)
+    ;; Given a type, return its field width in bytes
+    (let* ((name (if (consp type) (car type) type))
+           (increment (get name 'byte-width :not-found)))
       (when (eq increment :not-found)
-        (error "~s isn't a known field accessor" name)))
-    increment))
-
-(eval-when (:compile-toplevel :load-toplevel :execute)
+        ;; Check for TYPE in a different package
+        (when (not (eq (symbol-package name) *xlib-package*))
+          (setq name (xintern name))
+          (setq increment (get name 'byte-width :not-found)))
+        (when (eq increment :not-found)
+          (error "~s isn't a known field accessor" name)))
+      increment))
   (defun getify (name)
     (symbolicate name '-get))
   (defun putify (name &optional predicate-p)
@@ -611,52 +610,53 @@
         `(let ((,var ,value))
            ,body))))
 
-(defun get-put-items (index type-args putp &optional body-function)
-  (declare (type (or null function) body-function)
-           (dynamic-extent body-function))
-  ;; Given a lists of the form (type item item ... item)
-  ;; Calls body-function with four arguments, a function name,
-  ;; index, item name, and optional arguments.
-  ;; The results are appended together and retured.
-  (unless body-function
-    (setq body-function
-          #'(lambda (type index item args)
-              `((check-put ,index ,item ,type ,@args)))))
-  (do* ((items type-args (cdr items))
-        (type (caar items) (caar items))
-        (args nil nil)
-        (result nil)
-        (sizes nil))
-       ((endp items) (values result index sizes))
-    (when (consp type)
-      (setq args (cdr type)
-            type (car type)))
-    (cond ((member type '(return buffer)))
-          ((eq type 'mask) ;; Hack to enable mask-get/put to return multiple values
-           (setq result
-                 (append result (if putp
-                                    (mask-put index (cdar items) body-function)
-                                    (mask-get index (cdar items) body-function)))
-                 index nil))
-          (t (do* ((item (cdar items) (cdr item))
-                   (increment (index-increment type)))
-                  ((endp item))
-               (when (constantp index)
-                 (case increment		;Round up index when needed
-                   (2 (setq index (wround index)))
-                   (4 (setq index (lround index)))))
-               (setq result
-                     (append result (funcall body-function type index (car item) args)))
-               (when (constantp index)
-                 ;; Variable length requests have null length increment.
-                 ;; Variable length requests set the request size
-                 ;; & maintain buffer pointers
-                 (if (null increment)
-                     (setq index nil)
-                     (progn
-                       (incf index increment)
-                       (when (and increment (zerop increment)) (setq increment 1))
-                       (pushnew (* increment 8) sizes)))))))))
+(eval-always 
+  (defun get-put-items (index type-args putp &optional body-function)
+    (declare (type (or null function) body-function)
+             (dynamic-extent body-function))
+    ;; Given a lists of the form (type item item ... item)
+    ;; Calls body-function with four arguments, a function name,
+    ;; index, item name, and optional arguments.
+    ;; The results are appended together and retured.
+    (unless body-function
+      (setq body-function
+            #'(lambda (type index item args)
+                `((check-put ,index ,item ,type ,@args)))))
+    (do* ((items type-args (cdr items))
+          (type (caar items) (caar items))
+          (args nil nil)
+          (result nil)
+          (sizes nil))
+         ((endp items) (values result index sizes))
+      (when (consp type)
+        (setq args (cdr type)
+              type (car type)))
+      (cond ((member type '(return buffer)))
+            ((eq type 'mask) ;; Hack to enable mask-get/put to return multiple values
+             (setq result
+                   (append result (if putp
+                                      (mask-put index (cdar items) body-function)
+                                      (mask-get index (cdar items) body-function)))
+                   index nil))
+            (t (do* ((item (cdar items) (cdr item))
+                     (increment (index-increment type)))
+                    ((endp item))
+                 (when (constantp index)
+                   (case increment		;Round up index when needed
+                     (2 (setq index (wround index)))
+                     (4 (setq index (lround index)))))
+                 (setq result
+                       (append result (funcall body-function type index (car item) args)))
+                 (when (constantp index)
+                   ;; Variable length requests have null length increment.
+                   ;; Variable length requests set the request size
+                   ;; & maintain buffer pointers
+                   (if (null increment)
+                       (setq index nil)
+                       (progn
+                         (incf index increment)
+                         (when (and increment (zerop increment)) (setq increment 1))
+                         (pushnew (* increment 8) sizes))))))))))
 
 (defmacro with-buffer-request-internal
     ((buffer opcode &key length sizes &allow-other-keys)

@@ -162,3 +162,10 @@
     wm-size-hints-width wm-size-hints-width-inc wm-size-hints-win-gravity
     wm-size-hints-x wm-size-hints-y wm-zoom-hints write-bitmap-file
     write-resources xatom))
+
+(in-package :xlib)
+
+(eval-always
+  (defparameter *xlib-package* (find-package :xlib))
+  (defun xintern (&rest parts)
+    (intern (apply #'concatenate 'string (mapcar #'string parts)) *xlib-package*)))
