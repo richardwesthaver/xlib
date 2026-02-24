@@ -40,6 +40,7 @@
     (:file "dbe")
     (:file "xc-misc")
     (:file "dri2")
+    (:file "dri3")
     (:file "composite")
     (:file "xkeyboard")
     (:file "xembed"))))

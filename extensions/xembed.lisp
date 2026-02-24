@@ -362,18 +362,19 @@ whith the value associated to KEY changed to VALUE"
 	(logior (window-event-mask window)
 		(make-event-mask :property-change))))
 
-(let ((x 0))
-  (flet ((some-value () (if (= x 1) (setf x 2) (setf x 1))))
-    (defun get-server-time (win)
-      (let ((dpy (window-display win)))
-	(display-finish-output dpy)
-	(change-property win :clx-xembed-timestamp `(,(some-value)) :clx-xembed-timestamp 32)
-	(event-cond (dpy :force-output-p t)
-	  (:property-notify
-	   (window atom time)
-	   (and (window-equal window win)
-		(eq :clx-xembed-timestamp atom))
-	   time))))))
+(eval-always
+  (let ((x 0))
+    (flet ((some-value () (if (= x 1) (setf x 2) (setf x 1))))
+      (defun get-server-time (win)
+        (let ((dpy (window-display win)))
+	  (display-finish-output dpy)
+	  (change-property win :clx-xembed-timestamp `(,(some-value)) :clx-xembed-timestamp 32)
+	  (event-cond (dpy :force-output-p t)
+	    (:property-notify
+	     (window atom time)
+	     (and (window-equal window win)
+		  (eq :clx-xembed-timestamp atom))
+	     time)))))))
 
 (defun update-timestamp (win &optional timestamp)
   (format t "TIMESTAMP: ~a > ~a = ~a ~%" timestamp *timestamp* (when (and *timestamp* timestamp) (> timestamp *timestamp*)))

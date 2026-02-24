@@ -10,8 +10,8 @@
 (defun dri3-opcode (display)
   (extension-opcode display "DRI3"))
 
-(defconstant +dri-major+ 1)
-(defconstant +dri-minor+ 4)
+(defconstant +dri3-major+ 1)
+(defconstant +dri3-minor+ 4)
 
 (defconstant +dri3-query-version+ 0)
 (defconstant +dri3-open+ 1)
