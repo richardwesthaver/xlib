@@ -20,10 +20,18 @@
                 #:data
                 #:card8
                 #:card8-get
+                #:card8-put
                 #:card16
+                #:card16-put
                 #:card16-get
                 #:card32
                 #:card32-get
+                #:card32-put
+                #:data-put
+                #:pad16-put
+                #:pad32-put
+                #:pad8-put
+                #:resource-id-put
                 #:extension-opcode
                 #:define-extension
                 #:gcontext

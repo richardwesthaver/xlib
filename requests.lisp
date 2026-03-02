@@ -243,29 +243,6 @@
 	      (setf (atom-id name display) id))
 	    id)))))
 
-(defun atom-name (display atom-id)
-  (declare (type display display)
-	   (type resource-id atom-id))
-  (if (zerop atom-id)
-      nil
-  (or (id-atom atom-id display)
-      (let ((keyword
-	      (keywordicate
-		  (with-buffer-request-and-reply
-		       (display +x-getatomname+ nil :sizes (16))
-		     ((resource-id atom-id))
-		  (values
-		    (string-get (card16-get 8) +replysize+))))))
-	(declare (type keyword keyword))
-	(setf (atom-id keyword display) atom-id)
-	  keyword))))
-
-;;; For binary compatibility with older code
-(defun lookup-xatom (display atom-id)
-  (declare (type display display)
-	   (type resource-id atom-id))
-  (atom-name display atom-id))
-
 (defun change-property (window property data type format
 		       &key (mode :replace) (start 0) end transform)
   ; Start and end affect sub-sequence extracted from data.
@@ -1169,20 +1146,6 @@
       (values
 	(card16-get 8)
 	(card16-get 10)))))
-
-(defun query-extension (display name)
-  (declare (type display display)
-	   (type stringable name))
-  (let ((string (string name)))
-    (with-buffer-request-and-reply (display +x-queryextension+ 12 :sizes 8)
-	 ((card16 (length string))
-	  (pad16 nil)
-	  (string string))
-      (and (boolean-get 8)    ;; If present
-	   (values
-	     (card8-get 9)
-	     (card8-get 10)
-	     (card8-get 11))))))
 
 (defun list-extensions (display &key (result-type 'list))
   (declare (type display display)

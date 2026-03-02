@@ -26,7 +26,8 @@
 		"CARD8" "CARD8-GET"
 		"CARD16" "CARD16-GET"
 		"CARD32" "CARD32-GET"
-		"INT16" "INT16-GET")
+		"INT16" "INT16-GET"
+                "DATA-PUT" "CARD8-PUT")
   (:export "SCREEN-INFO"
            "SCREEN-INFO-NUMBER"
            "SCREEN-INFO-X"

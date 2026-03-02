@@ -24,6 +24,37 @@
 ;; 12/10/87	LGO	Created
 (in-package :xlib)
 
+(defun atom-name (display atom-id)
+  (declare (type display display)
+           (type resource-id atom-id))
+  (if (zerop atom-id)
+      nil
+      (or (id-atom atom-id display)
+          (let ((keyword
+                  (keywordicate
+                   (with-buffer-request-and-reply
+                       (display +x-getatomname+ nil :sizes (16))
+                       ((resource-id atom-id))
+                     (values
+                      (string-get (card16-get 8) +replysize+))))))
+            (declare (type keyword keyword))
+            (setf (atom-id keyword display) atom-id)
+            keyword))))
+
+(defun query-extension (display name)
+  (declare (type display display)
+           (type stringable name))
+  (let ((string (string name)))
+    (with-buffer-request-and-reply (display +x-queryextension+ 12 :sizes 8)
+         ((card16 (length string))
+          (pad16 nil)
+          (string string))
+      (and (boolean-get 8)    ;; If present
+           (values
+             (card8-get 9)
+             (card8-get 10)
+             (card8-get 11))))))
+
 ;; Event Resource
 (defvar *event-free-list* nil) ;; List of unused (processed) events
 
@@ -146,6 +177,12 @@
 	  (x-cerror "Ignore the event"
 		    'unimplemented-event :event-code code :display display))
         code)))
+
+(defun get-event-code (event)
+  ;; Returns the event code given an event-key
+  (declare (type event-key event))
+  (or (get event 'event-code)
+      (x-type-error event 'event-key)))
 
 (defun get-external-event-code (display event)
   ;; Given an X11 event name, return the event-code
@@ -1264,12 +1301,6 @@ that returns nil."
        (declare (type display ,disp))
        (event-loop (,disp ,event ,timeout ,force-output-p ,discard-p)
 	 (event-dispatch (,disp ,event ,peek) ,@clauses)))))
-
-(defun get-event-code (event)
-  ;; Returns the event code given an event-key
-  (declare (type event-key event))
-  (or (get event 'event-code)
-      (x-type-error event 'event-key)))
 
 (defun universal-event-get-macro (display event-key variable)
   (getf
