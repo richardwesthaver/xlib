@@ -114,7 +114,7 @@
                    :string 8)
   command)
 
-;; WM_HINTS
+;;; WM_HINTS
 (def-clx-class (wm-hints)
   (input nil :type (or null (member :off :on)))
   (initial-state nil :type (or null (member :dont-care :normal :zoom :iconic :inactive)))
@@ -220,7 +220,7 @@
       (setf (aref vector 0) (logior flags (logandc2 (wm-hints-flags wm-hints) mask)))
       vector)))
 
-;; WM_SIZE_HINTS
+;;; WM_SIZE_HINTS
 (def-clx-class (wm-size-hints)
   (user-specified-position-p nil :type generalized-boolean) ;; True when user specified x y
   (user-specified-size-p nil :type generalized-boolean)     ;; True when user specified width height
@@ -258,14 +258,14 @@
   (change-property window :WM_NORMAL_HINTS (encode-wm-size-hints hints) :WM_SIZE_HINTS 32)
   hints)
 
-;;; OBSOLETE
+;; OBSOLETE
 (defun wm-zoom-hints (window)
   (declare (type window window))
   (decode-wm-size-hints (get-property window :WM_ZOOM_HINTS :type :WM_SIZE_HINTS :result-type 'vector)))
 
-;;; OBSOLETE
+;; OBSOLETE
 (defsetf wm-zoom-hints set-wm-zoom-hints)
-;;; OBSOLETE
+;; OBSOLETE
 (defun set-wm-zoom-hints (window hints)
   (declare (type window window)
            (type wm-size-hints hints))
@@ -385,7 +385,7 @@
     (setf (aref vector 0) flags)
     vector))
 
-;; Icon_Size
+;;; Icon_Size
 
 ;; Use the same intermediate structure as WM_SIZE_HINTS
 (defun icon-sizes (window)
@@ -414,7 +414,7 @@
     (change-property window :WM_ICON_SIZE vector :WM_ICON_SIZE 32)
     wm-size-hints))
 
-;; WM-Protocols
+;;; WM-Protocols
 (defun wm-protocols (window)
   (map 'list #'(lambda (id) (atom-name (window-display window) id))
        (get-property window :WM_PROTOCOLS :type :ATOM)))
@@ -427,7 +427,7 @@
                    :ATOM 32)
   protocols)
 
-;; WM-Colormap-windows
+;;; WM-Colormap-windows
 (defun wm-colormap-windows (window)
   (values (get-property window :WM_COLORMAP_WINDOWS :type :WINDOW
                                                     :transform #'(lambda (id)
@@ -439,7 +439,7 @@
                           :transform #'window-id)
   colormap-windows)
 
-;; Transient-For
+;;; Transient-For
 (defun transient-for (window)
   (let ((prop (get-property window :WM_TRANSIENT_FOR :type :WINDOW :result-type 'list)))
     (and prop (lookup-window (window-display window) (car prop)))))
@@ -450,7 +450,7 @@
   (change-property window :WM_TRANSIENT_FOR (list (window-id transient)) :WINDOW 32)
   transient)
 
-;; Set-WM-Properties
+;;; Set-WM-Properties
 (defun set-wm-properties (window &rest options &key
                                                name icon-name resource-name resource-class command
                                                client-machine hints normal-hints zoom-hints
@@ -553,12 +553,12 @@
   (when zoom-hints (setf (wm-zoom-hints window) zoom-hints))
   )
 
-;;; OBSOLETE
+;; OBSOLETE
 (defun set-standard-properties (window &rest options)
   (declare (dynamic-extent options))
   (apply #'set-wm-properties window options))
 
-;; WM Control
+;;; WM Control
 (defun iconify-window (window screen)
   (declare (type window window)
            (type screen screen))
@@ -576,7 +576,7 @@
     (send-event root :unmap-notify '(:substructure-redirect :substructure-notify)
                      :window window :event-window root :configure-p nil)))
 
-;; Colormaps
+;;; Colormaps
 (def-clx-class (standard-colormap (:copier nil) (:predicate nil))
   (colormap nil :type (or null colormap))
   (base-pixel 0 :type pixel)
@@ -653,7 +653,7 @@
                 (font (font-id kill))))))
     (change-property window property prop :RGB_COLOR_MAP 32)))
 
-;;; OBSOLETE
+;; OBSOLETE
 (defun get-standard-colormap (window property)
   (declare (type window window)
            (type (member :RGB_DEFAULT_MAP :RGB_BEST_MAP :RGB_RED_MAP
@@ -671,7 +671,7 @@
                           :green (rgb-val-from-card16 (aref prop 4))
                           :blue  (rgb-val-from-card16 (aref prop 6)))))))
 
-;;; OBSOLETE
+;; OBSOLETE
 (defun set-standard-colormap (window property colormap base-pixel max-color mult-color)
   (declare (type window window)
            (type (member :RGB_DEFAULT_MAP :RGB_BEST_MAP :RGB_RED_MAP
@@ -690,7 +690,7 @@
                       base-pixel)))
     (change-property window property prop :RGB_COLOR_MAP 32)))
 
-;; Cut-Buffers
+;;; Cut-Buffers
 (defun cut-buffer (display &key (buffer 0) (type :STRING) (result-type 'string)
                                 (transform #'char-from-card8) (start 0) end)
   ;; Return the contents of cut-buffer BUFFER

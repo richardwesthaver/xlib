@@ -17,11 +17,15 @@
 ;; Texas Instruments Incorporated provides this software "as is" without
 ;; express or implied warranty.
 
+;;; Commentary:
+
 ;; Change history:
 ;;
 ;;  Date	Author	Description
 ;; -------------------------------------------------------------------------------------
 ;; 12/10/87	LGO	Created
+
+;;; Code:
 (in-package :xlib)
 
 (defun atom-name (display atom-id)

@@ -15,6 +15,8 @@
 
 ;; Texas Instruments Incorporated provides this software "as is" without
 ;; express or implied warranty.
+
+;;; Code:
 (in-package :xlib)
 
 (defmacro with-image-data-buffer ((buffer size) &body body)

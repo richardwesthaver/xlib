@@ -1,15 +1,30 @@
 ;;; xlib @ 2025-06-27.22:43:51 -*- mode:skel; -*-
-:name "xlib"
-:author ("Richard Westhaver" . "ellis@rwest.io")
-:description "A fork of CLX maintained by Sharplispers"
+:name xlib
+:author ("Richard Westhaver" . "ellis@compiler.company")
+:description "A fork of CLX formerly maintained by [[gh:sharplispers][sharplispers]]"
 :license #p"LICENSE"
 :tags ("x")
 :version "1.0.0"
 :vc (:hg "https://vc.compiler.company/shed/xlib"
-     (upstream (:git "https://github.com/sharplispers/clx"))
      (gh (:git "ssh://github.com/richardwesthaver/xlib")))
 :rules
 ((clean ()
   #$rm -f **.fasl
   rm -f *.log *.fns *.fn *.aux *.cp *.ky *.log *.toc *.pg *.tp *.vr *.vrs
-  rm -rf .stash$#))
+  rm -rf .stash$#)
+ (docs ()
+  (:build ()
+   (load-sys "../vec/vec.sys")
+   (load-system :vec)
+   (load-system :vec/paths)
+   (load-system :vec/paths/ttf)
+   (load-sys "xlib.sys")
+   (load-system :xlib :force t)
+   (load-system :xlib/truetype :force t)
+   (let ((*document-multi-file* t))
+    (time (publish (project-documentation)
+           :output #p".stash/api.org"
+           :parent "shed"
+           ;; :info t 
+           :setupfile "../../../clean.theme"))))))
+

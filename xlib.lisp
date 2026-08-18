@@ -1,18 +1,18 @@
 ;;; clx.lisp
 
-;;;			 TEXAS INSTRUMENTS INCORPORATED
-;;;				  P.O. BOX 2909
-;;;			       AUSTIN, TEXAS 78769
+;;			 TEXAS INSTRUMENTS INCORPORATED
+;;				  P.O. BOX 2909
+;;			       AUSTIN, TEXAS 78769
 
-;;; Copyright (C) 1987 Texas Instruments Incorporated.
+;; Copyright (C) 1987 Texas Instruments Incorporated.
 
-;;; Permission is granted to any individual or institution to use, copy, modify,
-;;; and distribute this software, provided that this complete copyright and
-;;; permission notice is maintained, intact, in all copies and supporting
-;;; documentation.
+;; Permission is granted to any individual or institution to use, copy, modify,
+;; and distribute this software, provided that this complete copyright and
+;; permission notice is maintained, intact, in all copies and supporting
+;; documentation.
 
-;;; Texas Instruments Incorporated provides this software "as is" without
-;;; express or implied warranty.
+;; Texas Instruments Incorporated provides this software "as is" without
+;; express or implied warranty.
 
 ;; Primary Interface Author:
 ;;	Robert W. Scheifler
@@ -45,34 +45,37 @@
 ;;	Chris Lindblad, MIT
 ;;	Robert Scheifler, MIT
 
-;;; Change history:
+;;; Commentary:
 
-;;;  Date	Author		Description
-;;; -------------------------------------------------------------------------------------
-;;; 04/07/87	R.Scheifler	Created code stubs
-;;; 04/08/87	L.Oren		Started Implementation
-;;; 05/11/87	L.Oren		Included draft 3 revisions
-;;; 07/07/87	L.Oren		Untested alpha release to MIT
-;;; 07/17/87	L.Oren		Alpha release
-;;; 08/**/87	C.Lindblad	Rewrite of buffer code
-;;; 08/**/87	et al		Various random bug fixes
-;;; 08/**/87	R.Scheifler	General syntactic and portability cleanups
-;;; 08/**/87	R.Scheifler	Rewrite of gcontext caching and shadowing
-;;; 09/02/87	L.Oren		Change events from resource-ids to objects
-;;; 12/24/87	R.Budzianowski	KCL support
-;;; 12/**/87	J.Irwin		ExCL 2.0 support
-;;; 01/20/88	L.Oren		Add server extension mechanisms
-;;; 01/20/88	L.Oren		Only force output when blocking on input
-;;; 01/20/88	L.Oren		Uniform support for :event-window on events
-;;; 01/28/88	L.Oren		Add window manager property functions
-;;; 01/28/88	L.Oren		Add character translation facility
-;;; 02/**/87	J.Irwin		Allegro 2.2 support
+;;;; Change history:
 
-;;; This is considered a somewhat changeable interface. Discussion of better
-;;; integration with CLOS, support for user-specified subclassess of basic
-;;; objects, and the additional functionality to match the C Xlib is still in
-;;; progress. Bug reports should be addressed to bug-clx@expo.lcs.mit.edu.
+;;  Date	Author		Description
+;; -------------------------------------------------------------------------------------
+;; 04/07/87	R.Scheifler	Created code stubs
+;; 04/08/87	L.Oren		Started Implementation
+;; 05/11/87	L.Oren		Included draft 3 revisions
+;; 07/07/87	L.Oren		Untested alpha release to MIT
+;; 07/17/87	L.Oren		Alpha release
+;; 08/**/87	C.Lindblad	Rewrite of buffer code
+;; 08/**/87	et al		Various random bug fixes
+;; 08/**/87	R.Scheifler	General syntactic and portability cleanups
+;; 08/**/87	R.Scheifler	Rewrite of gcontext caching and shadowing
+;; 09/02/87	L.Oren		Change events from resource-ids to objects
+;; 12/24/87	R.Budzianowski	KCL support
+;; 12/**/87	J.Irwin		ExCL 2.0 support
+;; 01/20/88	L.Oren		Add server extension mechanisms
+;; 01/20/88	L.Oren		Only force output when blocking on input
+;; 01/20/88	L.Oren		Uniform support for :event-window on events
+;; 01/28/88	L.Oren		Add window manager property functions
+;; 01/28/88	L.Oren		Add character translation facility
+;; 02/**/87	J.Irwin		Allegro 2.2 support
 
+;; This is considered a somewhat changeable interface. Discussion of better
+;; integration with CLOS, support for user-specified subclassess of basic
+;; objects, and the additional functionality to match the C Xlib is still in
+;; progress. Bug reports should be addressed to bug-clx@expo.lcs.mit.edu.
+
+;;; Code:
 ;; Note: all of the following is in the package XLIB.
 (in-package :xlib)
 (pushnew :xlib *features*)
@@ -810,7 +813,7 @@
   (make-mumble-equal drawable))
 
 ;;; Event-mask encode/decode functions
-;;;    Converts from keyword-lists to integer and back
+;;    Converts from keyword-lists to integer and back
 (defun encode-mask (key-vector key-list key-type)
   ;; KEY-VECTOR is a vector containg bit-position keywords. The
   ;; position of the keyword in the vector indicates its bit position

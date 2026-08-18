@@ -1,4 +1,4 @@
-;;; ~/comp/shed/xlib/xlib.sys --- XLIB Sytem Definitions
+;;; xlib.sys --- XLIB Sytem Definitions
 (defsys :xlib
  "An implementation of the X Window System protocol in Lisp."
  :version "0.7.7"
@@ -54,9 +54,7 @@ rendering using XLIB and XRender extension."
    (#:xlib 
     #:obj
     #:dat
-    #:vec
-    #:vec/paths/ttf
-    #:vec/aa)
+    #:vec)
    :components ((:file "truetype")))
   (:tests
    :require (:rt :xlib :xlib/truetype)

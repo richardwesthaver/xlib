@@ -1,4 +1,6 @@
 ;;; common.lisp --- code moved from "dependent" files that has been unified
+
+;;; Code:
 (in-package :xlib)
 
 ;;; BUFFER-READ-DEFAULT - read data from the X stream

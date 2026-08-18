@@ -38,6 +38,8 @@
 ;;	lisps will have problems. Fortunately, most other lisps don't care,
 ;;	because they don't run in a multi-processing shared-address space
 ;;	environment.
+
+;;; Code:
 (in-package :xlib)
 
 ;; GContext state accessors

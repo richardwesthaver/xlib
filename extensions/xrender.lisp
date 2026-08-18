@@ -99,17 +99,17 @@
           render-free-glyphs))
 
 (define-extension "RENDER")
-;;; X-RenderQueryVersion will always return the highest version it supports
-;;; which is no higher than requested client version. For example:
+;; X-RenderQueryVersion will always return the highest version it supports
+;; which is no higher than requested client version. For example:
 
-;;; server version: 0.11; client version: 0.10; answer: 0.10
-;;; server version: 0.11; client version: 0.12; answer: 0.11
-;;; server version: 0.11; client version: 0.1; answer: 0.1
-;;; server version: 0.11; client version: 1.0; answer: 0.11
+;; server version: 0.11; client version: 0.10; answer: 0.10
+;; server version: 0.11; client version: 0.12; answer: 0.11
+;; server version: 0.11; client version: 0.1; answer: 0.1
+;; server version: 0.11; client version: 1.0; answer: 0.11
 (defconstant +X-client-major-version+ 0)
 (defconstant +X-client-minor-version+ 10)
 
-;;;; Request constants
+;;; Request constants
 (defconstant +X-RenderQueryVersion+              0) ;done
 (defconstant +X-RenderQueryPictFormats+          1)
 (defconstant +X-RenderQueryPictIndexValues+      2) ;0.7
@@ -136,19 +136,19 @@
 (defconstant +X-RenderCompositeGlyphs8+         23) ;done
 (defconstant +X-RenderCompositeGlyphs16+        24) ;done
 (defconstant +X-RenderCompositeGlyphs32+        25) ;done
-;;; >= 0.1
+;; >= 0.1
 (defconstant +X-RenderFillRectangles+           26) ;single rectangle version done
-;;; >= 0.5
+;; >= 0.5
 (defconstant +X-RenderCreateCursor+             27)
-;;; >= 0.6
+;; >= 0.6
 (defconstant +X-RenderSetPictureTransform+      28) ;done (transforms picture used)
 (defconstant +X-RenderQueryFilters+             29) ;some work done, needs more
 (defconstant +X-RenderSetPictureFilter+         30) ;some work done, needs more
-;;; >= 0.8
+;; >= 0.8
 (defconstant +X-RenderCreateAnimCursor+         31)
-;;; >= 0.9
+;; >= 0.9
 (defconstant +X-RenderAddTraps+                 32)
-;;; >= 0.10
+;; >= 0.10
 (defconstant +X-RenderCreateSolidFill+          33)
 (defconstant +X-RenderCreateLinearGradient+     34)
 (defconstant +X-RenderCreateRadialGradient+     35)
@@ -165,7 +165,7 @@
 (defconstant +PictTypeIndexed+ 0)
 (defconstant +PictTypeDirect+  1)
 
-;;; Operators (implemented with keywrods and member8-get)
+;;; Operators (implemented with keywords and member8-get)
 (defconstant +PictOpClear+                       0)
 (defconstant +PictOpSrc+                         1)
 (defconstant +PictOpDst+                         2)
@@ -180,7 +180,7 @@
 (defconstant +PictOpXor+                        11)
 (defconstant +PictOpAdd+                        12)
 (defconstant +PictOpSaturate+                   13)
-;;; >= 0.2
+;; >= 0.2
 (defconstant +PictOpDisjointClear+            #x10)
 (defconstant +PictOpDisjointSrc+              #x11)
 (defconstant +PictOpDisjointDst+              #x12)
@@ -1121,7 +1121,6 @@ by every function, which attempts to generate RENDER requests."
       ((sequence :format card32 :start start :end end) glyphs))))
 
 #||
-;;; --------------------------------------------------------------------------------
 
 ;; testing code:
 
@@ -1215,7 +1214,7 @@ by every function, which attempts to generate RENDER requests."
            (display-finish-output dpy))
       (close-display dpy))))
 
-;;; ----------------------------------------------------------------------------------------------------
+;; ----------------------------------------------------------------------------------------------------
 
 (defun y (op)
   (let ((dpy (open-display "")))
@@ -1271,7 +1270,7 @@ by every function, which attempts to generate RENDER requests."
     (close-display dpy)))
 ||#
 
-;;;; Cursors
+;;; Cursors
 (defun render-create-cursor (picture &optional (x 0) (y 0))
   (let ((display (picture-display picture)))
     (ensure-render-initialized display)
